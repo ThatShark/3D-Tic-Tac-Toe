@@ -11,6 +11,7 @@ public class GameManager : MonoBehaviour {
     private Player currentTurn, winner = Player.Neither;
     private int[,,] board = new int[5, 5, 5];
 
+
     void Start() {
         currentTurn = Player.O;
         ResetScene();
@@ -58,9 +59,21 @@ public class GameManager : MonoBehaviour {
     }
 
     public bool IsMoveComplete() {
-        return false;
+        if (Input.GetMouseButtonDown(0)) {
+            if(IsEffectiveInput()) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 
+    // 檢查是否有效的輸入(沒有實例我不知道要怎麼輸入)
+    public bool IsEffectiveInput() {
+        return true;
+    }
 
     public void ResetScene() {
         winner = Player.Neither;
