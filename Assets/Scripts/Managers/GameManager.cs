@@ -9,7 +9,7 @@ public class GameManager : MonoBehaviour {
         Neither
     }
     private Player currentTurn, winner = Player.Neither;
-    private int[,,] board = new int[7, 7, 7];
+    private int[,,] board = new int[5, 5, 5];
 
     void Start() {
         currentTurn = Player.O;
@@ -38,26 +38,6 @@ public class GameManager : MonoBehaviour {
     }
 
     public bool SomeoneHasWin() {
-        bool someoneHasWin = false;
-        return someoneHasWin;
-    }
-
-    public bool IsMoveComplete() {
-        return false;
-    }
-
-
-    public void ResetScene() {
-        winner = Player.Neither;
-        board = new int[7, 7, 7];
-    }
-
-    public void AgainOrQuit() {
-
-    }
-
-
-    public bool CheckWin(char player) {
         int vs = 0;
         // 檢查每層、列、行以及對角線
         for (int i = 0; i < 5; i++) {
@@ -76,6 +56,21 @@ public class GameManager : MonoBehaviour {
             return false;
         }
     }
+
+    public bool IsMoveComplete() {
+        return false;
+    }
+
+
+    public void ResetScene() {
+        winner = Player.Neither;
+        board = new int[5, 5, 5];
+    }
+
+    public void AgainOrQuit() {
+
+    }
+
 
     // 檢查某一層是否有玩家獲勝
     private int CheckLayer(int layer) {

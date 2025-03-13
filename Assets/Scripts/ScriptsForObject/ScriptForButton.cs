@@ -13,5 +13,8 @@ public class ScriptForButton : MonoBehaviour{
         EditorApplication.isPlaying = false;
         Application.Quit();
     }
+
+    public void Skill () {
+        
+    }
 }
-// 且慢
