@@ -389,6 +389,7 @@ GameObject:
   - component: {fileID: 292478701}
   - component: {fileID: 292478700}
   - component: {fileID: 292478703}
+  - component: {fileID: 292478704}
   m_Layer: 5
   m_Name: StatisticsButton
   m_TagString: Untagged
@@ -460,8 +461,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 292478703}
-        m_TargetAssemblyTypeName: SwitchScene, Assembly-CSharp
+      - m_Target: {fileID: 292478704}
+        m_TargetAssemblyTypeName: ScriptForButton, Assembly-CSharp
         m_MethodName: SwitchSceneTo
         m_Mode: 3
         m_Arguments:
@@ -520,6 +521,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b7c482acd8d521946880e81cc54418d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &292478704
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 292478698}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aebc296da78b6cb4189ab6e5d3277686, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &296657933
@@ -1068,6 +1081,7 @@ GameObject:
   - component: {fileID: 1668067934}
   - component: {fileID: 1668067933}
   - component: {fileID: 1668067932}
+  - component: {fileID: 1668067936}
   m_Layer: 5
   m_Name: QuitButton
   m_TagString: Untagged
@@ -1151,9 +1165,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1668067932}
-        m_TargetAssemblyTypeName: QuitGame, Assembly-CSharp
-        m_MethodName: Quit
+      - m_Target: {fileID: 1668067936}
+        m_TargetAssemblyTypeName: ScriptForButton, Assembly-CSharp
+        m_MethodName: QuitGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1201,6 +1215,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1668067930}
   m_CullTransparentMesh: 1
+--- !u!114 &1668067936
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1668067930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aebc296da78b6cb4189ab6e5d3277686, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1702820149
 GameObject:
   m_ObjectHideFlags: 0
@@ -1350,6 +1376,7 @@ GameObject:
   - component: {fileID: 1718267936}
   - component: {fileID: 1718267935}
   - component: {fileID: 1718267938}
+  - component: {fileID: 1718267939}
   m_Layer: 5
   m_Name: StartButton
   m_TagString: Untagged
@@ -1421,8 +1448,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1718267938}
-        m_TargetAssemblyTypeName: SwitchScene, Assembly-CSharp
+      - m_Target: {fileID: 1718267939}
+        m_TargetAssemblyTypeName: ScriptForButton, Assembly-CSharp
         m_MethodName: SwitchSceneTo
         m_Mode: 3
         m_Arguments:
@@ -1481,6 +1508,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b7c482acd8d521946880e81cc54418d4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1718267939
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1718267933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aebc296da78b6cb4189ab6e5d3277686, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &1981334568
