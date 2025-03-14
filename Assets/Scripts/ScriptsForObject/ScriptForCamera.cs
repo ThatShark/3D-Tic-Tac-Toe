@@ -3,8 +3,8 @@ using UnityEngine;
 public class ScriptForCamera : MonoBehaviour {
     public Transform target; // 旋轉中心目標
     private Camera c;
-    public int maxView = 120;
-    public int minView = 10;
+    public int maxView = 120; // 最大縮放距離
+    public int minView = 10; // 最小縮放距離
     private float slideSpeed = 20f;
 
     private void Start() {
@@ -18,7 +18,7 @@ public class ScriptForCamera : MonoBehaviour {
             transform.RotateAround(target.transform.position, Vector3.up, mouseX * 5);
             transform.RotateAround(target.transform.position, transform.right, mouseY * 5);
         }
-
+// 我剛剛有ㄒ
         float mouseCenter = Input.GetAxis("Mouse ScrollWheel");
         if (mouseCenter < 0) { // 滾輪縮小
             if (c.fieldOfView <= maxView) {
