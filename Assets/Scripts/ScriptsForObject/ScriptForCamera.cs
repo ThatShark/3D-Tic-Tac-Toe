@@ -54,42 +54,16 @@ public class ScriptForCamera : MonoBehaviour {
 
 
     #region shark
-    // 固定camera與正中央的距離
-    // public Transform middleCube;
-    // float offsetZ = 2f, offsetY = 1f;
-
-    // void Start() {
-    //     transform.rotation = Quaternion.identity;
-    //     Vector3 pos = middleCube.position;
-    //     pos.z -= offsetZ; // 後退 offsetZ 的距離
-    //     transform.position = pos;
-    // }
-
-    // // 旋轉camera
-    // void Update() {
-    //     float mouse_dx = Input.GetAxis("Mouse X");
-    //     float mouse_dy = Input.GetAxis("Mouse Y");
-    //     if (Input.GetMouseButton(0)) {
-    //         if (Mathf.Abs(mouse_dx) > 0 || Mathf.Abs(mouse_dy) > 0) {
-    //             // 獲取camera的歐拉角  
-    //             Vector3 currentCameraAngle = transform.rotation.eulerAngles;
-
-    //             currentCameraAngle.x = Mathf.Repeat(currentCameraAngle.x + 180f, 360f) - 180f; // 永遠在 0 ~ 180
-    //             currentCameraAngle.y += mouse_dx; // unity Y軸，往右為正，往左為負
-    //             currentCameraAngle.x -= mouse_dy; // unity X軸，往上為負，往下為正
-
-    //             Quaternion cameraRotation = Quaternion.identity;
-    //             cameraRotation.eulerAngles = new Vector3(currentCameraAngle.x, currentCameraAngle.y, 0);
-    //             transform.rotation = cameraRotation;
-
-    //             // 重制camera位置
-    //             Vector3 middlePosition = middleCube.position;
-    //             Vector3 distance = cameraRotation * new Vector3(0f, 0f, offsetZ);
-    //             transform.position = middlePosition - distance;
-
-    //         }
-    //     }
-
-    // }
+    public Transform target; // 旋轉中心目標
+    private float mouse_x;
+    private float mouse_y;
+    private void LateUpdate() {
+        float mouse_x = Input.GetAxis("Mouse X"); // 獲取鼠標X軸增加量
+        float mouse_y = -Input.GetAxis("Mouse Y"); // 獲取鼠標Y軸增加量
+        if (Input.GetMouseButton(1)) { 
+            transform.RotateAround(target.transform.position, Vector3.up, mouse_x * 5); 
+            transform.RotateAround(target.transform.position, transform.right, mouse_y * 5); 
+        } 
+    }
     #endregion
 }
