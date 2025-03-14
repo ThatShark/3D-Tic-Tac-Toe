@@ -77,13 +77,12 @@ public class GameManager : MonoBehaviour {
     }
 
     public GameObject myPrefab;
-    public int cubeWidth = 6;
     public void ResetScene() {
         winner = Player.Neither;
         board = new int[5, 5, 5]; 
-        for (int x = -cubeWidth; x <= cubeWidth; x += cubeWidth) {
-            for (int y = -cubeWidth; y <= cubeWidth; y += cubeWidth) {
-                for (int z = -cubeWidth; z <= cubeWidth; z += cubeWidth) {
+        for (int x = -7; x <= 7; x += 7) {
+            for (int y = -7; y <= 7; y += 7) {
+                for (int z = -7; z <= 7; z += 7) {
                     Instantiate(myPrefab, new Vector3(x, y, z), Quaternion.identity);
                 }
             }  //妳PUSH遺下 我要try個東西
