@@ -3,8 +3,8 @@ using UnityEngine;
 public class ScriptForCamera : MonoBehaviour {
     public Transform target; // 旋轉中心目標
     private Camera c;
-    public int maxView = 120; // 最大縮放距離
-    public int minView = 10; // 最小縮放距離
+    public int maxView = 90; // 最大縮放距離
+    public int minView = 50; // 最小縮放距離
     public float testView;
     private float slideSpeed = 20f;
 
