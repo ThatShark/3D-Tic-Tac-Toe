@@ -3,7 +3,7 @@ Shader "Unlit/CubeOutline"
     Properties
     {
         _Color("Color", color) = (1,1,1,1)
-        _Width("Width", range(0,0.5)) = 0.1
+        _Width("Width", range(0,0.5)) = 0.01
     }
     SubShader
     {
@@ -40,17 +40,17 @@ Shader "Unlit/CubeOutline"
             }
             
             float4 frag(v2f i) : SV_Target {
-                fixed4 col = fixed4(0,0,0,0); // ³]¬°§¹¥þ³z©ú
+                fixed4 col = fixed4(0,0,0,0); // ï¿½]ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½zï¿½ï¿½
                 
-                // ­pºâÃä®Ø
+                // ï¿½pï¿½ï¿½ï¿½ï¿½ï¿½
                 float border = saturate(
                     step(i.uv.x, _Width) + step(1 - _Width, i.uv.x) +
                     step(i.uv.y, _Width) + step(1 - _Width, i.uv.y)
                 );
                 
-                // ¥u¦³Ãä®Ø³¡¤ÀÅã¥ÜÃC¦â¡A¨ä¾l³¡¤À³z©ú
+                // ï¿½uï¿½ï¿½ï¿½ï¿½Ø³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Cï¿½ï¿½Aï¿½ï¿½lï¿½ï¿½ï¿½ï¿½ï¿½zï¿½ï¿½
                 col.rgb = _Color.rgb * border;
-                col.a = border; // Ãä®Ø³¡¤À¤£³z©ú¡A¨ä¥L³¡¤À³z©ú
+                col.a = border; // ï¿½ï¿½Ø³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½zï¿½ï¿½ï¿½Aï¿½ï¿½Lï¿½ï¿½ï¿½ï¿½ï¿½zï¿½ï¿½
                 
                 return col;
             }

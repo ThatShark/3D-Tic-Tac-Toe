@@ -1,6 +1,7 @@
 using System;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour {
     public enum Player {
@@ -75,9 +76,18 @@ public class GameManager : MonoBehaviour {
         return true;
     }
 
+    public GameObject myPrefab;
+    public int cubeWidth = 6;
     public void ResetScene() {
         winner = Player.Neither;
-        board = new int[5, 5, 5];
+        board = new int[5, 5, 5]; 
+        for (int x = -cubeWidth; x <= cubeWidth; x += cubeWidth) {
+            for (int y = -cubeWidth; y <= cubeWidth; y += cubeWidth) {
+                for (int z = -cubeWidth; z <= cubeWidth; z += cubeWidth) {
+                    Instantiate(myPrefab, new Vector3(x, y, z), Quaternion.identity);
+                }
+            }  //妳PUSH遺下 我要try個東西
+        }
     }
 
     public void AgainOrQuit() {
