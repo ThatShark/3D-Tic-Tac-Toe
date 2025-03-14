@@ -7,19 +7,37 @@ public class ScriptForCamera : MonoBehaviour {
     public int minView = 50; // 最小縮放距離
     private float slideSpeed = 20f;
 
-    private void Start() {
-        c = this.GetComponent<Camera>();
+    private float currentPitch = 0f; // 記錄垂直旋轉角度
+    private float currentYaw = 0f; // 記錄水平旋轉角度
 
-    }
-    private void LateUpdate() {
+    private float distanceToTarget; // 相機與目標之間的距離
+
+    private void Start() {
         transform.LookAt(target);
-        float mouseX = Input.GetAxis("Mouse X"); // 獲取鼠標X軸增加量
-        float mouseY = -Input.GetAxis("Mouse Y"); // 獲取鼠標Y軸增加量
-        if (Input.GetMouseButton(1)) { // 右鍵轉動
-            QuaternionRotateAround(target.transform.position, Vector3.up, mouseX * 5);
-            QuaternionRotateAround(target.transform.position, Vector3.right, mouseY * 5);
+        c = this.GetComponent<Camera>();
+        c.fieldOfView = 80f;
+        distanceToTarget = Vector3.Distance(transform.position, target.position);
+    }
+
+    private void LateUpdate() {
+        float mouseX = Input.GetAxis("Mouse X"); // 獲取鼠標X軸增量
+        float mouseY = -Input.GetAxis("Mouse Y"); // 獲取鼠標Y軸增量
+
+        if (Input.GetMouseButton(1)) { // 右鍵旋轉
+            // 更新水平和垂直旋轉角度
+            currentYaw += mouseX * 5f; // 水平旋轉
+            currentPitch -= mouseY * 5f; // 垂直旋轉
+            currentPitch = Mathf.Clamp(currentPitch, -85f, 85f); // 限制垂直旋轉角度
+
+            // 計算新的相機位置並更新
+            Quaternion rotation = Quaternion.Euler(currentPitch, currentYaw, 0);
+            Vector3 direction = rotation * Vector3.back; // 使用 `Vector3.back` 來定義從相機到目標的方向
+            transform.position = target.position + direction * distanceToTarget; // 根據距離調整相機位置
+
+            transform.LookAt(target); // 讓相機始終指向目標
         }
 
+        // 滾輪縮放
         float mouseCenter = Input.GetAxis("Mouse ScrollWheel");
         if (mouseCenter < 0) { // 滾輪縮小
             if (c.fieldOfView <= maxView) {
@@ -30,15 +48,5 @@ public class ScriptForCamera : MonoBehaviour {
                 c.fieldOfView -= 10 * slideSpeed * Time.deltaTime;
             }
         }
-    }
-
-    void QuaternionRotateAround(Vector3 center, Vector3 axis, float angle) {
-        Vector3 pos = transform.position;
-        Quaternion rot = Quaternion.AngleAxis(angle, axis);
-        Vector3 dir = pos - center; // 計算從圓心指向camera的朝向向量
-        dir = rot * dir; // 旋轉此向量 
-        transform.position = center + dir; // 移動camera位置 
-        var myRot = transform.rotation;
-        transform.rotation *= Quaternion.Inverse(myRot) * rot * myRot; // 設置角度
     }
 }

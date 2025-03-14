@@ -85,7 +85,7 @@ public class GameManager : MonoBehaviour {
                 for (int z = -7; z <= 7; z += 7) {
                     Instantiate(myPrefab, new Vector3(x, y, z), Quaternion.identity);
                 }
-            }  //妳PUSH遺下 我要try個東西
+            }
         }
     }
 
