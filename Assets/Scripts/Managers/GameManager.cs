@@ -113,6 +113,7 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+
     public bool IsMoveComplete() {
         foreach (KeyCode key in new KeyCode[] {
             KeyCode.W, KeyCode.A, KeyCode.S, KeyCode.Q, 
@@ -194,13 +195,13 @@ public class GameManager : MonoBehaviour {
     }
 
     void SetLayerNotActive(int y1, int y2) {
-        for (int i = 1; i <= 3; i++) {
-            for (int k = 1; k <= 3; k++) {
-                if (cubeBoard[i, y1, k].activeSelf) {
-                    cubeBoard[i, y1, k].SetActive(false);
+        for (int x = 1; x <= 3; x++) {
+            for (int z = 1; z <= 3; z++) {
+                if (cubeBoard[x, y1, z].activeSelf) {
+                    cubeBoard[x, y1, z].SetActive(false);
                 }
-                if (cubeBoard[i, y2, k].activeSelf) {
-                    cubeBoard[i, y2, k].SetActive(false);
+                if (cubeBoard[x, y2, z].activeSelf) {
+                    cubeBoard[x, y2, z].SetActive(false);
                 }
             }
         }
