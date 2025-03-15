@@ -11,18 +11,21 @@ public class GameManager : MonoBehaviour {
         X,
         Neither
     }
-    private Player currentTurn, winner = Player.Neither;
+    public Player currentTurn, winner;
 
     void Start() {
         currentTurn = Player.O;
-
         ResetScene();
     }
 
+    public GameObject OCanvas, XCanvas, endScene, OWinText, XWinText;
     void Update() {
         switch (currentTurn) {
             case Player.Neither:
-                AgainOrQuit();
+                OCanvas.SetActive(false);
+                XCanvas.SetActive(false);
+                endScene.SetActive(true);
+                ((winner == Player.O) ? XWinText : OWinText).SetActive(false);
                 break;
             default:
                 CheckIfNextTurn();
@@ -34,10 +37,100 @@ public class GameManager : MonoBehaviour {
         if (SomeoneHasWin()) {
             currentTurn = Player.Neither;
         } else if (IsMoveComplete()) {
-            currentTurn = (currentTurn == Player.O) ? Player.X : Player.O;
+            if (currentTurn == Player.O) {
+                currentTurn = Player.X;
+                OCanvas.SetActive(false);
+                XCanvas.SetActive(true);
+            } else {
+                currentTurn = Player.O;
+                OCanvas.SetActive(true);
+                XCanvas.SetActive(false);
+            }
         } else {
             int nowTurn = (currentTurn == Player.O) ? 1 : -1;
         }
+    }
+
+    
+
+    public bool IsMoveComplete() {
+        foreach (KeyCode key in new KeyCode[] {
+            KeyCode.Alpha0, KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3, KeyCode.Alpha4,
+            KeyCode.Alpha5, KeyCode.Alpha6, KeyCode.Alpha7, KeyCode.Alpha8, KeyCode.Alpha9,
+            
+            KeyCode.Keypad1, KeyCode.Keypad2, KeyCode.Keypad3, KeyCode.Keypad4, KeyCode.Keypad5,
+            KeyCode.Keypad6, KeyCode.Keypad7, KeyCode.Keypad8, KeyCode.Keypad9, KeyCode.Keypad0,
+            
+            KeyCode.W, KeyCode.A, KeyCode.S, KeyCode.Q, 
+            
+            KeyCode.UpArrow, KeyCode.DownArrow, 
+            
+            KeyCode.Escape
+        })  {
+            
+            if (Input.GetKeyDown(key)) {
+                switch (key) {
+                    case KeyCode.Alpha1:
+                    case KeyCode.Alpha2:
+                    case KeyCode.Alpha3:
+                    case KeyCode.Alpha4:
+                    case KeyCode.Alpha5:
+                    case KeyCode.Alpha6:
+                    case KeyCode.Alpha7:
+                    case KeyCode.Alpha8:
+                    case KeyCode.Alpha9:
+                    case KeyCode.Alpha0:
+                    case KeyCode.Keypad1:
+                    case KeyCode.Keypad2:
+                    case KeyCode.Keypad3:
+                    case KeyCode.Keypad4:
+                    case KeyCode.Keypad5:
+                    case KeyCode.Keypad6:
+                    case KeyCode.Keypad7:
+                    case KeyCode.Keypad8:
+                    case KeyCode.Keypad9:
+                    case KeyCode.Keypad0:
+                    case KeyCode.W:
+                    case KeyCode.A:
+                    case KeyCode.S:
+                    case KeyCode.Q:
+                    case KeyCode.UpArrow:
+                    case KeyCode.DownArrow:
+                    case KeyCode.Escape:
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        }
+            return false;
+    }
+    
+    public GameObject myPrefab;
+    private int[,,] board = new int[5, 5, 5];
+    private GameObject[,,] cubeBoard = new GameObject[5, 5, 5]; // 座標[7*(i-2), 7*(j-2), 7*(k-2)]
+    public void ResetScene() {
+        endScene.SetActive(false);
+        OCanvas.SetActive(true);
+        XCanvas.SetActive(false);
+        currentTurn = Player.O;
+        winner = Player.Neither;
+
+        board = new int[5, 5, 5]; 
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
+                for (int k = 0; k < 5; k++) {
+                    cubeBoard[i,j,k] = myPrefab;
+                }
+            }
+        }
+        for (int x = -7; x <= 7; x += 7) {
+            for (int y = -7; y <= 7; y += 7) {
+                for (int z = -7; z <= 7; z += 7) {
+                    Instantiate(myPrefab, new Vector3(x, y, z), Quaternion.identity);
+                }
+            }
+        } 
     }
 
     public bool SomeoneHasWin() {
@@ -59,30 +152,6 @@ public class GameManager : MonoBehaviour {
             return false;
         }
     }
-
-    public bool IsMoveComplete() {
-        ㄑㄛ
-        return false;
-    }
-    public GameObject myPrefab;
-    private int[,,] board = new int[5, 5, 5];
-    private GameObject[,,] cubeBoard = new GameObject[5, 5, 5]; // 座標[7*(i-2), 7*(j-2), 7*(k-2)]
-    public void ResetScene() {
-        winner = Player.Neither;
-        board = new int[5, 5, 5]; 
-        for (int x = -7; x <= 7; x += 7) {
-            for (int y = -7; y <= 7; y += 7) {
-                for (int z = -7; z <= 7; z += 7) {
-                    Instantiate(myPrefab, new Vector3(x, y, z), Quaternion.identity);
-                }
-            }
-        }
-    }
-
-    public void AgainOrQuit() {
-
-    }
-
 
     // 檢查某一層是否有玩家獲勝
     private int CheckLayer(int layer) {
