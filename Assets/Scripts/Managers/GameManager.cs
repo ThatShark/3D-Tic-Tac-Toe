@@ -1,7 +1,9 @@
 using System;
 using Unity.VisualScripting;
+using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 public class GameManager : MonoBehaviour {
     public enum Player {
@@ -13,6 +15,7 @@ public class GameManager : MonoBehaviour {
 
     void Start() {
         currentTurn = Player.O;
+
         ResetScene();
     }
 
@@ -58,26 +61,19 @@ public class GameManager : MonoBehaviour {
     }
 
     public bool IsMoveComplete() {
-        return false;   
+        ㄑㄛ
+        return false;
     }
-
     public GameObject myPrefab;
     private int[,,] board = new int[5, 5, 5];
     private GameObject[,,] cubeBoard = new GameObject[5, 5, 5]; // 座標[7*(i-2), 7*(j-2), 7*(k-2)]
     public void ResetScene() {
         winner = Player.Neither;
         board = new int[5, 5, 5]; 
-        for (int x = 0; x <= 4; x++) {
-            for (int y = 0; y <= 4; y++) {
-                for (int z = 0; z <= 4; z++) {
-                    cubeBoard[x, y, z] = myPrefab;
-                }
-            }
-        }
-        for (int x = -1; x <= 1; x++) {
-            for (int y = -1; y <= 1; y++) {
-                for (int z = -1; z <= 1; z++) {
-                    Instantiate(myPrefab, new Vector3(7*x, 7*y, 7*z), Quaternion.identity);
+        for (int x = -7; x <= 7; x += 7) {
+            for (int y = -7; y <= 7; y += 7) {
+                for (int z = -7; z <= 7; z += 7) {
+                    Instantiate(myPrefab, new Vector3(x, y, z), Quaternion.identity);
                 }
             }
         }
@@ -95,12 +91,12 @@ public class GameManager : MonoBehaviour {
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 3; j++) {
                 // 檢查行
-                if (Mathf.Abs(board[layer, i, j] + board[layer, i, j+1] + board[layer, i, j+2]) == 3) {
+                if (Mathf.Abs(board[layer, i, j] + board[layer, i, j + 1] + board[layer, i, j + 2]) == 3) {
                     vs += board[layer, i, j];
                 }
-                
+
                 // 檢查列
-                if (Mathf.Abs(board[layer, j, i] + board[layer, j+1, i] + board[layer, j+2, i]) == 3) {
+                if (Mathf.Abs(board[layer, j, i] + board[layer, j + 1, i] + board[layer, j + 2, i]) == 3) {
                     vs += board[layer, j, i];
                 }
             }
@@ -108,12 +104,12 @@ public class GameManager : MonoBehaviour {
 
         // 檢查對角線
         for (int i = 0; i < 3; i++) {
-            if (Mathf.Abs(board[layer, i, i] + board[layer, i+1, i+1] + board[layer, i+2, i+2]) == 3) {
+            if (Mathf.Abs(board[layer, i, i] + board[layer, i + 1, i + 1] + board[layer, i + 2, i + 2]) == 3) {
                 vs += board[layer, i, i];
             }
-            
-            if (Mathf.Abs(board[layer, i, 4-i] + board[layer, i+1, 3-i] + board[layer, i+2, 2-i]) == 3) {
-                vs += board[layer, i, 4-i];
+
+            if (Mathf.Abs(board[layer, i, 4 - i] + board[layer, i + 1, 3 - i] + board[layer, i + 2, 2 - i]) == 3) {
+                vs += board[layer, i, 4 - i];
             }
         }
         return vs;
@@ -126,12 +122,12 @@ public class GameManager : MonoBehaviour {
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 3; j++) {
                 // 檢查行
-                if (Mathf.Abs(board[i, j, col] + board[i, j+1, col] + board[i, j+2, col]) == 3) {
+                if (Mathf.Abs(board[i, j, col] + board[i, j + 1, col] + board[i, j + 2, col]) == 3) {
                     vs += board[i, j, col];
                 }
-                
+
                 // 檢查列
-                if (Mathf.Abs(board[j, i, col] + board[j+1, i, col] + board[j+2, i, col]) == 3) {
+                if (Mathf.Abs(board[j, i, col] + board[j + 1, i, col] + board[j + 2, i, col]) == 3) {
                     vs += board[j, i, col];
                 }
             }
@@ -139,12 +135,12 @@ public class GameManager : MonoBehaviour {
 
         // 檢查對角線
         for (int i = 0; i < 3; i++) {
-            if (Mathf.Abs(board[i, i, col] + board[i+1, i+1, col] + board[i+2, i+2, col]) == 3) {
+            if (Mathf.Abs(board[i, i, col] + board[i + 1, i + 1, col] + board[i + 2, i + 2, col]) == 3) {
                 vs += board[i, i, col];
             }
-            
-            if (Mathf.Abs(board[i, 4-i, col] + board[i+1, 3-i, col] + board[i+2, 2-i, col]) == 3) {
-                vs += board[i, 4-i, col];
+
+            if (Mathf.Abs(board[i, 4 - i, col] + board[i + 1, 3 - i, col] + board[i + 2, 2 - i, col]) == 3) {
+                vs += board[i, 4 - i, col];
             }
         }
         return vs;
@@ -157,12 +153,12 @@ public class GameManager : MonoBehaviour {
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 3; j++) {
                 // 檢查行
-                if (Mathf.Abs(board[i, row, j] + board[i, row, j+1] + board[i, row, j+2]) == 3) {
+                if (Mathf.Abs(board[i, row, j] + board[i, row, j + 1] + board[i, row, j + 2]) == 3) {
                     vs += board[i, row, j];
                 }
-                
+
                 // 檢查列
-                if (Mathf.Abs(board[j, row, i] + board[j+1, row, i] + board[j+2, row, i]) == 3) {
+                if (Mathf.Abs(board[j, row, i] + board[j + 1, row, i] + board[j + 2, row, i]) == 3) {
                     vs += board[j, row, i];
                 }
             }
@@ -170,12 +166,12 @@ public class GameManager : MonoBehaviour {
 
         // 檢查對角線
         for (int i = 0; i < 3; i++) {
-            if (Mathf.Abs(board[i, row, i] + board[i+1, row, i+1] + board[i+2, row, i+2]) == 3) {
+            if (Mathf.Abs(board[i, row, i] + board[i + 1, row, i + 1] + board[i + 2, row, i + 2]) == 3) {
                 vs += board[i, row, i];
             }
-            
-            if (Mathf.Abs(board[i, row, 4-i] + board[i+1, row, 3-i] + board[i+2, row, 2-i]) == 3) {
-                vs += board[i, row, 4-i];
+
+            if (Mathf.Abs(board[i, row, 4 - i] + board[i + 1, row, 3 - i] + board[i + 2, row, 2 - i]) == 3) {
+                vs += board[i, row, 4 - i];
             }
         }
         return vs;
@@ -185,17 +181,17 @@ public class GameManager : MonoBehaviour {
     private int Check3DDiagonals() {
         int vs = 0;
         for (int i = 0; i < 3; i++) {
-            if (Mathf.Abs(board[i, i, i] + board[i+1, i+1, i+1] + board[i+2, i+2, i+2]) == 3) {
+            if (Mathf.Abs(board[i, i, i] + board[i + 1, i + 1, i + 1] + board[i + 2, i + 2, i + 2]) == 3) {
                 vs += board[i, i, i];
             }
-            if (Mathf.Abs(board[i, i, 4-i] + board[i+1, i+1, 3-i] + board[i+2, i+2, 2-i]) == 3) {
-                vs += board[i, i, 4-i];
+            if (Mathf.Abs(board[i, i, 4 - i] + board[i + 1, i + 1, 3 - i] + board[i + 2, i + 2, 2 - i]) == 3) {
+                vs += board[i, i, 4 - i];
             }
-            if (Mathf.Abs(board[i, 4-i, i] + board[i+1, 3-i, i+1] + board[i+2, 2-i, i+2]) == 3) {
-                vs += board[i, 4-i, i];
+            if (Mathf.Abs(board[i, 4 - i, i] + board[i + 1, 3 - i, i + 1] + board[i + 2, 2 - i, i + 2]) == 3) {
+                vs += board[i, 4 - i, i];
             }
-            if (Mathf.Abs(board[4-i, i, i] + board[3-i, i+1, i+1] + board[2-i, i+2, i+2]) == 3) {
-                vs += board[4-i, i, i];
+            if (Mathf.Abs(board[4 - i, i, i] + board[3 - i, i + 1, i + 1] + board[2 - i, i + 2, i + 2]) == 3) {
+                vs += board[4 - i, i, i];
             }
         }
         return vs;
