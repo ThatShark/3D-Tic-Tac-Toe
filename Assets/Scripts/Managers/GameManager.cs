@@ -1,7 +1,9 @@
 using System;
 using Unity.VisualScripting;
+using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 public class GameManager : MonoBehaviour {
     public enum Player {
@@ -91,7 +93,7 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    public void ButtonWasClicked() {
+    public void CubeWasClicked() {
         buttonClicked = true;  // 按鈕被點擊
     }
 
@@ -104,6 +106,10 @@ public class GameManager : MonoBehaviour {
                 for (int z = -7; z <= 7; z += 7) {
                     GameObject EmptyCube = Instantiate(myPrefab, new Vector3(x, y, z), Quaternion.identity);
                     EmptyCube.AddComponent<ButtonClick>();
+                    EmptyCube.name = $"EmptyCube({x}, {y}, {z})";
+
+                    ButtonClick buttonScript = EmptyCube.AddComponent<ButtonClick>(); // 確保有 ButtonClick 腳本
+                    buttonScript.buttonID = $"({x}, {y}, {z})";
                 }
             }
         }
