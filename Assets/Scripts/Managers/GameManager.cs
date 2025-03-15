@@ -10,8 +10,6 @@ public class GameManager : MonoBehaviour {
         Neither
     }
     private Player currentTurn, winner = Player.Neither;
-    private int[,,] board = new int[5, 5, 5];
-
 
     void Start() {
         currentTurn = Player.O;
@@ -60,30 +58,26 @@ public class GameManager : MonoBehaviour {
     }
 
     public bool IsMoveComplete() {
-        if (Input.GetMouseButtonDown(0)) {
-            if(IsEffectiveInput()) {
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            return false;
-        }
-    }
-
-    // 檢查是否有效的輸入(沒有實例我不知道要怎麼輸入)
-    public bool IsEffectiveInput() {
-        return true;
+        return false;   
     }
 
     public GameObject myPrefab;
+    private int[,,] board = new int[5, 5, 5];
+    private GameObject[,,] cubeBoard = new GameObject[5, 5, 5]; // 座標[7*(i-2), 7*(j-2), 7*(k-2)]
     public void ResetScene() {
         winner = Player.Neither;
         board = new int[5, 5, 5]; 
-        for (int x = -7; x <= 7; x += 7) {
-            for (int y = -7; y <= 7; y += 7) {
-                for (int z = -7; z <= 7; z += 7) {
-                    Instantiate(myPrefab, new Vector3(x, y, z), Quaternion.identity);
+        for (int x = 0; x <= 4; x++) {
+            for (int y = 0; y <= 4; y++) {
+                for (int z = 0; z <= 4; z++) {
+                    cubeBoard[x, y, z] = myPrefab;
+                }
+            }
+        }
+        for (int x = -1; x <= 1; x++) {
+            for (int y = -1; y <= 1; y++) {
+                for (int z = -1; z <= 1; z++) {
+                    Instantiate(myPrefab, new Vector3(7*x, 7*y, 7*z), Quaternion.identity);
                 }
             }
         }
