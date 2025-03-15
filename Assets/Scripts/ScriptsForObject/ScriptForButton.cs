@@ -32,13 +32,12 @@ public class ScriptForButton : MonoBehaviour {
         
     }
 
-    
+    private GameManager.Player nowTurn;
     public void SurrenderSkill () {
-        gameManager.winner = ((gameManager.currentTurn == GameManager.Player.O) ? GameManager.Player.X : GameManager.Player.O);
+        gameManager.winner = ((nowTurn == GameManager.Player.O) ? GameManager.Player.X : GameManager.Player.O);
         gameManager.currentTurn = GameManager.Player.Neither;
     }
 
-    private GameManager.Player nowTurn;
     public void Check () {
         nowTurn = gameManager.currentTurn;
         gameManager.currentTurn = GameManager.Player.Checking;

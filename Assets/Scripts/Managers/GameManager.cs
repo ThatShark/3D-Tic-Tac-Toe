@@ -141,45 +141,54 @@ public class GameManager : MonoBehaviour {
                 }
             }
         }
-        // if (Input.GetMouseButtonDown(0)) {
-        //     Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        //     RaycastHit hit;
+        if (Input.GetMouseButtonDown(0)) {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
 
-        //     if (Physics.Raycast(ray, out hit)) {
-        //         GameObject clickedObject = hit.collider.gameObject;
+            if (Physics.Raycast(ray, out hit)) {
+                GameObject clickedArrow = hit.collider.gameObject;
 
-        //         if (clickedObject.name.Contains("Cube")) { 
-        //             Debug.Log("點擊到 Cube：" + clickedObject.name);
-        //         }
-        //     }
-        // }
+                if (clickedArrow.name.Contains("Arrow")) { 
+                    Debug.Log("點擊到 Cube：" + clickedArrow.name);
+                }
+            }
+        }
         return false;
     } 
-
+    private Transform child;
     void SetRowNotActive(int x1, int x2) {
-        for (int j = 1; j <= 3; j++) {
-            for (int k = 1; k <= 3; k++) {
-                if (cubeBoard[x1, j, k].activeSelf) {
-                    cubeBoard[x1, j, k].SetActive(false);
+        int x = 6 - x1 - x2;
+        for (int y = 1; y <= 3; y++) {
+            for (int z = 1; z <= 3; z++) {
+                if (cubeBoard[x1, y, z].activeSelf) {
+                    cubeBoard[x1, y, z].SetActive(false);
                 } 
-                if (cubeBoard[x2, j, k].activeSelf) {
-                    cubeBoard[x2, j, k].SetActive(false);
+                if (cubeBoard[x2, y, z].activeSelf) {
+                    cubeBoard[x2, y, z].SetActive(false);
                 }
+                
+                child = upArrows.transform.Find($"UpArrow_({x}, -1, {z})");
+                child.gameObject.SetActive(true);
             }
         }
         
         
     }
 
-        void SetColumnNotActive(int z1, int z2) {
-        for (int i = 1; i <= 3; i++) {
-            for (int j = 1; j <= 3; j++) {
-                if (cubeBoard[i, j, z1].activeSelf) {
-                    cubeBoard[i, j, z1].SetActive(false);
+    void SetColumnNotActive(int z1, int z2) {
+        int z = 6 - z1 - z2;
+        for (int x = 1; x <= 3; x++) {
+            for (int y = 1; y <= 3; y++) {
+                if (cubeBoard[x, y, z1].activeSelf) {
+                    cubeBoard[x, y, z1].SetActive(false);
                 }
-                if (cubeBoard[i, j, z2].activeSelf) {
-                    cubeBoard[i, j, z2].SetActive(false);
+                if (cubeBoard[x, y, z2].activeSelf) {
+                    cubeBoard[x, y, z2].SetActive(false);
                 }
+            
+        
+                child = upArrows.transform.Find($"UpArrow_({x}, -1, {z})");
+                child.gameObject.SetActive(true);
             }
         }
     }
@@ -207,6 +216,7 @@ public class GameManager : MonoBehaviour {
         }
     }
     public GameObject myPrefab;
+    public GameObject upArrows, downArrows;
     private int[,,] board = new int[5, 5, 5];
     private GameObject[,,] cubeBoard = new GameObject[5, 5, 5]; // 座標[7*(i-2), 7*(j-2), 7*(k-2)]
     private GameObject EmptyCube;
@@ -214,6 +224,13 @@ public class GameManager : MonoBehaviour {
         endScene.SetActive(false);
         OCanvas.SetActive(true);
         XCanvas.SetActive(false);
+        foreach (var arrow in upArrows.GetComponentsInChildren<Transform>()) {
+            arrow.gameObject.SetActive(false);
+        }
+        foreach (var arrow in downArrows.GetComponentsInChildren<Transform>()) {
+            arrow.gameObject.SetActive(false);
+        }
+        
         currentTurn = Player.O;
         winner = Player.Neither;
 
