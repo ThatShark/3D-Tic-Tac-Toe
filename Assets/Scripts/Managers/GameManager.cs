@@ -113,7 +113,7 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-
+    private bool isHoldingTriangle = false;
     public bool IsMoveComplete() {
         foreach (KeyCode key in new KeyCode[] {
             KeyCode.W, KeyCode.A, KeyCode.S, KeyCode.Q, 
@@ -124,9 +124,12 @@ public class GameManager : MonoBehaviour {
         })  {
             
             if (Input.GetKeyDown(key)) {
+                isHoldingTriangle = false;
                 switch (key) {
                     
                     case KeyCode.W:
+                        isHoldingTriangle = true;
+                        return true;
                     case KeyCode.A:
                     case KeyCode.S:
                         return true;
@@ -142,18 +145,18 @@ public class GameManager : MonoBehaviour {
                 }
             }
         }
-        if (Input.GetMouseButtonDown(0)) {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
+        // if (Input.GetMouseButtonDown(0)) {
+        //     Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        //     RaycastHit hit;
 
-            if (Physics.Raycast(ray, out hit)) {
-                GameObject clickedArrow = hit.collider.gameObject;
+        //     if (Physics.Raycast(ray, out hit)) {
+        //         GameObject clickedCube = hit.collider.gameObject;
 
-                if (clickedArrow.name.Contains("Arrow")) { 
-                    Debug.Log("點擊到 Cube：" + clickedArrow.name);
-                }
-            }
-        }
+        //         if (clickedCube.name.Contains("EmptyCube")) { 
+        //             Debug.Log("點擊到 Cube：" + clickedCube.name);
+        //         }
+        //     }
+        // } 
         return false;
     } 
     private Transform child;
@@ -168,8 +171,8 @@ public class GameManager : MonoBehaviour {
                     cubeBoard[x2, y, z].SetActive(false);
                 }
                 
-                child = upArrows.transform.Find($"UpArrow_({x}, -1, {z})");
-                child.gameObject.SetActive(true);
+                // child = upArrows.transform.Find($"UpArrow_({x}, -1, {z})");
+                // child.gameObject.SetActive(true);
             }
         }
         
@@ -188,8 +191,8 @@ public class GameManager : MonoBehaviour {
                 }
             
         
-                child = upArrows.transform.Find($"UpArrow_({x}, -1, {z})");
-                child.gameObject.SetActive(true);
+                // child = upArrows.transform.Find($"UpArrow_({x}, -1, {z})");
+                // child.gameObject.SetActive(true);
             }
         }
     }
