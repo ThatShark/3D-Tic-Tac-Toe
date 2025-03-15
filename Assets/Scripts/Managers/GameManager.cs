@@ -9,25 +9,31 @@ public class GameManager : MonoBehaviour {
     public enum Player {
         O,
         X,
-        Neither
+        Neither,
+        Checking
     }
     public Player currentTurn, winner;
 
-    void Start() {
+    void Start() { 
         currentTurn = Player.O;
         ResetScene();
     }
 
-    public GameObject OCanvas, XCanvas, endScene, OWinText, XWinText;
+    public GameObject OCanvas, XCanvas, endScene, OWinText, XWinText, checkBox;
     void Update() {
         switch (currentTurn) {
+            
             case Player.Neither:
+                checkBox.SetActive(false);
                 OCanvas.SetActive(false);
                 XCanvas.SetActive(false);
                 endScene.SetActive(true);
                 ((winner == Player.O) ? XWinText : OWinText).SetActive(false);
                 break;
+            case Player.Checking:
+                break;
             default:
+                IsNumberPress();
                 CheckIfNextTurn();
                 break;
         }
@@ -51,49 +57,81 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    
+    public UnityEngine.UI.Button surrenderButton;
 
-    public bool IsMoveComplete() {
+    public void IsNumberPress() {
         foreach (KeyCode key in new KeyCode[] {
             KeyCode.Alpha0, KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3, KeyCode.Alpha4,
             KeyCode.Alpha5, KeyCode.Alpha6, KeyCode.Alpha7, KeyCode.Alpha8, KeyCode.Alpha9,
-            
+
             KeyCode.Keypad1, KeyCode.Keypad2, KeyCode.Keypad3, KeyCode.Keypad4, KeyCode.Keypad5,
             KeyCode.Keypad6, KeyCode.Keypad7, KeyCode.Keypad8, KeyCode.Keypad9, KeyCode.Keypad0,
             
+        }) {
+
+            if (Input.GetKeyDown(key)) {
+                AllCubeActive();
+                switch (key) {
+                    case KeyCode.Alpha1:
+                    case KeyCode.Keypad1:
+                        SetRowNotActive(2, 3);
+                        break;
+                    case KeyCode.Alpha2:
+                    case KeyCode.Keypad2:
+                        SetRowNotActive(1, 3);
+                        break;
+                    case KeyCode.Alpha3:
+                    case KeyCode.Keypad3:
+                        SetRowNotActive(1, 2);
+                        break;
+                    case KeyCode.Alpha4:
+                    case KeyCode.Keypad4:
+                        SetColumnNotActive(2, 3);
+                        break;
+                    case KeyCode.Alpha5:
+                    case KeyCode.Keypad5:
+                        SetColumnNotActive(1, 3);
+                        break;
+                    case KeyCode.Alpha6:
+                    case KeyCode.Keypad6:
+                        SetColumnNotActive(1, 2);
+                        break;
+                    case KeyCode.Alpha7:
+                    case KeyCode.Keypad7:
+                        SetLayerNotActive(2, 3);
+                        break;
+                    case KeyCode.Alpha8:
+                    case KeyCode.Keypad8:
+                        SetLayerNotActive(1, 3);
+                        break;
+                    case KeyCode.Alpha9:
+                    case KeyCode.Keypad9:
+                        SetLayerNotActive(1, 2);
+                        break;
+                }
+            }
+        }
+    }
+
+    public bool IsMoveComplete() {
+        foreach (KeyCode key in new KeyCode[] {
             KeyCode.W, KeyCode.A, KeyCode.S, KeyCode.Q, 
             
             KeyCode.UpArrow, KeyCode.DownArrow, 
             
-            KeyCode.Escape
+            KeyCode.Escape, 
         })  {
             
             if (Input.GetKeyDown(key)) {
                 switch (key) {
-                    case KeyCode.Alpha1:
-                    case KeyCode.Alpha2:
-                    case KeyCode.Alpha3:
-                    case KeyCode.Alpha4:
-                    case KeyCode.Alpha5:
-                    case KeyCode.Alpha6:
-                    case KeyCode.Alpha7:
-                    case KeyCode.Alpha8:
-                    case KeyCode.Alpha9:
-                    case KeyCode.Alpha0:
-                    case KeyCode.Keypad1:
-                    case KeyCode.Keypad2:
-                    case KeyCode.Keypad3:
-                    case KeyCode.Keypad4:
-                    case KeyCode.Keypad5:
-                    case KeyCode.Keypad6:
-                    case KeyCode.Keypad7:
-                    case KeyCode.Keypad8:
-                    case KeyCode.Keypad9:
-                    case KeyCode.Keypad0:
+                    
                     case KeyCode.W:
                     case KeyCode.A:
                     case KeyCode.S:
+                        return true;
                     case KeyCode.Q:
+                        surrenderButton.onClick.Invoke();
+                        return false;
                     case KeyCode.UpArrow:
                     case KeyCode.DownArrow:
                     case KeyCode.Escape:
@@ -103,12 +141,75 @@ public class GameManager : MonoBehaviour {
                 }
             }
         }
-            return false;
+        // if (Input.GetMouseButtonDown(0)) {
+        //     Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        //     RaycastHit hit;
+
+        //     if (Physics.Raycast(ray, out hit)) {
+        //         GameObject clickedObject = hit.collider.gameObject;
+
+        //         if (clickedObject.name.Contains("Cube")) { 
+        //             Debug.Log("點擊到 Cube：" + clickedObject.name);
+        //         }
+        //     }
+        // }
+        return false;
+    } 
+
+    void SetRowNotActive(int x1, int x2) {
+        for (int j = 1; j <= 3; j++) {
+            for (int k = 1; k <= 3; k++) {
+                if (cubeBoard[x1, j, k].activeSelf) {
+                    cubeBoard[x1, j, k].SetActive(false);
+                } 
+                if (cubeBoard[x2, j, k].activeSelf) {
+                    cubeBoard[x2, j, k].SetActive(false);
+                }
+            }
+        }
+        
+        
     }
-    
+
+        void SetColumnNotActive(int z1, int z2) {
+        for (int i = 1; i <= 3; i++) {
+            for (int j = 1; j <= 3; j++) {
+                if (cubeBoard[i, j, z1].activeSelf) {
+                    cubeBoard[i, j, z1].SetActive(false);
+                }
+                if (cubeBoard[i, j, z2].activeSelf) {
+                    cubeBoard[i, j, z2].SetActive(false);
+                }
+            }
+        }
+    }
+
+    void SetLayerNotActive(int y1, int y2) {
+        for (int i = 1; i <= 3; i++) {
+            for (int k = 1; k <= 3; k++) {
+                if (cubeBoard[i, y1, k].activeSelf) {
+                    cubeBoard[i, y1, k].SetActive(false);
+                }
+                if (cubeBoard[i, y2, k].activeSelf) {
+                    cubeBoard[i, y2, k].SetActive(false);
+                }
+            }
+        }
+    }
+
+    void AllCubeActive() {
+        for (int x = 1; x <= 3; x++) {
+            for (int y = 1; y <= 3; y++) {
+                for (int z = 1; z <= 3; z++) {
+                    cubeBoard[x, y, z].SetActive(true);
+                }
+            }
+        }
+    }
     public GameObject myPrefab;
     private int[,,] board = new int[5, 5, 5];
     private GameObject[,,] cubeBoard = new GameObject[5, 5, 5]; // 座標[7*(i-2), 7*(j-2), 7*(k-2)]
+    private GameObject EmptyCube;
     public void ResetScene() {
         endScene.SetActive(false);
         OCanvas.SetActive(true);
@@ -116,21 +217,32 @@ public class GameManager : MonoBehaviour {
         currentTurn = Player.O;
         winner = Player.Neither;
 
-        board = new int[5, 5, 5]; 
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 5; j++) {
-                for (int k = 0; k < 5; k++) {
-                    cubeBoard[i,j,k] = myPrefab;
+        for (int x = 0; x < 5; x++) { // 清除舊方塊
+            for (int y = 0; y < 5; y++) {
+                for (int z = 0; z < 5; z++) {
+                    Destroy(cubeBoard[x, y, z]);  
                 }
             }
         }
-        for (int x = -7; x <= 7; x += 7) {
-            for (int y = -7; y <= 7; y += 7) {
-                for (int z = -7; z <= 7; z += 7) {
-                    Instantiate(myPrefab, new Vector3(x, y, z), Quaternion.identity);
+
+        board = new int[5, 5, 5]; 
+        for (int x = 0; x < 5; x++) {
+            for (int y = 0; y < 5; y++) {
+                for (int z = 0; z < 5; z++) {
+                    Vector3 position = new Vector3(7 * (x - 2), 7 * (y - 2), 7 * (z - 2));
+                    EmptyCube = Instantiate(myPrefab, position, Quaternion.identity);
+                    
+                    EmptyCube.SetActive(true); // 先全部建出來
+                    cubeBoard[x, y, z] = EmptyCube; // 存入 cubeBoard 陣列
+                    EmptyCube.name = $"EmptyCube(Clone)_({x}, {y}, {z})";
+
+                    //(1~3, 1~3, 1~3)的 cube 不失活
+                    if (x == 0 || x == 4 || y == 0 || y == 4 || z == 0 || z == 4) {
+                        EmptyCube.SetActive(false);
+                    }
                 }
             }
-        } 
+        }
     }
 
     public bool SomeoneHasWin() {

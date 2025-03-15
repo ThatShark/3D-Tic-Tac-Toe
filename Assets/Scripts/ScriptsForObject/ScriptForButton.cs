@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 public class ScriptForButton : MonoBehaviour {
     public GameManager gameManager;
     void Start() {
-        gameManager = GameObject.Find("GameObject").GetComponent<GameManager>();
+        gameManager = FindFirstObjectByType<GameManager>();
     }
     public void SwitchSceneTo(int sceneNumber) {
         SceneManager.LoadScene(sceneNumber);
@@ -36,5 +36,16 @@ public class ScriptForButton : MonoBehaviour {
     public void SurrenderSkill () {
         gameManager.winner = ((gameManager.currentTurn == GameManager.Player.O) ? GameManager.Player.X : GameManager.Player.O);
         gameManager.currentTurn = GameManager.Player.Neither;
+    }
+
+    private GameManager.Player nowTurn;
+    public void Check () {
+        nowTurn = gameManager.currentTurn;
+        gameManager.currentTurn = GameManager.Player.Checking;
+        gameManager.checkBox.SetActive(true);
+    }
+    public void Cancel () {
+        gameManager.currentTurn = nowTurn;
+        gameManager.checkBox.SetActive(false);
     }
 }
