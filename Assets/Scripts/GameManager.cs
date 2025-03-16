@@ -15,9 +15,11 @@ public class GameManager : MonoBehaviour {
         Checking
     }
     public Player currentTurn, winner;
+    public ScriptForCursor cursorManager;
 
     void Start() {
         currentTurn = Player.O;
+        cursorManager = FindFirstObjectByType<ScriptForCursor>();
         ResetScene();
     }
 
@@ -28,8 +30,8 @@ public class GameManager : MonoBehaviour {
     public GameObject OCube, TriangleCube, XCube;
     void Update() {
         switch (currentTurn) {
-
             case Player.Neither:
+                cursorManager.cursorState = ScriptForCursor.CursorState.Default;
                 checkBox.SetActive(false);
                 OCanvas.SetActive(false);
                 XCanvas.SetActive(false);
@@ -37,8 +39,14 @@ public class GameManager : MonoBehaviour {
                 ((winner == Player.O) ? XWinText : OWinText).SetActive(false);
                 break;
             case Player.Checking:
+                cursorManager.cursorState = ScriptForCursor.CursorState.Default;
                 break;
             default:
+                if (currentTurn == Player.O) {
+                    cursorManager.cursorState = ScriptForCursor.CursorState.O;
+                } else {
+                    cursorManager.cursorState = ScriptForCursor.CursorState.X;
+                }
                 IsNumberPress();
                 CheckIfNextTurn();
                 break;
