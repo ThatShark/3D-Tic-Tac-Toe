@@ -15,22 +15,21 @@ public class GameManager : MonoBehaviour {
         Checking
     }
     public Player currentTurn, winner;
-    public ScriptForCursor cursorManager;
 
     void Start() {
         currentTurn = Player.O;
-        cursorManager = FindFirstObjectByType<ScriptForCursor>();
         ResetScene();
     }
 
     public GameObject OCanvas, XCanvas, endScene, OWinText, XWinText, checkBox;
 
     private int currentNumber = 0;
+
+    public GameObject OCube, TriangleCube, XCube;
     void Update() {
-        
         switch (currentTurn) {
+
             case Player.Neither:
-                cursorManager.cursorState = ScriptForCursor.CursorState.Default;
                 checkBox.SetActive(false);
                 OCanvas.SetActive(false);
                 XCanvas.SetActive(false);
@@ -38,14 +37,8 @@ public class GameManager : MonoBehaviour {
                 ((winner == Player.O) ? XWinText : OWinText).SetActive(false);
                 break;
             case Player.Checking:
-                cursorManager.cursorState = ScriptForCursor.CursorState.Default;
                 break;
             default:
-                if (currentTurn == Player.O) {
-                    cursorManager.cursorState = ScriptForCursor.CursorState.O;
-                } else {
-                    cursorManager.cursorState = ScriptForCursor.CursorState.X;
-                }
                 IsNumberPress();
                 CheckIfNextTurn();
                 break;
@@ -70,7 +63,7 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-
+    public UnityEngine.UI.Button surrenderButton;
 
     public void IsNumberPress() {
         foreach (KeyCode key in new KeyCode[] {
@@ -144,9 +137,6 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    public GraphicRaycaster raycaster;
-    public EventSystem eventSystem;
-    public UnityEngine.UI.Button surrenderButton;
 
     public bool IsMoveComplete() {
         foreach (KeyCode key in new KeyCode[] {
@@ -200,7 +190,7 @@ public class GameManager : MonoBehaviour {
                 GameObject clickedArrow = hit.collider.gameObject;
 
                 if (clickedArrow.name.Contains("Arrow")) {
-                    InputOX(clickedArrow.name);
+                    return InputOX(clickedArrow.name);
                 }
             }
         }
@@ -208,9 +198,169 @@ public class GameManager : MonoBehaviour {
         return false;
     }
 
-    // 輸入O或X
-    void InputOX(string clickedArrow) {
+    private GameObject[,,] OXboard = new GameObject[5, 5, 5];
+    private GameObject tempCube;
 
+    // 輸入O或X
+    private bool InputOX(string clickedArrow) {
+        if(currentNumber == 0) {
+            return false;
+        }
+        int count = 0;
+        for (int i = 1; i <= 3; i++) {
+            for (int k = 1; k <= 3; k++) {
+                if (clickedArrow.Contains($"({i}, -1, {k})")) {
+                    for (int y = 1; y <= 3; y++) {
+                        if (board[i, y, k] != 0) {
+                            count++;
+                        }
+                    }
+                    if (count != 3) {
+                        if (board[i, 1, k] == 0) {
+                            cubeBoard[i, 1, k].SetActive(false);
+                            if (currentTurn == Player.O) {
+                                tempCube = Instantiate(OCube, cubeBoard[i, 1, k].transform.position, Quaternion.identity);
+                                tempCube.SetActive(true);
+                                OXboard[i, 1, k] = tempCube;
+                                board[i, 1, k] = 1;
+                            } else {
+                                tempCube = Instantiate(XCube, cubeBoard[i, 1, k].transform.position, Quaternion.identity);
+                                tempCube.SetActive(true);
+                                OXboard[i, 1, k] = tempCube;
+                                board[i, 1, k] = -1;
+                            }
+                            return true;
+                        } else if (board[i, 1, k] != 0 && board[i, 2, k] == 0) {
+                            cubeBoard[i, 2, k].SetActive(false);
+                            if (currentTurn == Player.O) {
+                                OXboard[i, 2, k] = Instantiate(OXboard[i, 1, k], cubeBoard[i, 2, k].transform.position, Quaternion.identity);
+                                if (OXboard[i, 1, k] != null) {
+                                    Destroy(OXboard[i, 1, k]);  // 刪除舊物件，避免殘留
+                                }
+
+                                tempCube = Instantiate(OCube, cubeBoard[i, 1, k].transform.position, Quaternion.identity);
+                                tempCube.SetActive(true);
+
+                                OXboard[i, 1, k] = tempCube;
+                                board[i, 2, k] = board[i, 1, k];
+                                board[i, 1, k] = 1;
+                            } else {
+                                OXboard[i, 2, k] = Instantiate(OXboard[i, 1, k], cubeBoard[i, 2, k].transform.position, Quaternion.identity);
+                                if (OXboard[i, 1, k] != null) {
+                                    Destroy(OXboard[i, 1, k]);  // 刪除舊物件，避免殘留
+                                }
+
+                                tempCube = Instantiate(XCube, cubeBoard[i, 1, k].transform.position, Quaternion.identity);
+                                tempCube.SetActive(true);
+
+                                OXboard[i, 1, k] = tempCube;
+                                board[i, 2, k] = board[i, 1, k];
+                                board[i, 1, k] = -1;
+                            }
+                            return true;
+                        } else if (board[i, 1, k] != 0 && board[i, 2, k] != 0 && board[i, 3, k] == 0) {
+                            cubeBoard[i, 3, k].SetActive(false);
+                            if (currentTurn == Player.O) {
+                                OXboard[i, 3, k] = Instantiate(OXboard[i, 2, k], cubeBoard[i, 3, k].transform.position, Quaternion.identity);
+                                if (OXboard[i, 2, k] != null) {
+                                    Destroy(OXboard[i, 2, k]);  // 刪除舊物件，避免殘留
+                                }
+                                OXboard[i, 2, k] = Instantiate(OXboard[i, 1, k], cubeBoard[i, 2, k].transform.position, Quaternion.identity);
+                                if (OXboard[i, 1, k] != null) {
+                                    Destroy(OXboard[i, 1, k]);  // 刪除舊物件，避免殘留
+                                }
+
+                                tempCube = Instantiate(OCube, cubeBoard[i, 1, k].transform.position, Quaternion.identity);
+                                tempCube.SetActive(true);
+
+                                OXboard[i, 1, k] = tempCube;
+                                board[i, 3, k] = board[i, 2, k];
+                                board[i, 2, k] = board[i, 1, k];
+                                board[i, 1, k] = -1;
+                            } else {
+                                OXboard[i, 3, k] = Instantiate(OXboard[i, 2, k], cubeBoard[i, 3, k].transform.position, Quaternion.identity);
+                                if (OXboard[i, 2, k] != null) {
+                                    Destroy(OXboard[i, 2, k]);  // 刪除舊物件，避免殘留
+                                }
+                                OXboard[i, 2, k] = Instantiate(OXboard[i, 1, k], cubeBoard[i, 2, k].transform.position, Quaternion.identity);
+                                if (OXboard[i, 1, k] != null) {
+                                    Destroy(OXboard[i, 1, k]);  // 刪除舊物件，避免殘留
+                                }
+
+                                tempCube = Instantiate(XCube, cubeBoard[i, 1, k].transform.position, Quaternion.identity);
+                                tempCube.SetActive(true);
+
+                                OXboard[i, 1, k] = tempCube;
+                                board[i, 3, k] = board[i, 2, k];
+                                board[i, 2, k] = board[i, 1, k];
+                                board[i, 1, k] = -1;
+                            }
+                            return true;
+                        }
+                    }
+                    count = 0;
+                    return false;
+                } else if (clickedArrow.Contains($"({i}, 5, {k})")) {
+                    for (int y = 3; y >= 1; y--) {
+                        if (board[i, y, k] != 0) {
+                            count++;
+                        }
+                    }
+                    if (count != 3) {
+                        if (board[i, 3, k] == 0) {
+                            if (board[i, 2, k] == 0) {
+                                if (board[i, 1, k] == 0) {
+                                    cubeBoard[i, 1, k].SetActive(false);
+                                    if (currentTurn == Player.O) {
+                                        tempCube = Instantiate(OCube, cubeBoard[i, 1, k].transform.position, Quaternion.identity);
+                                        tempCube.SetActive(true);
+                                        OXboard[i, 1, k] = tempCube;
+                                        board[i, 1, k] = 1;
+                                    } else {
+                                        tempCube = Instantiate(XCube, cubeBoard[i, 1, k].transform.position, Quaternion.identity);
+                                        tempCube.SetActive(true);
+                                        OXboard[i, 1, k] = tempCube;
+                                        board[i, 1, k] = -1;
+                                    }
+                                    return true;
+                                }
+
+                                cubeBoard[i, 2, k].SetActive(false);
+                                if (currentTurn == Player.O) {
+                                    tempCube = Instantiate(OCube, cubeBoard[i, 2, k].transform.position, Quaternion.identity);
+                                    tempCube.SetActive(true);
+                                    OXboard[i, 2, k] = tempCube;
+                                    board[i, 2, k] = 1;
+                                } else {
+                                    tempCube = Instantiate(XCube, cubeBoard[i, 2, k].transform.position, Quaternion.identity);
+                                    tempCube.SetActive(true);
+                                    OXboard[i, 2, k] = tempCube;
+                                    board[i, 2, k] = -1;
+                                }
+                                return true;
+                            }
+                            cubeBoard[i, 1, k].SetActive(false);
+                            if (currentTurn == Player.O) {
+                                tempCube = Instantiate(OCube, cubeBoard[i, 3, k].transform.position, Quaternion.identity);
+                                tempCube.SetActive(true);
+
+                                OXboard[i, 1, k] = tempCube;
+                                board[i, 1, k] = 1;
+                            } else {
+                                tempCube = Instantiate(XCube, cubeBoard[i, 3, k].transform.position, Quaternion.identity);
+                                tempCube.SetActive(true);
+                                OXboard[i, 1, k] = tempCube;
+                                board[i, 1, k] = -1;
+                            }
+                            return true;
+                        }
+                        count = 0;
+                        return false;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     private Transform childUp;
