@@ -1,2 +1,26 @@
 fileFormatVersion: 2
 guid: bd0ec28eaa9b5d34ab74f2fc1d996e99
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - emptyCube: {fileID: 2085359752843085642, guid: 990c4d435c4f43447bd0d2cb691c9fbb, type: 3}
+  - OCanvas: {instanceID: 0}
+  - XCanvas: {instanceID: 0}
+  - endScene: {instanceID: 0}
+  - OWinText: {instanceID: 0}
+  - XWinText: {instanceID: 0}
+  - checkBox: {instanceID: 0}
+  - OCube: {fileID: 8834641648324022854, guid: e302fcc04c9e2ca4a93b61caa4a9afe5, type: 3}
+  - XCube: {fileID: 8616204649847574666, guid: 00b92d1956d487543a252c33010e1497, type: 3}
+  - TriangleCube: {fileID: 5834258100895418651, guid: 7a69fe0a0ad54df4d8e0957f04448e53, type: 3}
+  - SelectEmptyCube: {fileID: 5451942993265438261, guid: 6b9a3553c15761646bcefdf0935a3d41, type: 3}
+  - SelectOCube: {fileID: 618448574677499338, guid: e7bbfbbc904e5eb408adc123cc7582d1, type: 3}
+  - SelectXCube: {fileID: 8616204649847574666, guid: 00b92d1956d487543a252c33010e1497, type: 3}
+  - SelectTriangleCube: {fileID: 5079808619898366687, guid: d07e659f9ced0f34a913200c5d6ca90a, type: 3}
+  - surrenderButton: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
