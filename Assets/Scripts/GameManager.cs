@@ -27,9 +27,10 @@ public class GameManager : MonoBehaviour {
 
     private int currentNumber = 0;
     void Update() {
-        cursorManager.cursorState = ScriptForCursor.CursorState.Default;
+        
         switch (currentTurn) {
             case Player.Neither:
+                cursorManager.cursorState = ScriptForCursor.CursorState.Default;
                 checkBox.SetActive(false);
                 OCanvas.SetActive(false);
                 XCanvas.SetActive(false);
@@ -37,6 +38,7 @@ public class GameManager : MonoBehaviour {
                 ((winner == Player.O) ? XWinText : OWinText).SetActive(false);
                 break;
             case Player.Checking:
+                cursorManager.cursorState = ScriptForCursor.CursorState.Default;
                 break;
             default:
                 if (currentTurn == Player.O) {
