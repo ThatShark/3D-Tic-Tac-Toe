@@ -15,9 +15,11 @@ public class GameManager : MonoBehaviour {
         Checking
     }
     public Player currentTurn, winner;
+    public ScriptForCursor cursorManager;
 
     void Start() {
         currentTurn = Player.O;
+        cursorManager = FindFirstObjectByType<ScriptForCursor>();
         ResetScene();
     }
 
@@ -25,8 +27,8 @@ public class GameManager : MonoBehaviour {
 
     private int currentNumber = 0;
     void Update() {
+        cursorManager.cursorState = ScriptForCursor.CursorState.Default;
         switch (currentTurn) {
-
             case Player.Neither:
                 checkBox.SetActive(false);
                 OCanvas.SetActive(false);
@@ -37,6 +39,11 @@ public class GameManager : MonoBehaviour {
             case Player.Checking:
                 break;
             default:
+                if (currentTurn == Player.O) {
+                    cursorManager.cursorState = ScriptForCursor.CursorState.O;
+                } else {
+                    cursorManager.cursorState = ScriptForCursor.CursorState.X;
+                }
                 IsNumberPress();
                 CheckIfNextTurn();
                 break;
@@ -61,7 +68,7 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    public UnityEngine.UI.Button surrenderButton;
+
 
     public void IsNumberPress() {
         foreach (KeyCode key in new KeyCode[] {
@@ -137,6 +144,7 @@ public class GameManager : MonoBehaviour {
 
     public GraphicRaycaster raycaster;
     public EventSystem eventSystem;
+    public UnityEngine.UI.Button surrenderButton;
 
     public bool IsMoveComplete() {
         foreach (KeyCode key in new KeyCode[] {

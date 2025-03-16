@@ -5846,12 +5846,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   currentTurn: 0
   winner: 2
+  cursorManager: {fileID: 0}
   OCanvas: {fileID: 368779725}
   XCanvas: {fileID: 918902806}
   endScene: {fileID: 54821412}
   OWinText: {fileID: 512296497}
   XWinText: {fileID: 275173820}
   checkBox: {fileID: 1317856377}
+  raycaster: {fileID: 0}
+  eventSystem: {fileID: 0}
   surrenderButton: {fileID: 178594639}
   myPrefab: {fileID: 2085359752843085642, guid: 990c4d435c4f43447bd0d2cb691c9fbb, type: 3}
   upArrows: {fileID: 134669064}
