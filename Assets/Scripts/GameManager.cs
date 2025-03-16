@@ -4,6 +4,8 @@ using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
+using UnityEngine.EventSystems;
+using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour {
     public enum Player {
@@ -14,15 +16,17 @@ public class GameManager : MonoBehaviour {
     }
     public Player currentTurn, winner;
 
-    void Start() { 
+    void Start() {
         currentTurn = Player.O;
         ResetScene();
     }
 
     public GameObject OCanvas, XCanvas, endScene, OWinText, XWinText, checkBox;
+
+    private int currentNumber = 0;
     void Update() {
         switch (currentTurn) {
-            
+
             case Player.Neither:
                 checkBox.SetActive(false);
                 OCanvas.SetActive(false);
@@ -65,71 +69,88 @@ public class GameManager : MonoBehaviour {
             KeyCode.Alpha5, KeyCode.Alpha6, KeyCode.Alpha7, KeyCode.Alpha8, KeyCode.Alpha9,
 
             KeyCode.Keypad1, KeyCode.Keypad2, KeyCode.Keypad3, KeyCode.Keypad4, KeyCode.Keypad5,
-            KeyCode.Keypad6, KeyCode.Keypad7, KeyCode.Keypad8, KeyCode.Keypad9, KeyCode.Keypad0,
-            
-        }) {
+            KeyCode.Keypad6, KeyCode.Keypad7, KeyCode.Keypad8, KeyCode.Keypad9, KeyCode.Keypad0,}) {
 
             if (Input.GetKeyDown(key)) {
+                currentNumber = 0;
                 AllCubeActive();
                 switch (key) {
                     case KeyCode.Alpha1:
                     case KeyCode.Keypad1:
+                        currentNumber = 1;
                         SetRowNotActive(2, 3);
                         break;
                     case KeyCode.Alpha2:
                     case KeyCode.Keypad2:
+                        currentNumber = 2;
                         SetRowNotActive(1, 3);
                         break;
                     case KeyCode.Alpha3:
                     case KeyCode.Keypad3:
+                        currentNumber = 3;
                         SetRowNotActive(1, 2);
                         break;
                     case KeyCode.Alpha4:
                     case KeyCode.Keypad4:
+                        currentNumber = 4;
                         SetColumnNotActive(2, 3);
                         break;
                     case KeyCode.Alpha5:
                     case KeyCode.Keypad5:
+                        currentNumber = 5;
                         SetColumnNotActive(1, 3);
                         break;
                     case KeyCode.Alpha6:
                     case KeyCode.Keypad6:
+                        currentNumber = 6;
                         SetColumnNotActive(1, 2);
                         break;
                     case KeyCode.Alpha7:
                     case KeyCode.Keypad7:
+                        currentNumber = 7;
                         SetLayerNotActive(2, 3);
                         break;
                     case KeyCode.Alpha8:
                     case KeyCode.Keypad8:
+                        currentNumber = 8;
                         SetLayerNotActive(1, 3);
                         break;
                     case KeyCode.Alpha9:
                     case KeyCode.Keypad9:
+                        currentNumber = 9;
                         SetLayerNotActive(1, 2);
                         break;
+                }
+                //讓箭頭消失
+                for (int x = 1; x <= 3; x++) {
+                    for (int z = 1; z <= 3; z++) {
+                        childUp = upArrows.transform.Find($"UpArrow_({x}, -1, {z})");
+                        childUp.gameObject.SetActive(false);
+
+                        childDown = downArrows.transform.Find($"DownArrow_({x}, 5, {z})");
+                        childDown.gameObject.SetActive(false);
+                    }
                 }
             }
         }
     }
 
-    private bool isHoldingTriangle = false;
+    public GraphicRaycaster raycaster;
+    public EventSystem eventSystem;
+
     public bool IsMoveComplete() {
         foreach (KeyCode key in new KeyCode[] {
-            KeyCode.W, KeyCode.A, KeyCode.S, KeyCode.Q, 
-            
-            KeyCode.UpArrow, KeyCode.DownArrow, 
-            
-            KeyCode.Escape, 
-        })  {
-            
+            KeyCode.W, KeyCode.A, KeyCode.S, KeyCode.Q,
+
+            KeyCode.UpArrow, KeyCode.DownArrow,
+
+            KeyCode.Escape,
+        }) {
+
             if (Input.GetKeyDown(key)) {
-                isHoldingTriangle = false;
                 switch (key) {
-                    
+
                     case KeyCode.W:
-                        isHoldingTriangle = true;
-                        return true;
                     case KeyCode.A:
                     case KeyCode.S:
                         return true;
@@ -145,40 +166,139 @@ public class GameManager : MonoBehaviour {
                 }
             }
         }
-        // if (Input.GetMouseButtonDown(0)) {
-        //     Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        //     RaycastHit hit;
 
-        //     if (Physics.Raycast(ray, out hit)) {
-        //         GameObject clickedCube = hit.collider.gameObject;
+        // 判斷滑鼠點擊EmptyCube
+        if (Input.GetMouseButtonDown(0)) {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
 
-        //         if (clickedCube.name.Contains("EmptyCube")) { 
-        //             Debug.Log("點擊到 Cube：" + clickedCube.name);
-        //         }
-        //     }
-        // } 
+            if (Physics.Raycast(ray, out hit)) {
+                GameObject clickedCube = hit.collider.gameObject;
+
+                if (clickedCube.name.Contains("EmptyCube")) {
+                    SetArrowActive();
+                }
+            }
+        }
+
+        // 判斷滑鼠點擊Arrow
+        if (Input.GetMouseButtonDown(0)) {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit;
+
+            if (Physics.Raycast(ray, out hit)) {
+                GameObject clickedArrow = hit.collider.gameObject;
+
+                if (clickedArrow.name.Contains("Arrow")) {
+                    InputOX(clickedArrow.name);
+                }
+            }
+        }
+
         return false;
-    } 
-    private Transform child;
+    }
+
+    // 輸入O或X
+    void InputOX(string clickedArrow) {
+
+    }
+
+    private Transform childUp;
+    private Transform childDown;
+
+    //設定箭頭根據輸入數字激活
+    void SetArrowActive() {
+        upArrows.SetActive(true);
+        downArrows.SetActive(true);
+
+
+        switch (currentNumber) {
+            case 1:
+                for (int z = 1; z <= 3; z++) {
+                    childUp = upArrows.transform.Find($"UpArrow_(1, -1, {z})");
+                    childUp.gameObject.SetActive(true);
+
+                    childDown = downArrows.transform.Find($"DownArrow_(1, 5, {z})");
+                    childDown.gameObject.SetActive(true);
+                }
+                break;
+            case 2:
+                for (int z = 1; z <= 3; z++) {
+                    childUp = upArrows.transform.Find($"UpArrow_(2, -1, {z})");
+                    childUp.gameObject.SetActive(true);
+                    childDown = downArrows.transform.Find($"DownArrow_(2, 5, {z})");
+                    childDown.gameObject.SetActive(true);
+                }
+                break;
+            case 3:
+                for (int z = 1; z <= 3; z++) {
+                    childUp = upArrows.transform.Find($"UpArrow_(3, -1, {z})");
+                    childUp.gameObject.SetActive(true);
+                    childDown = downArrows.transform.Find($"DownArrow_(3, 5, {z})");
+                    childDown.gameObject.SetActive(true);
+                }
+                break;
+            case 4:
+                for (int x = 1; x <= 3; x++) {
+                    childUp = upArrows.transform.Find($"UpArrow_({x}, -1, 1)");
+                    childUp.gameObject.SetActive(true);
+                    childDown = downArrows.transform.Find($"DownArrow_({x}, 5, 1)");
+                    childDown.gameObject.SetActive(true);
+                }
+                break;
+            case 5:
+                for (int x = 1; x <= 3; x++) {
+                    childUp = upArrows.transform.Find($"UpArrow_({x}, -1, 2)");
+                    childUp.gameObject.SetActive(true);
+                    childDown = downArrows.transform.Find($"DownArrow_({x}, 5, 2)");
+                    childDown.gameObject.SetActive(true);
+                }
+                break;
+            case 6:
+                for (int x = 1; x <= 3; x++) {
+                    childUp = upArrows.transform.Find($"UpArrow_({x}, -1, 3)");
+                    childUp.gameObject.SetActive(true);
+                    childDown = downArrows.transform.Find($"DownArrow_({x}, 5, 3)");
+                    childDown.gameObject.SetActive(true);
+                }
+                break;
+            case 7:
+            case 8:
+            case 9:
+            case 0:
+                for (int x = 1; x <= 3; x++) {
+                    for (int z = 1; z <= 3; z++) {
+                        childUp = upArrows.transform.Find($"UpArrow_({x}, -1, {z})");
+                        childUp.gameObject.SetActive(true);
+
+                        childDown = downArrows.transform.Find($"DownArrow_({x}, 5, {z})");
+                        childDown.gameObject.SetActive(true);
+                    }
+                }
+                break;
+        }
+
+    }
+
+    //設定只激活一行
     void SetRowNotActive(int x1, int x2) {
         int x = 6 - x1 - x2;
         for (int y = 1; y <= 3; y++) {
             for (int z = 1; z <= 3; z++) {
                 if (cubeBoard[x1, y, z].activeSelf) {
                     cubeBoard[x1, y, z].SetActive(false);
-                } 
+                }
                 if (cubeBoard[x2, y, z].activeSelf) {
                     cubeBoard[x2, y, z].SetActive(false);
                 }
-                
-                // child = upArrows.transform.Find($"UpArrow_({x}, -1, {z})");
-                // child.gameObject.SetActive(true);
+
             }
         }
-        
-        
+
+
     }
 
+    //設定只激活一列
     void SetColumnNotActive(int z1, int z2) {
         int z = 6 - z1 - z2;
         for (int x = 1; x <= 3; x++) {
@@ -189,14 +309,11 @@ public class GameManager : MonoBehaviour {
                 if (cubeBoard[x, y, z2].activeSelf) {
                     cubeBoard[x, y, z2].SetActive(false);
                 }
-            
-        
-                // child = upArrows.transform.Find($"UpArrow_({x}, -1, {z})");
-                // child.gameObject.SetActive(true);
             }
         }
     }
 
+    //設定只激活一層
     void SetLayerNotActive(int y1, int y2) {
         for (int x = 1; x <= 3; x++) {
             for (int z = 1; z <= 3; z++) {
@@ -210,6 +327,7 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    //激活3*3*3所有方塊
     void AllCubeActive() {
         for (int x = 1; x <= 3; x++) {
             for (int y = 1; y <= 3; y++) {
@@ -224,6 +342,7 @@ public class GameManager : MonoBehaviour {
     private int[,,] board = new int[5, 5, 5];
     private GameObject[,,] cubeBoard = new GameObject[5, 5, 5]; // 座標[7*(i-2), 7*(j-2), 7*(k-2)]
     private GameObject EmptyCube;
+
     public void ResetScene() {
         endScene.SetActive(false);
         OCanvas.SetActive(true);
@@ -234,25 +353,25 @@ public class GameManager : MonoBehaviour {
         foreach (var arrow in downArrows.GetComponentsInChildren<Transform>()) {
             arrow.gameObject.SetActive(false);
         }
-        
+
         currentTurn = Player.O;
         winner = Player.Neither;
 
         for (int x = 0; x < 5; x++) { // 清除舊方塊
             for (int y = 0; y < 5; y++) {
                 for (int z = 0; z < 5; z++) {
-                    Destroy(cubeBoard[x, y, z]);  
+                    Destroy(cubeBoard[x, y, z]);
                 }
             }
         }
 
-        board = new int[5, 5, 5]; 
+        board = new int[5, 5, 5];
         for (int x = 0; x < 5; x++) {
             for (int y = 0; y < 5; y++) {
                 for (int z = 0; z < 5; z++) {
                     Vector3 position = new Vector3(7 * (x - 2), 7 * (y - 2), 7 * (z - 2));
                     EmptyCube = Instantiate(myPrefab, position, Quaternion.identity);
-                    
+
                     EmptyCube.SetActive(true); // 先全部建出來
                     cubeBoard[x, y, z] = EmptyCube; // 存入 cubeBoard 陣列
                     EmptyCube.name = $"EmptyCube(Clone)_({x}, {y}, {z})";
