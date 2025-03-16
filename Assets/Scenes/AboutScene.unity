@@ -176,7 +176,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "That Shark: \n\nHypor_biotic:\n\n"
+  m_text: "That Shark: A shark who like coding but his skill is like joking.\n\"Nothing
+    can stop me from coding, so I am stopped by Nothing.\" \n\nHypor_biotic:\n\n"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 6f56b4062ecf0f14991e30cc0e81aa5a, type: 2}
   m_sharedMaterial: {fileID: -1235169476982058409, guid: 6f56b4062ecf0f14991e30cc0e81aa5a, type: 2}
@@ -1295,8 +1296,8 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 926339655}
-  - {fileID: 1750661494}
   - {fileID: 28024352}
+  - {fileID: 1750661494}
   - {fileID: 1954145285}
   m_Father: {fileID: 1879571136}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
