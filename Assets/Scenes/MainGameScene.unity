@@ -935,7 +935,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3691589891317101641, guid: b7a170cd873a1fb44a2f1e67cbd2ce7c, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -15.5
+      value: 15.5
       objectReference: {fileID: 0}
     - target: {fileID: 3691589891317101641, guid: b7a170cd873a1fb44a2f1e67cbd2ce7c, type: 3}
       propertyPath: m_LocalPosition.y
@@ -943,7 +943,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3691589891317101641, guid: b7a170cd873a1fb44a2f1e67cbd2ce7c, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 15.5
+      value: -15.5
       objectReference: {fileID: 0}
     - target: {fileID: 3691589891317101641, guid: b7a170cd873a1fb44a2f1e67cbd2ce7c, type: 3}
       propertyPath: m_LocalRotation.w
@@ -2092,13 +2092,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 0, y: 0, z: 20}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -20}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &330585547
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4127,7 +4127,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 1961d75de0a7f3a4daa2b231f1a46a43, type: 2}
+  - {fileID: 2100000, guid: d9b03f109553a6846a0477a8e0cff3d1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -5588,7 +5588,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d9b03f109553a6846a0477a8e0cff3d1, type: 2}
+  - {fileID: 2100000, guid: 1961d75de0a7f3a4daa2b231f1a46a43, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -6452,7 +6452,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 93c96455489600149bec9bc19fc0884b, type: 2}
+  - {fileID: 2100000, guid: 067cccb5cc188b14aa86d909548d671d, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -6826,7 +6826,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5195151604506848839, guid: d13427efb322b1b439d26b08d8a4e367, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 15
+      value: -15
       objectReference: {fileID: 0}
     - target: {fileID: 5195151604506848839, guid: d13427efb322b1b439d26b08d8a4e367, type: 3}
       propertyPath: m_LocalPosition.y
@@ -6834,7 +6834,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5195151604506848839, guid: d13427efb322b1b439d26b08d8a4e367, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 15
+      value: -15
       objectReference: {fileID: 0}
     - target: {fileID: 5195151604506848839, guid: d13427efb322b1b439d26b08d8a4e367, type: 3}
       propertyPath: m_LocalRotation.w
@@ -7090,8 +7090,12 @@ MonoBehaviour:
   XWinText: {fileID: 275173820}
   checkBox: {fileID: 1317856377}
   OCube: {fileID: 0}
-  TriangleCube: {fileID: 0}
   XCube: {fileID: 0}
+  TriangleCube: {fileID: 0}
+  SelectEmptyCube: {fileID: 0}
+  SelectOCube: {fileID: 0}
+  SelectXCube: {fileID: 0}
+  SelectTriangleCube: {fileID: 0}
   surrenderButton: {fileID: 178594639}
   myPrefab: {fileID: 2085359752843085642, guid: 990c4d435c4f43447bd0d2cb691c9fbb, type: 3}
   upArrows: {fileID: 134669064}
@@ -7603,7 +7607,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 067cccb5cc188b14aa86d909548d671d, type: 2}
+  - {fileID: 2100000, guid: 93c96455489600149bec9bc19fc0884b, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

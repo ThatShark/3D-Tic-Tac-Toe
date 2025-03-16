@@ -7,7 +7,8 @@ using UnityEngine.UIElements;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
 
-public class GameManager : MonoBehaviour {
+public class GameManager : MonoBehaviour
+{
     public enum Player {
         O,
         X,
@@ -24,10 +25,7 @@ public class GameManager : MonoBehaviour {
     }
 
     public GameObject OCanvas, XCanvas, endScene, OWinText, XWinText, checkBox;
-
-    private int currentNumber = 0;
-
-    public GameObject OCube, TriangleCube, XCube;
+    public GameObject OCube, XCube, TriangleCube, SelectEmptyCube, SelectOCube, SelectXCube, SelectTriangleCube;
     void Update() {
         switch (currentTurn) {
             case Player.Neither:
@@ -72,6 +70,7 @@ public class GameManager : MonoBehaviour {
     }
 
     public UnityEngine.UI.Button surrenderButton;
+    private int currentNumber = 0;
     public void IsNumberPress() {
         foreach (KeyCode key in new KeyCode[] {
             KeyCode.Alpha0, KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3, KeyCode.Alpha4,
@@ -130,16 +129,16 @@ public class GameManager : MonoBehaviour {
                         SetLayerNotActive(1, 2);
                         break;
                 }
-                //讓箭頭消失
-                for (int x = 1; x <= 3; x++) {
-                    for (int z = 1; z <= 3; z++) {
-                        childUp = upArrows.transform.Find($"UpArrow_({x}, -1, {z})");
-                        childUp.gameObject.SetActive(false);
+                // 讓箭頭消失 // 讓我消失
+                // for (int x = 1; x <= 3; x++) {
+                //    for (int z = 1; z <= 3; z++) {
+                //        childUp = upArrows.transform.Find($"UpArrow_({x}, -1, {z})");
+                //        childUp.gameObject.SetActive(false);
 
-                        childDown = downArrows.transform.Find($"DownArrow_({x}, 5, {z})");
-                        childDown.gameObject.SetActive(false);
-                    }
-                }
+                //        childDown = downArrows.transform.Find($"DownArrow_({x}, 5, {z})");
+                //        childDown.gameObject.SetActive(false);
+                //    }
+                // }
             }
         }
     }
@@ -183,7 +182,7 @@ public class GameManager : MonoBehaviour {
                 GameObject clickedCube = hit.collider.gameObject;
 
                 if (clickedCube.name.Contains("EmptyCube")) {
-                    SetArrowActive();
+                    SetCubeActive(clickedCube.name);
                 }
             }
         }
@@ -194,10 +193,10 @@ public class GameManager : MonoBehaviour {
             RaycastHit hit;
 
             if (Physics.Raycast(ray, out hit)) {
-                GameObject clickedArrow = hit.collider.gameObject;
+                GameObject clickedActiveCube = hit.collider.gameObject;
 
-                if (clickedArrow.name.Contains("Arrow")) {
-                    return InputOX(clickedArrow.name);
+                if (clickedActiveCube.name.Contains("EmptyCube")) {
+                    return InputOX(clickedActiveCube.name);
                 }
             }
         }
@@ -209,22 +208,27 @@ public class GameManager : MonoBehaviour {
     private GameObject tempCube;
 
     // 輸入O或X
-    private bool InputOX(string clickedArrow) {
-        if(currentNumber == 0) {
+    private bool InputOX(string clickedActiveCube) {
+        //顯示全部時無效
+        if (currentNumber == 0) {
             return false;
         }
+
         int count = 0;
         for (int i = 1; i <= 3; i++) {
             for (int k = 1; k <= 3; k++) {
-                if (clickedArrow.Contains($"({i}, -1, {k})")) {
+                if (clickedActiveCube.Contains($"({i}, -1, {k})")) {
                     for (int y = 1; y <= 3; y++) {
                         if (board[i, y, k] != 0) {
                             count++;
                         }
                     }
+                    // 如果該列有空位
                     if (count != 3) {
+                        //最下層有空位
                         if (board[i, 1, k] == 0) {
                             cubeBoard[i, 1, k].SetActive(false);
+                            //直接生成
                             if (currentTurn == Player.O) {
                                 tempCube = Instantiate(OCube, cubeBoard[i, 1, k].transform.position, Quaternion.identity);
                                 tempCube.SetActive(true);
@@ -237,6 +241,8 @@ public class GameManager : MonoBehaviour {
                                 board[i, 1, k] = -1;
                             }
                             return true;
+
+                            //將最下層移至第二層後再生成最下層
                         } else if (board[i, 1, k] != 0 && board[i, 2, k] == 0) {
                             cubeBoard[i, 2, k].SetActive(false);
                             if (currentTurn == Player.O) {
@@ -265,16 +271,18 @@ public class GameManager : MonoBehaviour {
                                 board[i, 1, k] = -1;
                             }
                             return true;
+
+                            //將第二層移至第三層後將第一層移至第二層後再生成第一層
                         } else if (board[i, 1, k] != 0 && board[i, 2, k] != 0 && board[i, 3, k] == 0) {
                             cubeBoard[i, 3, k].SetActive(false);
                             if (currentTurn == Player.O) {
                                 OXboard[i, 3, k] = Instantiate(OXboard[i, 2, k], cubeBoard[i, 3, k].transform.position, Quaternion.identity);
                                 if (OXboard[i, 2, k] != null) {
-                                    Destroy(OXboard[i, 2, k]);  // 刪除舊物件，避免殘留
+                                    Destroy(OXboard[i, 2, k]);  // 刪除舊物件
                                 }
                                 OXboard[i, 2, k] = Instantiate(OXboard[i, 1, k], cubeBoard[i, 2, k].transform.position, Quaternion.identity);
                                 if (OXboard[i, 1, k] != null) {
-                                    Destroy(OXboard[i, 1, k]);  // 刪除舊物件，避免殘留
+                                    Destroy(OXboard[i, 1, k]);  // 刪除舊物件
                                 }
 
                                 tempCube = Instantiate(OCube, cubeBoard[i, 1, k].transform.position, Quaternion.identity);
@@ -287,11 +295,11 @@ public class GameManager : MonoBehaviour {
                             } else {
                                 OXboard[i, 3, k] = Instantiate(OXboard[i, 2, k], cubeBoard[i, 3, k].transform.position, Quaternion.identity);
                                 if (OXboard[i, 2, k] != null) {
-                                    Destroy(OXboard[i, 2, k]);  // 刪除舊物件，避免殘留
+                                    Destroy(OXboard[i, 2, k]);  // 刪除舊物件
                                 }
                                 OXboard[i, 2, k] = Instantiate(OXboard[i, 1, k], cubeBoard[i, 2, k].transform.position, Quaternion.identity);
                                 if (OXboard[i, 1, k] != null) {
-                                    Destroy(OXboard[i, 1, k]);  // 刪除舊物件，避免殘留
+                                    Destroy(OXboard[i, 1, k]);  // 刪除舊物件
                                 }
 
                                 tempCube = Instantiate(XCube, cubeBoard[i, 1, k].transform.position, Quaternion.identity);
@@ -307,16 +315,16 @@ public class GameManager : MonoBehaviour {
                     }
                     count = 0;
                     return false;
-                } else if (clickedArrow.Contains($"({i}, 5, {k})")) {
+                } else if (clickedActiveCube.Contains($"({i}, 5, {k})")) {
                     for (int y = 3; y >= 1; y--) {
                         if (board[i, y, k] != 0) {
                             count++;
                         }
                     }
                     if (count != 3) {
-                        if (board[i, 3, k] == 0) {
-                            if (board[i, 2, k] == 0) {
-                                if (board[i, 1, k] == 0) {
+                        if (board[i, 3, k] == 0) { // 只有最上層有空位，直接生成到最上層
+                            if (board[i, 2, k] == 0) { //最上層有空位且中層也有，將方塊生成到中層
+                                if (board[i, 1, k] == 0) { //最上層有空位且中下層也有，將方塊生成到最下層
                                     cubeBoard[i, 1, k].SetActive(false);
                                     if (currentTurn == Player.O) {
                                         tempCube = Instantiate(OCube, cubeBoard[i, 1, k].transform.position, Quaternion.identity);
@@ -370,86 +378,55 @@ public class GameManager : MonoBehaviour {
         return false;
     }
 
-    private Transform childUp;
-    private Transform childDown;
-
+    private GameObject tempSelectCube;
     //設定箭頭根據輸入數字激活
-    void SetArrowActive() {
-        upArrows.SetActive(true);
-        downArrows.SetActive(true);
-
-
-        switch (currentNumber) {
-            case 1:
-                for (int z = 1; z <= 3; z++) {
-                    childUp = upArrows.transform.Find($"UpArrow_(1, -1, {z})");
-                    childUp.gameObject.SetActive(true);
-
-                    childDown = downArrows.transform.Find($"DownArrow_(1, 5, {z})");
-                    childDown.gameObject.SetActive(true);
-                }
-                break;
-            case 2:
-                for (int z = 1; z <= 3; z++) {
-                    childUp = upArrows.transform.Find($"UpArrow_(2, -1, {z})");
-                    childUp.gameObject.SetActive(true);
-                    childDown = downArrows.transform.Find($"DownArrow_(2, 5, {z})");
-                    childDown.gameObject.SetActive(true);
-                }
-                break;
-            case 3:
-                for (int z = 1; z <= 3; z++) {
-                    childUp = upArrows.transform.Find($"UpArrow_(3, -1, {z})");
-                    childUp.gameObject.SetActive(true);
-                    childDown = downArrows.transform.Find($"DownArrow_(3, 5, {z})");
-                    childDown.gameObject.SetActive(true);
-                }
-                break;
-            case 4:
-                for (int x = 1; x <= 3; x++) {
-                    childUp = upArrows.transform.Find($"UpArrow_({x}, -1, 1)");
-                    childUp.gameObject.SetActive(true);
-                    childDown = downArrows.transform.Find($"DownArrow_({x}, 5, 1)");
-                    childDown.gameObject.SetActive(true);
-                }
-                break;
-            case 5:
-                for (int x = 1; x <= 3; x++) {
-                    childUp = upArrows.transform.Find($"UpArrow_({x}, -1, 2)");
-                    childUp.gameObject.SetActive(true);
-                    childDown = downArrows.transform.Find($"DownArrow_({x}, 5, 2)");
-                    childDown.gameObject.SetActive(true);
-                }
-                break;
-            case 6:
-                for (int x = 1; x <= 3; x++) {
-                    childUp = upArrows.transform.Find($"UpArrow_({x}, -1, 3)");
-                    childUp.gameObject.SetActive(true);
-                    childDown = downArrows.transform.Find($"DownArrow_({x}, 5, 3)");
-                    childDown.gameObject.SetActive(true);
-                }
-                break;
-            case 7:
-            case 8:
-            case 9:
-            case 0:
-                for (int x = 1; x <= 3; x++) {
-                    for (int z = 1; z <= 3; z++) {
-                        childUp = upArrows.transform.Find($"UpArrow_({x}, -1, {z})");
-                        childUp.gameObject.SetActive(true);
-
-                        childDown = downArrows.transform.Find($"DownArrow_({x}, 5, {z})");
-                        childDown.gameObject.SetActive(true);
+    //正在改
+    void SetCubeActive(string clickedCube) {
+        int count = 0;
+        if (count == 0) {
+            switch (currentNumber) {
+                case 1:
+                case 2:
+                case 3:
+                    for (int j = 1; j <= 3; j++) {
+                        for (int k = 1; k <= 3; k++) {
+                            if (clickedCube.Contains($"({currentNumber}, , )")) {
+                                if (board[currentNumber, j, k] == 0) {
+                                    tempSelectCube = Instantiate(SelectOCube, cubeBoard[currentNumber, j, k].transform.position, Quaternion.identity);
+                                    tempSelectCube.SetActive(true);
+                                    cubeBoard[currentNumber, j, k].SetActive(false);
+                                    cubeBoard[currentNumber, j, k] = tempSelectCube;
+                                } else {
+                                    tempSelectCube = Instantiate(SelectOCube, cubeBoard[currentNumber, j, k].transform.position, Quaternion.identity);
+                                    tempSelectCube.SetActive(true);
+                                    cubeBoard[currentNumber, j, k] = tempSelectCube;
+                                    cubeBoard[currentNumber, j, k].SetActive(false);
+                                }
+                            }
+                        }
                     }
-                }
-                break;
-        }
+                    count++;
+                    break;
+                case 4:
 
+                    break;
+                case 5:
+
+                    break;
+                case 6:
+
+                    break;
+                case 7:
+                case 8:
+                case 9:
+                case 0:
+                    break;
+            }
+        }
     }
 
     //設定只激活一行
     void SetRowNotActive(int x1, int x2) {
-        int x = 6 - x1 - x2;
         for (int y = 1; y <= 3; y++) {
             for (int z = 1; z <= 3; z++) {
                 if (cubeBoard[x1, y, z].activeSelf) {
@@ -467,7 +444,6 @@ public class GameManager : MonoBehaviour {
 
     //設定只激活一列
     void SetColumnNotActive(int z1, int z2) {
-        int z = 6 - z1 - z2;
         for (int x = 1; x <= 3; x++) {
             for (int y = 1; y <= 3; y++) {
                 if (cubeBoard[x, y, z1].activeSelf) {
@@ -514,7 +490,7 @@ public class GameManager : MonoBehaviour {
         endScene.SetActive(false);
         OCanvas.SetActive(true);
         XCanvas.SetActive(false);
-        foreach (var arrow in upArrows.GetComponentsInChildren<Transform>()) {
+        foreach (var arrow in upArrows.GetComponentsInChildren<Transform>()){
             arrow.gameObject.SetActive(false);
         }
         foreach (var arrow in downArrows.GetComponentsInChildren<Transform>()) {
@@ -525,7 +501,7 @@ public class GameManager : MonoBehaviour {
         winner = Player.Neither;
 
         for (int x = 0; x < 5; x++) { // 清除舊方塊
-            for (int y = 0; y < 5; y++) {
+            for (int y = 0; y < 5; y++){
                 for (int z = 0; z < 5; z++) {
                     Destroy(cubeBoard[x, y, z]);
                 }
@@ -551,11 +527,14 @@ public class GameManager : MonoBehaviour {
             }
         }
     }
-
-    public bool SomeoneHasWin() {
+    
+    #region 判斷是否連線
+    public bool SomeoneHasWin()
+    {
         int vs = 0;
         // 檢查每層、列、行以及對角線
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 5; i++)
+        {
             vs += CheckLayer(i); // 檢查每一層
             vs += CheckColumn(i); // 檢查每一列
             vs += CheckRow(i); // 檢查每一行
@@ -564,39 +543,50 @@ public class GameManager : MonoBehaviour {
         // 檢查 3D 對角線
         vs += Check3DDiagonals();
 
-        if (vs != 0) {
+        if (vs != 0)
+        {
             winner = (vs > 0) ? Player.O : Player.X;
             return true;
-        } else {
+        }
+        else
+        {
             return false;
         }
     }
 
     // 檢查某一層是否有玩家獲勝
-    private int CheckLayer(int layer) {
+    private int CheckLayer(int layer)
+    {
         int vs = 0;
         // 檢查每一層的行和列
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 3; j++) {
+        for (int i = 0; i < 5; i++)
+        {
+            for (int j = 0; j < 3; j++)
+            {
                 // 檢查行
-                if (Mathf.Abs(board[layer, i, j] + board[layer, i, j + 1] + board[layer, i, j + 2]) == 3) {
+                if (Mathf.Abs(board[layer, i, j] + board[layer, i, j + 1] + board[layer, i, j + 2]) == 3)
+                {
                     vs += board[layer, i, j];
                 }
 
                 // 檢查列
-                if (Mathf.Abs(board[layer, j, i] + board[layer, j + 1, i] + board[layer, j + 2, i]) == 3) {
+                if (Mathf.Abs(board[layer, j, i] + board[layer, j + 1, i] + board[layer, j + 2, i]) == 3)
+                {
                     vs += board[layer, j, i];
                 }
             }
         }
 
         // 檢查對角線
-        for (int i = 0; i < 3; i++) {
-            if (Mathf.Abs(board[layer, i, i] + board[layer, i + 1, i + 1] + board[layer, i + 2, i + 2]) == 3) {
+        for (int i = 0; i < 3; i++)
+        {
+            if (Mathf.Abs(board[layer, i, i] + board[layer, i + 1, i + 1] + board[layer, i + 2, i + 2]) == 3)
+            {
                 vs += board[layer, i, i];
             }
 
-            if (Mathf.Abs(board[layer, i, 4 - i] + board[layer, i + 1, 3 - i] + board[layer, i + 2, 2 - i]) == 3) {
+            if (Mathf.Abs(board[layer, i, 4 - i] + board[layer, i + 1, 3 - i] + board[layer, i + 2, 2 - i]) == 3)
+            {
                 vs += board[layer, i, 4 - i];
             }
         }
@@ -604,30 +594,38 @@ public class GameManager : MonoBehaviour {
     }
 
     // 檢查縱向的列是否有玩家獲勝
-    private int CheckColumn(int col) {
+    private int CheckColumn(int col)
+    {
         int vs = 0;
         // 檢查每一列的行和列
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 3; j++) {
+        for (int i = 0; i < 5; i++)
+        {
+            for (int j = 0; j < 3; j++)
+            {
                 // 檢查行
-                if (Mathf.Abs(board[i, j, col] + board[i, j + 1, col] + board[i, j + 2, col]) == 3) {
+                if (Mathf.Abs(board[i, j, col] + board[i, j + 1, col] + board[i, j + 2, col]) == 3)
+                {
                     vs += board[i, j, col];
                 }
 
                 // 檢查列
-                if (Mathf.Abs(board[j, i, col] + board[j + 1, i, col] + board[j + 2, i, col]) == 3) {
+                if (Mathf.Abs(board[j, i, col] + board[j + 1, i, col] + board[j + 2, i, col]) == 3)
+                {
                     vs += board[j, i, col];
                 }
             }
         }
 
         // 檢查對角線
-        for (int i = 0; i < 3; i++) {
-            if (Mathf.Abs(board[i, i, col] + board[i + 1, i + 1, col] + board[i + 2, i + 2, col]) == 3) {
+        for (int i = 0; i < 3; i++)
+        {
+            if (Mathf.Abs(board[i, i, col] + board[i + 1, i + 1, col] + board[i + 2, i + 2, col]) == 3)
+            {
                 vs += board[i, i, col];
             }
 
-            if (Mathf.Abs(board[i, 4 - i, col] + board[i + 1, 3 - i, col] + board[i + 2, 2 - i, col]) == 3) {
+            if (Mathf.Abs(board[i, 4 - i, col] + board[i + 1, 3 - i, col] + board[i + 2, 2 - i, col]) == 3)
+            {
                 vs += board[i, 4 - i, col];
             }
         }
@@ -635,30 +633,38 @@ public class GameManager : MonoBehaviour {
     }
 
     // 檢查橫向的行是否有玩家獲勝
-    private int CheckRow(int row) {
+    private int CheckRow(int row)
+    {
         int vs = 0;
         // 檢查每一行的行和列
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 3; j++) {
+        for (int i = 0; i < 5; i++)
+        {
+            for (int j = 0; j < 3; j++)
+            {
                 // 檢查行
-                if (Mathf.Abs(board[i, row, j] + board[i, row, j + 1] + board[i, row, j + 2]) == 3) {
+                if (Mathf.Abs(board[i, row, j] + board[i, row, j + 1] + board[i, row, j + 2]) == 3)
+                {
                     vs += board[i, row, j];
                 }
 
                 // 檢查列
-                if (Mathf.Abs(board[j, row, i] + board[j + 1, row, i] + board[j + 2, row, i]) == 3) {
+                if (Mathf.Abs(board[j, row, i] + board[j + 1, row, i] + board[j + 2, row, i]) == 3)
+                {
                     vs += board[j, row, i];
                 }
             }
         }
 
         // 檢查對角線
-        for (int i = 0; i < 3; i++) {
-            if (Mathf.Abs(board[i, row, i] + board[i + 1, row, i + 1] + board[i + 2, row, i + 2]) == 3) {
+        for (int i = 0; i < 3; i++)
+        {
+            if (Mathf.Abs(board[i, row, i] + board[i + 1, row, i + 1] + board[i + 2, row, i + 2]) == 3)
+            {
                 vs += board[i, row, i];
             }
 
-            if (Mathf.Abs(board[i, row, 4 - i] + board[i + 1, row, 3 - i] + board[i + 2, row, 2 - i]) == 3) {
+            if (Mathf.Abs(board[i, row, 4 - i] + board[i + 1, row, 3 - i] + board[i + 2, row, 2 - i]) == 3)
+            {
                 vs += board[i, row, 4 - i];
             }
         }
@@ -668,20 +674,26 @@ public class GameManager : MonoBehaviour {
     // 檢查 3D 對角線是否有玩家獲勝
     private int Check3DDiagonals() {
         int vs = 0;
-        for (int i = 0; i < 3; i++) {
-            if (Mathf.Abs(board[i, i, i] + board[i + 1, i + 1, i + 1] + board[i + 2, i + 2, i + 2]) == 3) {
+        for (int i = 0; i < 3; i++)
+        {
+            if (Mathf.Abs(board[i, i, i] + board[i + 1, i + 1, i + 1] + board[i + 2, i + 2, i + 2]) == 3)
+            {
                 vs += board[i, i, i];
             }
-            if (Mathf.Abs(board[i, i, 4 - i] + board[i + 1, i + 1, 3 - i] + board[i + 2, i + 2, 2 - i]) == 3) {
+            if (Mathf.Abs(board[i, i, 4 - i] + board[i + 1, i + 1, 3 - i] + board[i + 2, i + 2, 2 - i]) == 3)
+            {
                 vs += board[i, i, 4 - i];
             }
-            if (Mathf.Abs(board[i, 4 - i, i] + board[i + 1, 3 - i, i + 1] + board[i + 2, 2 - i, i + 2]) == 3) {
+            if (Mathf.Abs(board[i, 4 - i, i] + board[i + 1, 3 - i, i + 1] + board[i + 2, 2 - i, i + 2]) == 3)
+            {
                 vs += board[i, 4 - i, i];
             }
-            if (Mathf.Abs(board[4 - i, i, i] + board[3 - i, i + 1, i + 1] + board[2 - i, i + 2, i + 2]) == 3) {
+            if (Mathf.Abs(board[4 - i, i, i] + board[3 - i, i + 1, i + 1] + board[2 - i, i + 2, i + 2]) == 3)
+            {
                 vs += board[4 - i, i, i];
             }
         }
         return vs;
     }
+    #endregion
 }
