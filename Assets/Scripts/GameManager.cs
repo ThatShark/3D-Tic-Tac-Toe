@@ -95,7 +95,7 @@ public class GameManager : MonoBehaviour {
                 } else if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) {
                     buttonManager.SurrenderSkill();
                 }
-                    break;
+                break;
             default:
                 if (currentTurn == Player.O) {
                     // cursorManager.cursorState = ScriptForCursor.CursorState.O;
@@ -185,9 +185,6 @@ public class GameManager : MonoBehaviour {
             for (int z = 0; z < 3; z++) {
                 cubeBoard[(x + 1) % 3, y, z].SetActive(false);
                 cubeBoard[(x + 2) % 3, y, z].SetActive(false);
-
-                OXBoard[(x + 1) % 3, y, z].SetActive(false);
-                OXBoard[(x + 2) % 3, y, z].SetActive(false);
             }
         }
     }
@@ -198,9 +195,6 @@ public class GameManager : MonoBehaviour {
             for (int y = 0; y < 3; y++) {
                 cubeBoard[x, y, (z + 1) % 3].SetActive(false);
                 cubeBoard[x, y, (z + 2) % 3].SetActive(false);
-                
-                OXBoard[x, y, (z + 1) % 3].SetActive(false);
-                OXBoard[x, y, (z + 2) % 3].SetActive(false);
             }
         }
     }
@@ -211,9 +205,6 @@ public class GameManager : MonoBehaviour {
             for (int z = 0; z < 3; z++) {
                 cubeBoard[x, (y + 1) % 3, z].SetActive(false);
                 cubeBoard[x, (y + 2) % 3, z].SetActive(false);
-
-                OXBoard[x, (y + 1) % 3, z].SetActive(false);
-                OXBoard[x, (y + 2) % 3, z].SetActive(false);
             }
         }
     }
@@ -225,8 +216,6 @@ public class GameManager : MonoBehaviour {
                 for (int z = 0; z < 3; z++) {
                     if (OXboard[x, y, z] == null) {
                         cubeBoard[x, y, z].SetActive(true);
-                    } else {
-                        OXBoard[x, y, z].SetActive(true);
                     }
                 }
             }
@@ -492,7 +481,8 @@ public class GameManager : MonoBehaviour {
                         return InputOX(false, clickedCube?.name);
                     case KeyCode.Escape:
                         clickedCube = null;
-                        DestroyAllSelect(); 
+                        DestroyAllSelect();
+                        return false;
                 }
             }
         }
@@ -556,6 +546,7 @@ public class GameManager : MonoBehaviour {
                     countBoard[i, 0, k] = -1;
                 }
             }
+            return true;
         } else {
             Destroy(cubeBoard[i, 2, k]);
             cubeBoard[i, 2, k] = Instantiate(cubeBoard[i, 1, k], new Vector3(7 * (i - 1), 7, 7 * (k - 1)), Quaternion.identity);
@@ -573,6 +564,7 @@ public class GameManager : MonoBehaviour {
                 cubeBoard[i, 0, k].name = $"({i}, {0}, {k})XCube";
                 countBoard[i, 0, k] = -1;
             }
+            return true;
         }
         /*
         for (int i = 0; i < 3; i++) {
