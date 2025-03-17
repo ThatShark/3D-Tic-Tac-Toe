@@ -528,6 +528,7 @@ public class GameManager : MonoBehaviour {
                     countBoard[i, 0, k] = -1;
                 }
             }
+            return true;
         } else {
             Debug.Log("pressDownArrow");
             Destroy(cubeBoard[i, 2, k]);
@@ -550,6 +551,7 @@ public class GameManager : MonoBehaviour {
                 cubeBoard[i, 0, k].name = $"({i}, 0, {k})XCube";
                 countBoard[i, 0, k] = -1;
             }
+            return true;
         }
         return true;
     }
