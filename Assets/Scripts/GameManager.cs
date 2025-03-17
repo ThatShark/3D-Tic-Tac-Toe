@@ -34,11 +34,16 @@ public class GameManager : MonoBehaviour {
 
         currentTurn = Player.O;
         winner = Player.Neither;
+        clickedCube = null;
 
         for (int x = 0; x < 4; x++) { // 清除舊方塊
             for (int y = 0; y < 3; y++) {
                 for (int z = 0; z < 3; z++) {
                     Destroy(cubeBoard[x, y, z]);
+                    if (cubeSelectBoard[x, y, z] != null) {
+                        Destroy(cubeSelectBoard[x, y, z]);
+                        cubeSelectBoard[x, y, z] = null;
+                    }
                 }
             }
         }
@@ -102,7 +107,7 @@ public class GameManager : MonoBehaviour {
             KeyCode.Keypad6, KeyCode.Keypad7, KeyCode.Keypad8, KeyCode.Keypad9, KeyCode.Keypad0,}) {
 
             if (Input.GetKeyDown(key)) {
-                //切換數字時讓SelectCube消失
+                //切換數字時重置狀態
                 for (int i = 0; i < 3; i++) {
                     for (int j = 0; j < 3; j++) {
                         for (int k = 0; k < 3; k++) {
@@ -165,8 +170,8 @@ public class GameManager : MonoBehaviour {
                         SetLayerActive(2);
                         break;
                 }
-                if (clickedCube != null) {
-                    isSelected = SelectCubeInstantiate(clickedCube?.name);
+                if (clickedCube != null && clickedCube.name.Contains("Cube")) {
+                    SelectCubeInstantiate(clickedCube.name);
                 }
             }
         }
@@ -398,7 +403,6 @@ public class GameManager : MonoBehaviour {
     private GameObject[,,] OXboard = new GameObject[5, 5, 5];
     private GameObject[,,] cubeSelectBoard = new GameObject[5, 5, 5];
     private GameObject tempCube, clickedCube;
-    private bool isSelected = false, onlyOne = true;
 
     public bool IsMoveComplete() {
         // 判斷滑鼠點擊Cube
@@ -407,18 +411,20 @@ public class GameManager : MonoBehaviour {
             RaycastHit hit;
 
             if (Physics.Raycast(ray, out hit)) {
-                clickedCube = hit.collider.gameObject;
+                GameObject clickedObject = hit.collider.gameObject;
 
                 //點擊時讓原本被點過的SelectCube消失
-                if (clickedCube.name.Contains("Cube") || Input.GetKeyDown(KeyCode.Escape)) {
-                    for (int x = 0; x < 3; x++) {
-                        for (int y = 0; y < 3; y++) {
-                            for (int z = 0; z < 3; z++) {
-                                if (cubeSelectBoard[x, y, z] != null) {
-                                    Destroy(cubeSelectBoard[x, y, z]);
-                                    if (OXboard[x, y, z] == null) {
-                                        cubeBoard[x, y, z].SetActive(true);
-                                    }
+                if (clickedObject.name.Contains("Cube")) {
+                    clickedCube = clickedObject;
+                }
+                for (int x = 0; x < 3; x++) {
+                    for (int y = 0; y < 3; y++) {
+                        for (int z = 0; z < 3; z++) {
+                            if (cubeSelectBoard[x, y, z] != null) {
+                                Destroy(cubeSelectBoard[x, y, z]);
+                                cubeSelectBoard[x, y, z] = null;
+                                if (OXboard[x, y, z] == null) {
+                                    cubeBoard[x, y, z].SetActive(true);
                                 }
                             }
                         }
@@ -433,7 +439,7 @@ public class GameManager : MonoBehaviour {
                 //     }
                 // }
 
-                    isSelected = SelectCubeInstantiate(clickedCube?.name);
+                SelectCubeInstantiate(clickedCube.name);
             }
         }
         foreach (KeyCode key in new KeyCode[] {
@@ -666,16 +672,16 @@ public class GameManager : MonoBehaviour {
     #region SelectCubeInstantiate()系列
     private GameObject tempSelectCube;
 
-    //設定CUBE根據點擊激活變為SELECTCUBE
-    bool SelectCubeInstantiate(string clickedCube) {
-        int i = clickedCube[1] - '0', k = clickedCube[7] - '0'; //這樣點到場景會有問題，雖然不會終止遊戲
+    //設定cube根據點擊激活變為selectCube
+    void SelectCubeInstantiate(string clickedCubeName) {
+        int i = clickedCubeName[1] - '0', k = clickedCubeName[7] - '0'; //這樣點到場景會有問題，雖然不會終止遊戲
         int tempNumber;
         switch (currentNumber) {
             case 1:
             case 2:
             case 3:
                 tempNumber = currentNumber - 1;
-                if (clickedCube.Contains($"({tempNumber}, ") && clickedCube.Contains($", {k})")) {
+                if (clickedCubeName.Contains($"({tempNumber}, ") && clickedCubeName.Contains($", {k})")) {
                     for (int j = 0; j < 3; j++) {
                         if (countBoard[tempNumber, j, k] == 0) {
                             tempSelectCube = Instantiate(SelectEmptyCube, cubeBoard[tempNumber, j, k].transform.position, Quaternion.identity);
@@ -698,13 +704,13 @@ public class GameManager : MonoBehaviour {
                         }
                     }
                 }
-                return true;
+                break;
 
             case 4:
             case 5:
             case 6:
                 tempNumber = currentNumber - 4;
-                if (clickedCube.Contains($"({i}, ") && clickedCube.Contains($", {tempNumber})")) {
+                if (clickedCubeName.Contains($"({i}, ") && clickedCubeName.Contains($", {tempNumber})")) {
                     for (int j = 0; j < 3; j++) {
                         if (countBoard[i, j, tempNumber] == 0) {
                             tempSelectCube = Instantiate(SelectEmptyCube, cubeBoard[i, j, tempNumber].transform.position, Quaternion.identity);
@@ -727,8 +733,8 @@ public class GameManager : MonoBehaviour {
                         }
                     }
                 }
+                break;
 
-                return true;
             case 7:
             case 8:
             case 9:
@@ -752,7 +758,7 @@ public class GameManager : MonoBehaviour {
                     cubeSelectBoard[i, tempNumber, k] = tempSelectCube;
                     tempSelectCube.name = $"({i}, {tempNumber}, {k})SelectXCube";
                 }
-                return true;
+                break;
 
             case 0:
                 for (int j = 0; j < 3; j++) {
@@ -776,11 +782,8 @@ public class GameManager : MonoBehaviour {
                         tempSelectCube.name = $"({i}, {j}, {currentNumber})SelectXCube";
                     }
                 }
-                return true;
+                break;
         }
-
-
-        return false;
     }
     #endregion
 }
