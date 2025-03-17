@@ -27,12 +27,12 @@ When using the skill, instead of placing their own block, a player places a tria
 
   - When placed from the bottom, all blocks above the triangle will automatically move up by one layer. If there are already three layers above, the third layer item will be moved to the fourth layer, ignoring the maximum layer limit.
 
-==Caution: Triangle can't destroy another triangle. Besides, no blocks can be put under a triangle.==
+***Caution: Triangle can't destroy another triangle. Besides, no blocks can be put under a triangle.***
 
 - Spin:
 When using the skill, all items can rotate 90 degrees in one of the four directions (front, back, left, or right). After the rotation, all items will still be affected by gravity and the triangle's effects.
 
-==Caution: Blocks that were originally moved beyond the third layer due to the triangle will disappear after the rotation.==
+***Caution: Blocks that were originally moved beyond the third layer due to the triangle will disappear after the rotation.***
 
 - UpsideDown:
 When using the skill, all items will be flipped upside down. After the flip, the effects will be the same as the "spin" skill.
