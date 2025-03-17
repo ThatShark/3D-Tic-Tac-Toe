@@ -1,5 +1,6 @@
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 public class ScriptForButton : MonoBehaviour {
@@ -38,7 +39,7 @@ public class ScriptForButton : MonoBehaviour {
         gameManager.currentTurn = GameManager.Player.Neither;
     }
 
-    public void Check () {
+    public void Check() {
         nowTurn = gameManager.currentTurn;
         gameManager.currentTurn = GameManager.Player.Checking;
         gameManager.checkBox.SetActive(true);

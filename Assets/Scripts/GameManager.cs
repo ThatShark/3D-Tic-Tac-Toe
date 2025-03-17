@@ -16,10 +16,12 @@ public class GameManager : MonoBehaviour {
         Checking
     }
     public Player currentTurn, winner;
-    // public ScriptForCursor cursorManager;
+    // private ScriptForCursor cursorManager;
+    private ScriptForButton buttonManager;
     void Start() {
         currentTurn = Player.O;
         // cursorManager = FindFirstObjectByType<ScriptForCursor>();
+        buttonManager = FindFirstObjectByType<ScriptForButton>();
         ResetScene();
     }
 
@@ -28,6 +30,8 @@ public class GameManager : MonoBehaviour {
     private int[,,] countBoard;
     private GameObject[,,] cubeBoard = new GameObject[4, 3, 3]; // 座標[7*(i-1), 7*(j-1), 7*(k-1)]
     public void ResetScene() {
+        XWinText.SetActive(true);
+        OWinText.SetActive(true);
         endScene.SetActive(false);
         OCanvas.SetActive(true);
         XCanvas.SetActive(false);
@@ -78,10 +82,20 @@ public class GameManager : MonoBehaviour {
                 XCanvas.SetActive(false);
                 endScene.SetActive(true);
                 ((winner == Player.O) ? XWinText : OWinText).SetActive(false);
+                if (Input.GetKeyDown(KeyCode.Escape)) {
+                    buttonManager.SwitchSceneTo(0);
+                } else if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) {
+                    ResetScene();
+                }
                 break;
             case Player.Checking:
                 // cursorManager.cursorState = ScriptForCursor.CursorState.Default;
-                break;
+                if (Input.GetKeyDown(KeyCode.Escape)) {
+                    buttonManager.Cancel();
+                } else if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) {
+                    buttonManager.SurrenderSkill();
+                }
+                    break;
             default:
                 if (currentTurn == Player.O) {
                     // cursorManager.cursorState = ScriptForCursor.CursorState.O;
@@ -108,19 +122,7 @@ public class GameManager : MonoBehaviour {
 
             if (Input.GetKeyDown(key)) {
                 //切換數字時重置狀態
-                for (int i = 0; i < 3; i++) {
-                    for (int j = 0; j < 3; j++) {
-                        for (int k = 0; k < 3; k++) {
-                            if (cubeSelectBoard[i, j, k] != null) {
-                                Destroy(cubeSelectBoard[i, j, k]);
-                                cubeSelectBoard[i, j, k] = null;
-                                if (OXboard[i, j, k] == null) {
-                                    cubeBoard[i, j, k].SetActive(true);
-                                }
-                            }
-                        }
-                    }
-                }
+                DestroyAllSelect();
                 currentNumber = 0;
                 AllCubeActive();
                 switch (key) {
@@ -221,10 +223,29 @@ public class GameManager : MonoBehaviour {
     }
     #endregion
 
+    void DestroyAllSelect() {
+        for (int x = 0; x < 3; x++) {
+            for (int y = 0; y < 3; y++) {
+                for (int z = 0; z < 3; z++) {
+                    if (cubeSelectBoard[x, y, z] != null) {
+                        Destroy(cubeSelectBoard[x, y, z]);
+                        cubeSelectBoard[x, y, z] = null;
+                        if (OXboard[x, y, z] == null) {
+                            cubeBoard[x, y, z].SetActive(true);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     void CheckIfNextTurn() {
         if (SomeoneHasWin()) {
             currentTurn = Player.Neither;
         } else if (IsMoveComplete()) {
+            clickedCube = null;
+            DestroyAllSelect();
+            AllCubeActive();
             if (currentTurn == Player.O) {
                 currentTurn = Player.X;
                 OCanvas.SetActive(false);
@@ -417,19 +438,7 @@ public class GameManager : MonoBehaviour {
                 if (clickedObject.name.Contains("Cube")) {
                     clickedCube = clickedObject;
                 }
-                for (int x = 0; x < 3; x++) {
-                    for (int y = 0; y < 3; y++) {
-                        for (int z = 0; z < 3; z++) {
-                            if (cubeSelectBoard[x, y, z] != null) {
-                                Destroy(cubeSelectBoard[x, y, z]);
-                                cubeSelectBoard[x, y, z] = null;
-                                if (OXboard[x, y, z] == null) {
-                                    cubeBoard[x, y, z].SetActive(true);
-                                }
-                            }
-                        }
-                    }
-                }
+                DestroyAllSelect();
                 // if (SetCubeActive(clickedCube.name)) {
                 //     // 判斷按下上下鍵
                 //     if (Input.GetKeyDown(KeyCode.UpArrow)) {
@@ -468,7 +477,10 @@ public class GameManager : MonoBehaviour {
                         return InputOX("UpArrow", clickedCube?.name);
                     case KeyCode.DownArrow:
                         return InputOX("DownArrow", clickedCube?.name);
-                    // case KeyCode.Escape:
+                    case KeyCode.Escape:
+                        clickedCube = null;
+                        DestroyAllSelect(); 
+                        return false;
                     default:
                         return false;
                 }
