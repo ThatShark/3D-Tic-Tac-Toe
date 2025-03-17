@@ -211,7 +211,7 @@ public class GameManager : MonoBehaviour {
         for (int x = 0; x < 3; x++) {
             for (int y = 0; y < 3; y++) {
                 for (int z = 0; z < 3; z++) {
-                    cubeBoard[x, y, z].SetActive(true);  
+                    cubeBoard[x, y, z].SetActive(true);
                 }
             }
         }
@@ -413,7 +413,7 @@ public class GameManager : MonoBehaviour {
 
     #region IsMoveComplete()系列
     private GameObject[,,] cubeSelectBoard = new GameObject[5, 5, 5];
-    private GameObject tempCube, clickedCube;
+    private GameObject clickedCube = null;
 
     bool IsMoveComplete() {
         // 判斷滑鼠點擊Cube
@@ -498,33 +498,33 @@ public class GameManager : MonoBehaviour {
                 Destroy(cubeBoard[i, 2, k]);
                 if (currentTurn == Player.O) {
                     cubeBoard[i, 2, k] = Instantiate(OCube, new Vector3(7 * (i - 1), 7, 7 * (k - 1)), Quaternion.identity);
-                    cubeBoard[i, 2, k].name = $"({i}, {2}, {k})OCube";
+                    cubeBoard[i, 2, k].name = $"({i}, 2, {k})OCube";
                     countBoard[i, 2, k] = 1;
                 } else if (currentTurn == Player.X) {
                     cubeBoard[i, 2, k] = Instantiate(XCube, new Vector3(7 * (i - 1), 7, 7 * (k - 1)), Quaternion.identity);
-                    cubeBoard[i, 2, k].name = $"({i}, {2}, {k})XCube";
+                    cubeBoard[i, 2, k].name = $"({i}, 2, {k})XCube";
                     countBoard[i, 2, k] = -1;
                 }
             } else if (countBoard[i, 0, k] != 0) {
                 Destroy(cubeBoard[i, 1, k]);
                 if (currentTurn == Player.O) {
                     cubeBoard[i, 1, k] = Instantiate(OCube, new Vector3(7 * (i - 1), 0, 7 * (k - 1)), Quaternion.identity);
-                    cubeBoard[i, 1, k].name = $"({i}, {1}, {k})OCube";
+                    cubeBoard[i, 1, k].name = $"({i}, 1, {k})OCube";
                     countBoard[i, 1, k] = 1;
                 } else if (currentTurn == Player.X) {
                     cubeBoard[i, 1, k] = Instantiate(XCube, new Vector3(7 * (i - 1), 0, 7 * (k - 1)), Quaternion.identity);
-                    cubeBoard[i, 1, k].name = $"({i}, {1}, {k})XCube";
+                    cubeBoard[i, 1, k].name = $"({i}, 1, {k})XCube";
                     countBoard[i, 1, k] = -1;
                 }
             } else {
                 Destroy(cubeBoard[i, 0, k]);
                 if (currentTurn == Player.O) {
                     cubeBoard[i, 0, k] = Instantiate(OCube, new Vector3(7 * (i - 1), -7, 7 * (k - 1)), Quaternion.identity);
-                    cubeBoard[i, 0, k].name = $"({i}, {0}, {k})OCube";
+                    cubeBoard[i, 0, k].name = $"({i}, 0, {k})OCube";
                     countBoard[i, 0, k] = 1;
                 } else if (currentTurn == Player.X) {
                     cubeBoard[i, 0, k] = Instantiate(XCube, new Vector3(7 * (i - 1), -7, 7 * (k - 1)), Quaternion.identity);
-                    cubeBoard[i, 0, k].name = $"({i}, {0}, {k})XCube";
+                    cubeBoard[i, 0, k].name = $"({i}, 0, {k})XCube";
                     countBoard[i, 0, k] = -1;
                 }
             }
@@ -532,18 +532,22 @@ public class GameManager : MonoBehaviour {
             Debug.Log("pressDownArrow");
             Destroy(cubeBoard[i, 2, k]);
             cubeBoard[i, 2, k] = Instantiate(cubeBoard[i, 1, k], new Vector3(7 * (i - 1), 7, 7 * (k - 1)), Quaternion.identity);
+            cubeBoard[i, 2, k].name = cubeBoard[i, 1, k].name;
             countBoard[i, 2, k] = countBoard[i, 1, k];
+
             Destroy(cubeBoard[i, 1, k]);
             cubeBoard[i, 1, k] = Instantiate(cubeBoard[i, 0, k], new Vector3(7 * (i - 1), 0, 7 * (k - 1)), Quaternion.identity);
+            cubeBoard[i, 1, k].name = cubeBoard[i, 0, k].name;
             countBoard[i, 1, k] = countBoard[i, 0, k];
+
             Destroy(cubeBoard[i, 0, k]);
             if (currentTurn == Player.O) {
                 cubeBoard[i, 0, k] = Instantiate(OCube, new Vector3(7 * (i - 1), -7, 7 * (k - 1)), Quaternion.identity);
-                cubeBoard[i, 0, k].name = $"({i}, {0}, {k})OCube";
+                cubeBoard[i, 0, k].name = $"({i}, 0, {k})OCube";
                 countBoard[i, 0, k] = 1;
             } else if (currentTurn == Player.X) {
                 cubeBoard[i, 0, k] = Instantiate(XCube, new Vector3(7 * (i - 1), -7, 7 * (k - 1)), Quaternion.identity);
-                cubeBoard[i, 0, k].name = $"({i}, {0}, {k})XCube";
+                cubeBoard[i, 0, k].name = $"({i}, 0, {k})XCube";
                 countBoard[i, 0, k] = -1;
             }
         }
@@ -560,34 +564,16 @@ public class GameManager : MonoBehaviour {
         if (clickedCubeName == null) {
             return;
         }
-        int i = clickedCubeName[1] - '0', k = clickedCubeName[7] - '0'; //這樣點到場景會有問題，雖然不會終止遊戲
+        int i = clickedCubeName[1] - '0', k = clickedCubeName[7] - '0';
         int tempNumber;
         switch (currentNumber) {
             case 1:
             case 2:
             case 3:
                 tempNumber = currentNumber - 1;
-                if (clickedCubeName.Contains($"({tempNumber}, ") && clickedCubeName.Contains($", {k})")) {
+                if (clickedCubeName.Contains($"({tempNumber}") && clickedCubeName.Contains($"{k})")) {
                     for (int j = 0; j < 3; j++) {
-                        if (countBoard[tempNumber, j, k] == 0) {
-                            tempSelectCube = Instantiate(SelectEmptyCube, cubeBoard[tempNumber, j, k].transform.position, Quaternion.identity);
-                            tempSelectCube.SetActive(true);
-                            cubeBoard[tempNumber, j, k].SetActive(false);
-                            cubeSelectBoard[tempNumber, j, k] = tempSelectCube;
-                            tempSelectCube.name = $"({tempNumber}, {j}, {k})SelectEmptyCube";
-                        } else if (countBoard[tempNumber, j, k] == 1) {
-                            tempSelectCube = Instantiate(SelectOCube, cubeBoard[tempNumber, j, k].transform.position, Quaternion.identity);
-                            tempSelectCube.SetActive(true);
-                            cubeBoard[tempNumber, j, k].SetActive(false);
-                            cubeSelectBoard[tempNumber, j, k] = tempSelectCube;
-                            tempSelectCube.name = $"({tempNumber}, {j}, {k})SelectOCube";
-                        } else if (countBoard[tempNumber, j, k] == -1) {
-                            tempSelectCube = Instantiate(SelectXCube, cubeBoard[tempNumber, j, k].transform.position, Quaternion.identity);
-                            tempSelectCube.SetActive(true);
-                            cubeBoard[tempNumber, j, k].SetActive(false);
-                            cubeSelectBoard[tempNumber, j, k] = tempSelectCube;
-                            tempSelectCube.name = $"({tempNumber}, {j}, {k})SelectXCube";
-                        }
+                        InstantiateSelectCube(tempNumber, j, k, countBoard[tempNumber, j, k]);
                     }
                 }
                 break;
@@ -596,27 +582,9 @@ public class GameManager : MonoBehaviour {
             case 5:
             case 6:
                 tempNumber = currentNumber - 4;
-                if (clickedCubeName.Contains($"({i}, ") && clickedCubeName.Contains($", {tempNumber})")) {
+                if (clickedCubeName.Contains($"({i}") && clickedCubeName.Contains($"{tempNumber})")) {
                     for (int j = 0; j < 3; j++) {
-                        if (countBoard[i, j, tempNumber] == 0) {
-                            tempSelectCube = Instantiate(SelectEmptyCube, cubeBoard[i, j, tempNumber].transform.position, Quaternion.identity);
-                            tempSelectCube.SetActive(true);
-                            cubeBoard[i, j, tempNumber].SetActive(false);
-                            cubeSelectBoard[i, j, tempNumber] = tempSelectCube;
-                            tempSelectCube.name = $"({i}, {j}, {tempNumber})SelectEmptyCube";
-                        } else if (countBoard[i, j, tempNumber] == 1) {
-                            tempSelectCube = Instantiate(SelectOCube, cubeBoard[i, j, tempNumber].transform.position, Quaternion.identity);
-                            tempSelectCube.SetActive(true);
-                            cubeBoard[i, j, tempNumber].SetActive(false);
-                            cubeSelectBoard[i, j, tempNumber] = tempSelectCube;
-                            tempSelectCube.name = $"({i}, {j}, {tempNumber})SelectOCube";
-                        } else if (countBoard[i, j, tempNumber] == -1) {
-                            tempSelectCube = Instantiate(SelectXCube, cubeBoard[i, j, tempNumber].transform.position, Quaternion.identity);
-                            tempSelectCube.SetActive(true);
-                            cubeBoard[i, j, tempNumber].SetActive(false);
-                            cubeSelectBoard[i, j, tempNumber] = tempSelectCube;
-                            tempSelectCube.name = $"({i}, {j}, {tempNumber})SelectXCube";
-                        }
+                        InstantiateSelectCube(i, j, tempNumber, countBoard[i, j, tempNumber]);
                     }
                 }
                 break;
@@ -625,50 +593,39 @@ public class GameManager : MonoBehaviour {
             case 8:
             case 9:
                 tempNumber = currentNumber - 7;
-                if (countBoard[i, tempNumber, k] == 0) {
-                    tempSelectCube = Instantiate(SelectEmptyCube, cubeBoard[i, tempNumber, k].transform.position, Quaternion.identity);
-                    tempSelectCube.SetActive(true);
-                    cubeBoard[i, tempNumber, k].SetActive(false);
-                    cubeSelectBoard[i, tempNumber, k] = tempSelectCube;
-                    tempSelectCube.name = $"({i}, {tempNumber}, {k})SelectEmptyCube";
-                } else if (countBoard[i, tempNumber, k] == 1) {
-                    tempSelectCube = Instantiate(SelectOCube, cubeBoard[i, tempNumber, k].transform.position, Quaternion.identity);
-                    tempSelectCube.SetActive(true);
-                    cubeBoard[i, tempNumber, k].SetActive(false);
-                    cubeSelectBoard[i, tempNumber, k] = tempSelectCube;
-                    tempSelectCube.name = $"({i}, {tempNumber}, {k})SelectOCube";
-                } else if (countBoard[i, tempNumber, k] == -1) {
-                    tempSelectCube = Instantiate(SelectXCube, cubeBoard[i, tempNumber, k].transform.position, Quaternion.identity);
-                    tempSelectCube.SetActive(true);
-                    cubeBoard[i, tempNumber, k].SetActive(false);
-                    cubeSelectBoard[i, tempNumber, k] = tempSelectCube;
-                    tempSelectCube.name = $"({i}, {tempNumber}, {k})SelectXCube";
-                }
+                InstantiateSelectCube(i, tempNumber, k, countBoard[i, tempNumber, k]);
                 break;
 
             case 0:
                 for (int j = 0; j < 3; j++) {
-                    if (countBoard[i, j, k] == 0) {
-                        tempSelectCube = Instantiate(SelectEmptyCube, cubeBoard[i, j, k].transform.position, Quaternion.identity);
-                        tempSelectCube.SetActive(true);
-                        cubeBoard[i, j, k].SetActive(false);
-                        cubeSelectBoard[i, j, k] = tempSelectCube;
-                        tempSelectCube.name = $"({i}, {j}, {k})SelectEmptyCube";
-                    } else if (countBoard[i, j, k] == 1) {
-                        tempSelectCube = Instantiate(SelectOCube, cubeBoard[i, j, currentNumber - 3].transform.position, Quaternion.identity);
-                        tempSelectCube.SetActive(true);
-                        cubeBoard[i, j, currentNumber].SetActive(false);
-                        cubeSelectBoard[i, j, currentNumber] = tempSelectCube;
-                        tempSelectCube.name = $"({i}, {j}, {currentNumber})SelectOCube";
-                    } else if (countBoard[i, j, currentNumber] == -1) {
-                        tempSelectCube = Instantiate(SelectXCube, cubeBoard[i, j, k - 3].transform.position, Quaternion.identity);
-                        tempSelectCube.SetActive(true);
-                        cubeBoard[i, j, currentNumber].SetActive(false);
-                        cubeSelectBoard[i, j, currentNumber] = tempSelectCube;
-                        tempSelectCube.name = $"({i}, {j}, {currentNumber})SelectXCube";
-                    }
+                    InstantiateSelectCube(i, j, k, countBoard[i, j, k]);
                 }
                 break;
+        }
+    }
+
+    void InstantiateSelectCube(int i, int j, int k, int cubeType) {
+        GameObject tempSelectCube;
+        Vector3 position = cubeBoard[i, j, k].transform.position;
+
+        if (cubeType == 1) {
+            tempSelectCube = Instantiate(SelectOCube, position, Quaternion.identity);
+        } else if (cubeType == -1) {
+            tempSelectCube = Instantiate(SelectXCube, position, Quaternion.identity);
+        } else {
+            tempSelectCube = Instantiate(SelectEmptyCube, position, Quaternion.identity);
+        }
+
+        tempSelectCube.SetActive(true);
+        cubeBoard[i, j, k].SetActive(false);
+        cubeSelectBoard[i, j, k] = tempSelectCube;
+
+        if (cubeType == 1) {
+            cubeSelectBoard[i, j, k].name = $"({i}, {j}, {k})SelectOCube";
+        } else if (cubeType == -1) {
+            cubeSelectBoard[i, j, k].name = $"({i}, {j}, {k})SelectXCube";
+        } else {
+            cubeSelectBoard[i, j, k].name = $"({i}, {j}, {k})SelectEmptyCube";
         }
     }
     #endregion
