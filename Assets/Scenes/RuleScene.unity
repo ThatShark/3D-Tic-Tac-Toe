@@ -709,7 +709,7 @@ MonoBehaviour:
 
     A: Spin
 
-    S: UpsideDoown
+    S: UpsideDown
 
     Q:
     Surrender
@@ -1733,7 +1733,7 @@ MonoBehaviour:
 
 
     Caution: Triangle can''t destroy another triangle.
-    Besides, no blocks can be put under a triangle;
+    Besides, no blocks can be put under a triangle!
 
 
     Spin:
@@ -2382,7 +2382,7 @@ Canvas:
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
   m_VertexColorAlwaysGammaSpace: 1
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0

@@ -439,7 +439,6 @@ public class GameManager : MonoBehaviour {
 
             KeyCode.Escape,
         }) {
-
             if (Input.GetKeyDown(key)) {
                 switch (key) {
                     case KeyCode.W:
@@ -467,7 +466,6 @@ public class GameManager : MonoBehaviour {
                 }
             }
         }
-
         return false;
     }
     #endregion
