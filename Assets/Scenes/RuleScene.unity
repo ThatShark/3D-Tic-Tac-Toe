@@ -176,7 +176,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Player who gets more "victory conditions"  at the same time wins the game.
+  m_text: 'Player who gets more "Victory Conditions"  at the same time wins the game.
 
 
     Victory
