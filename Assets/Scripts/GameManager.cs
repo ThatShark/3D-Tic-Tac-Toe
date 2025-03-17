@@ -185,6 +185,9 @@ public class GameManager : MonoBehaviour {
             for (int z = 0; z < 3; z++) {
                 cubeBoard[(x + 1) % 3, y, z].SetActive(false);
                 cubeBoard[(x + 2) % 3, y, z].SetActive(false);
+
+                OXBoard[(x + 1) % 3, y, z].SetActive(false);
+                OXBoard[(x + 2) % 3, y, z].SetActive(false);
             }
         }
     }
@@ -195,6 +198,9 @@ public class GameManager : MonoBehaviour {
             for (int y = 0; y < 3; y++) {
                 cubeBoard[x, y, (z + 1) % 3].SetActive(false);
                 cubeBoard[x, y, (z + 2) % 3].SetActive(false);
+                
+                OXBoard[x, y, (z + 1) % 3].SetActive(false);
+                OXBoard[x, y, (z + 2) % 3].SetActive(false);
             }
         }
     }
@@ -205,6 +211,9 @@ public class GameManager : MonoBehaviour {
             for (int z = 0; z < 3; z++) {
                 cubeBoard[x, (y + 1) % 3, z].SetActive(false);
                 cubeBoard[x, (y + 2) % 3, z].SetActive(false);
+
+                OXBoard[x, (y + 1) % 3, z].SetActive(false);
+                OXBoard[x, (y + 2) % 3, z].SetActive(false);
             }
         }
     }
@@ -216,6 +225,8 @@ public class GameManager : MonoBehaviour {
                 for (int z = 0; z < 3; z++) {
                     if (OXboard[x, y, z] == null) {
                         cubeBoard[x, y, z].SetActive(true);
+                    } else {
+                        OXBoard[x, y, z].SetActive(true);
                     }
                 }
             }
@@ -232,6 +243,8 @@ public class GameManager : MonoBehaviour {
                         cubeSelectBoard[x, y, z] = null;
                         if (OXboard[x, y, z] == null) {
                             cubeBoard[x, y, z].SetActive(true);
+                        } else {
+                            OXboard[x, y, z].SetActive(false);
                         }
                     }
                 }
@@ -474,15 +487,12 @@ public class GameManager : MonoBehaviour {
                         surrenderButton.onClick.Invoke();
                         return false;
                     case KeyCode.UpArrow:
-                        return InputOX("UpArrow", clickedCube?.name);
+                        return InputOX(true, clickedCube?.name);
                     case KeyCode.DownArrow:
-                        return InputOX("DownArrow", clickedCube?.name);
+                        return InputOX(false, clickedCube?.name);
                     case KeyCode.Escape:
                         clickedCube = null;
                         DestroyAllSelect(); 
-                        return false;
-                    default:
-                        return false;
                 }
             }
         }
@@ -493,24 +503,88 @@ public class GameManager : MonoBehaviour {
 
     #region inputOX()系列
     // 輸入O或X
-    private bool InputOX(string pressUpDownArrow, string clickedCube) {
-        //顯示全部時無效
-        if (currentNumber == 0) {
+    private bool InputOX(bool pressUpArrow, string clickedCubeNName) { // true: up, false: down
+        //非點選方塊時無效
+        if (!clickedCubeNName.Contains("Cube")) {
             return false;
         }
 
-        int count = 0;
+        int emptyCubeCount = 0;
+        int i = clickedCubeNName[1] - '0', k = clickedCubeNName[7] - '0';
+        for (int y = 0; y < 3; y++) {
+            if (countBoard[i, y, k] == 0) {
+                emptyCubeCount++;
+            }
+        }
+        if (emptyCubeCount > 0) {
+            // showInvalidInput();
+            return false;
+        }
 
+        if (pressUpArrow) {
+            if (countBoard[i, 1, k] != 0) {
+                Destroy(cubeBoard[i, 2, k]);
+                if (currentTurn == Player.O) {
+                    cubeBoard[i, 2, k] = Instantiate(OCube, new Vector3(7 * (i - 1), 7, 7 * (k - 1)), Quaternion.identity);
+                    cubeBoard[i, 2, k].name = $"({i}, {2}, {k})OCube";
+                    countBoard[i, 2, k] = 1;
+                } else if (currentTurn == Player.X) {
+                    cubeBoard[i, 2, k] = Instantiate(XCube, new Vector3(7 * (i - 1), 7, 7 * (k - 1)), Quaternion.identity);
+                    cubeBoard[i, 2, k].name = $"({i}, {2}, {k})XCube";
+                    countBoard[i, 2, k] = -1;
+                }
+            } else if (countBoard[i, 0, k] != 0) {
+                Destroy(cubeBoard[i, 1, k]);
+                if (currentTurn == Player.O) {
+                    cubeBoard[i, 1, k] = Instantiate(OCube, new Vector3(7 * (i - 1), 0, 7 * (k - 1)), Quaternion.identity);
+                    cubeBoard[i, 1, k].name = $"({i}, {1}, {k})OCube";
+                    countBoard[i, 1, k] = 1;
+                } else if (currentTurn == Player.X) {
+                    cubeBoard[i, 1, k] = Instantiate(XCube, new Vector3(7 * (i - 1), 0, 7 * (k - 1)), Quaternion.identity);
+                    cubeBoard[i, 1, k].name = $"({i}, {1}, {k})XCube";
+                    countBoard[i, 1, k] = -1;
+                }
+            } else {
+                Destroy(cubeBoard[i, 0, k]);
+                if (currentTurn == Player.O) {
+                    cubeBoard[i, 0, k] = Instantiate(OCube, new Vector3(7 * (i - 1), -7, 7 * (k - 1)), Quaternion.identity);
+                    cubeBoard[i, 0, k].name = $"({i}, {0}, {k})OCube";
+                    countBoard[i, 0, k] = 1;
+                } else if (currentTurn == Player.X) {
+                    cubeBoard[i, 0, k] = Instantiate(XCube, new Vector3(7 * (i - 1), -7, 7 * (k - 1)), Quaternion.identity);
+                    cubeBoard[i, 0, k].name = $"({i}, {0}, {k})XCube";
+                    countBoard[i, 0, k] = -1;
+                }
+            }
+        } else {
+            Destroy(cubeBoard[i, 2, k]);
+            cubeBoard[i, 2, k] = Instantiate(cubeBoard[i, 1, k], new Vector3(7 * (i - 1), 7, 7 * (k - 1)), Quaternion.identity);
+            countBoard[i, 2, k] = countBoard[i, 1, k];
+            Destroy(cubeBoard[i, 1, k]);
+            cubeBoard[i, 1, k] = Instantiate(cubeBoard[i, 0, k], new Vector3(7 * (i - 1), 0, 7 * (k - 1)), Quaternion.identity);
+            countBoard[i, 1, k] = countBoard[i, 0, k];
+            Destroy(cubeBoard[i, 0, k]);
+            if (currentTurn == Player.O) {
+                cubeBoard[i, 0, k] = Instantiate(OCube, new Vector3(7 * (i - 1), -7, 7 * (k - 1)), Quaternion.identity);
+                cubeBoard[i, 0, k].name = $"({i}, {0}, {k})OCube";
+                countBoard[i, 0, k] = 1;
+            } else if (currentTurn == Player.X) {
+                cubeBoard[i, 0, k] = Instantiate(XCube, new Vector3(7 * (i - 1), -7, 7 * (k - 1)), Quaternion.identity);
+                cubeBoard[i, 0, k].name = $"({i}, {0}, {k})XCube";
+                countBoard[i, 0, k] = -1;
+            }
+        }
+        /*
         for (int i = 0; i < 3; i++) {
             for (int k = 0; k < 3; k++) {
-                if (pressUpDownArrow == "DownArrow" && clickedCube.Contains($"({i}") && clickedCube.Contains($"{k})")) {
+                if (!pressUpArrow && clickedCubeNName.Contains($"({i}") && clickedCubeNName.Contains($"{k})")) {
                     for (int y = 0; y < 3; y++) {
                         if (countBoard[i, y, k] != 0) {
-                            count++;
+                            emptyCubeCount++;
                         }
                     }
                     // 如果該列有空位
-                    if (count != 3) {
+                    if (emptyCubeCount != 3) {
                         //最下層有空位
                         if (countBoard[i, 0, k] == 0) {
                             cubeSelectBoard[i, 0, k].SetActive(false);
@@ -614,15 +688,15 @@ public class GameManager : MonoBehaviour {
                             return true;
                         }
                     }
-                    count = 0;
+                    emptyCubeCount = 0;
                     return false;
-                } else if (pressUpDownArrow == "UpArrow" && clickedCube.Contains($"({i}") && clickedCube.Contains($"{k})")) {
+                } else if (pressUpArrow && clickedCubeNName.Contains($"({i}") && clickedCubeNName.Contains($"{k})")) {
                     for (int y = 2; y >= 0; y--) {
                         if (countBoard[i, y, k] != 0) {
-                            count++;
+                            emptyCubeCount++;
                         }
                     }
-                    if (count != 3) {
+                    if (emptyCubeCount != 3) {
                         if (countBoard[i, 2, k] == 0) {//只有最上層有空位，直接生成到最上層
                             if (countBoard[i, 1, k] == 0) { //最上層有空位且中層也有，將方塊生成到中層
                                 if (countBoard[i, 0, k] == 0) { //最上層有空位且中下層也有，將方塊生成到最下層
@@ -670,13 +744,14 @@ public class GameManager : MonoBehaviour {
                             }
                             return true;
                         }
-                        count = 0;
+                        emptyCubeCount = 0;
                         return false;
                     }
                 }
             }
         }
         return false;
+        */
     }
 
     #endregion
