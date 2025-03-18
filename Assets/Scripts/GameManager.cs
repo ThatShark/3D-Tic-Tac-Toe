@@ -68,7 +68,7 @@ public class GameManager : MonoBehaviour {
         countBoard = new int[3, 4, 3];
 
         for (int x = 0; x < 3; x++) {
-            for (int y = 0; y < 4; y++) {
+            for (int y = 0; y < 3; y++) {
                 for (int z = 0; z < 3; z++) {
                     GameObject cube = Instantiate(emptyCube, new Vector3(7 * (x - 1), 7 * (y - 1), 7 * (z - 1)), Quaternion.identity);
                     cube.SetActive(true);
