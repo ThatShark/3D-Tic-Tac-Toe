@@ -1,11 +1,13 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
 using UnityEngine.EventSystems;
-using System.Collections.Generic;
+
 using static UnityEditor.Experimental.GraphView.GraphView;
 
 public class GameManager : MonoBehaviour {
@@ -69,7 +71,6 @@ public class GameManager : MonoBehaviour {
         }
     }
     #endregion
-
     public GameObject OCanvas, XCanvas, endScene, OWinText, XWinText, checkBox;
     public GameObject OCube, XCube, TriangleCube, SelectEmptyCube, SelectOCube, SelectXCube, SelectTriangleCube;
     void Update() {
@@ -171,7 +172,6 @@ public class GameManager : MonoBehaviour {
                         SetLayerActive(2);
                         break;
                 }
-                Debug.Log("IsNumberPress" + cubeBoard[1, 0, 0].name);
                 SelectCubeInstantiate(clickedCube?.name);
             }
         }
@@ -416,7 +416,6 @@ public class GameManager : MonoBehaviour {
     #region IsMoveComplete()系列
     private GameObject[,,] cubeSelectBoard = new GameObject[5, 5, 5];
     private GameObject clickedCube = null;
-    public GameObject clickedObject = null;
 
     bool IsMoveComplete() {
         // 判斷滑鼠點擊Cube
@@ -425,15 +424,15 @@ public class GameManager : MonoBehaviour {
             RaycastHit hit;
 
             if (Physics.Raycast(ray, out hit)) {
-                clickedObject = hit.collider.gameObject;
-
+                GameObject clickedObject = hit.collider.gameObject;            
                 //點擊時讓原本被點過的SelectCube消失
                 if (clickedObject.name.Contains("Cube")) {
                     clickedCube = clickedObject;
                 }
-                DestroyAllSelect();
-                Debug.Log("IsMoveComplete" + cubeBoard[1, 0, 0].name);
-                SelectCubeInstantiate(clickedCube?.name);
+                if (!clickedObject.name.Contains("Select")) {
+                    DestroyAllSelect();
+                    SelectCubeInstantiate(clickedCube?.name);
+                }
             }
         }
         foreach (KeyCode key in new KeyCode[] {
@@ -475,14 +474,13 @@ public class GameManager : MonoBehaviour {
     #endregion
 
     #region inputOX()系列
+    public GameObject ErrorCanvas;
     // 輸入O或X
     bool InputOX(bool pressUpArrow, string clickedCubeNName) { // true: up, false: down
-        Debug.Log("BeforeInputOX" + cubeBoard[1, 0, 0].name);
         //非點選方塊時無效
         if (clickedCubeNName == null || !clickedCubeNName.Contains("Cube")) {
             return false;
         }
-
         int emptyCubeCount = 0;
         int i = clickedCubeNName[1] - '0', k = clickedCubeNName[7] - '0';
         for (int y = 0; y < 3; y++) {
@@ -491,10 +489,10 @@ public class GameManager : MonoBehaviour {
             }
         }
         if (emptyCubeCount == 0) {
-            // showInvalidInput();
+            ErrorCanvas.SetActive(true);
+            StartCoroutine(DelayedSetNotActive(1.5f));
             return false;
         }
-
         if (pressUpArrow) {
             if (countBoard[i, 1, k] != 0) {
                 Destroy(cubeBoard[i, 2, k]);
@@ -552,10 +550,13 @@ public class GameManager : MonoBehaviour {
                 countBoard[i, 0, k] = -1;
             }
         }
-        Debug.Log("AfterInputOX" + cubeBoard[1, 0, 0].name);
         return true;
     }
 
+    IEnumerator DelayedSetNotActive(float delayTime) {
+        yield return new WaitForSeconds(delayTime);  // 延遲指定的時間
+        ErrorCanvas.SetActive(false);
+    }
     string nameCube(int i, int j, int k, int cubeType) {
         if (cubeType == 1) {
             return $"({i}, {j}, {k})OCube";
@@ -572,7 +573,6 @@ public class GameManager : MonoBehaviour {
     #region SelectCubeInstantiate()系列
     //設定cube根據點擊激活變為selectCube
     void SelectCubeInstantiate(string clickedCubeName) {
-        Debug.Log("SelectCubeInstantiate"+clickedCubeName);
         if (clickedCubeName == null) {
             return;
         }

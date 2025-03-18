@@ -4,7 +4,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 public class ScriptForButton : MonoBehaviour {
-    public GameManager gameManager;
+    private GameManager gameManager;
     void Start() {
         gameManager = FindFirstObjectByType<GameManager>();
     }
@@ -33,7 +33,7 @@ public class ScriptForButton : MonoBehaviour {
         
     }
 
-    public GameManager.Player nowTurn;
+    private GameManager.Player nowTurn;
     public void SurrenderSkill () {
         gameManager.winner = ((nowTurn == GameManager.Player.O) ? GameManager.Player.X : GameManager.Player.O);
         gameManager.currentTurn = GameManager.Player.Neither;
