@@ -416,6 +416,7 @@ public class GameManager : MonoBehaviour {
     #region IsMoveComplete()系列
     private GameObject[,,] cubeSelectBoard = new GameObject[5, 5, 5];
     private GameObject clickedCube = null;
+    public GameObject clickedObject = null;
 
     bool IsMoveComplete() {
         // 判斷滑鼠點擊Cube
@@ -424,7 +425,7 @@ public class GameManager : MonoBehaviour {
             RaycastHit hit;
 
             if (Physics.Raycast(ray, out hit)) {
-                GameObject clickedObject = hit.collider.gameObject;
+                clickedObject = hit.collider.gameObject;
 
                 //點擊時讓原本被點過的SelectCube消失
                 if (clickedObject.name.Contains("Cube")) {
@@ -476,7 +477,7 @@ public class GameManager : MonoBehaviour {
     #region inputOX()系列
     // 輸入O或X
     bool InputOX(bool pressUpArrow, string clickedCubeNName) { // true: up, false: down
-        Debug.Log("InputOX" + clickedCubeNName);
+        Debug.Log("BeforeInputOX" + cubeBoard[1, 0, 0].name);
         //非點選方塊時無效
         if (clickedCubeNName == null || !clickedCubeNName.Contains("Cube")) {
             return false;
@@ -551,6 +552,7 @@ public class GameManager : MonoBehaviour {
                 countBoard[i, 0, k] = -1;
             }
         }
+        Debug.Log("AfterInputOX" + cubeBoard[1, 0, 0].name);
         return true;
     }
 
