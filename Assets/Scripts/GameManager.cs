@@ -71,8 +71,7 @@ public class GameManager : MonoBehaviour {
             for (int y = 0; y < 3; y++) {
                 for (int z = 0; z < 3; z++) {
                     GameObject cube = Instantiate(emptyCube, new Vector3(7 * (x - 1), 7 * (y - 1), 7 * (z - 1)), Quaternion.identity);
-                    cube.SetActive(true);
-                    // 先把3x3建出來
+                    cube.SetActive(true);// 先把3x3建出來
                     cubeBoard[x, y, z] = cube; // 存入 cubeBoard 陣列
                     cube.name = $"({x}, {y}, {z})EmptyCube";
                 }
@@ -194,9 +193,11 @@ public class GameManager : MonoBehaviour {
             for (int z = 0; z < 3; z++) {
                 cubeBoard[(x + 1) % 3, y, z].SetActive(false);
                 cubeBoard[(x + 2) % 3, y, z].SetActive(false);
-                if (y == 3 && cubeBoard[x, y, z] != null) {
-                    cubeBoard[x, 3, z].SetActive(true);
-                }
+            }
+        }
+        for (int z = 0; z < 3; z++) {
+            if (cubeBoard[x, 3, z] != null) {
+                cubeBoard[x, 3, z].SetActive(true);
             }
         }
     }
@@ -207,9 +208,11 @@ public class GameManager : MonoBehaviour {
             for (int y = 0; y < 3; y++) {
                 cubeBoard[x, y, (z + 1) % 3].SetActive(false);
                 cubeBoard[x, y, (z + 2) % 3].SetActive(false);
-                if (y == 3 && cubeBoard[x, y, z] != null) {
-                    cubeBoard[x, 3, z].SetActive(true);
-                }
+            }
+        }
+        for (int x = 0; x < 3; x++) {
+            if (cubeBoard[x, 3, z] != null) {
+                cubeBoard[x, 3, z].SetActive(true);
             }
         }
     }
@@ -230,12 +233,17 @@ public class GameManager : MonoBehaviour {
             for (int y = 0; y < 3; y++) {
                 for (int z = 0; z < 3; z++) {
                     cubeBoard[x, y, z].SetActive(true);
-                    if (y == 3 && cubeBoard[x, y, z] != null) {
-                        cubeBoard[x, 3, z].SetActive(true);
-                    }
 
                 }
             }
+        }
+        for (int x = 0; x < 3; x++) {
+            for (int z = 0; z < 3; z++) {
+                if (cubeBoard[x, 3, z] != null) {
+                    cubeBoard[x, 3, z].SetActive(true);
+                }
+            }
+
         }
     }
     #endregion
