@@ -36,11 +36,23 @@ public class GameManager : MonoBehaviour {
         OWinText.SetActive(true);
         endScene.SetActive(false);
         OCanvas.SetActive(true);
+        OTriangleButton.SetActive(true);
+        OSpinButton.SetActive(true);
+        OFlipButton.SetActive(true);
+        XTriangleButton.SetActive(true);
+        XSpinButton.SetActive(true);
+        XFlipButton.SetActive(true);
         XCanvas.SetActive(false);
 
         currentTurn = Player.O;
         winner = Player.Neither;
         clickedCube = null;
+        isOTriangleUsed = false;
+        isXTriangleUsed = false;
+        isOSpinUsed = false;
+        isXSpinUsed = false;
+        isOFlipUsed = false;
+        isXFlipUsed = false;
 
         for (int x = 0; x < 4; x++) { // 清除舊方塊
             for (int y = 0; y < 3; y++) {
@@ -71,7 +83,9 @@ public class GameManager : MonoBehaviour {
         }
     }
     #endregion
+
     public GameObject OCanvas, XCanvas, endScene, OWinText, XWinText, checkBox;
+    public GameObject OTriangleButton, XTriangleButton, OSpinButton, XSpinButton, OFlipButton, XFlipButton;
     public GameObject OCube, XCube, TriangleCube, SelectEmptyCube, SelectOCube, SelectXCube, SelectTriangleCube;
     void Update() {
         switch (currentTurn) {
@@ -91,7 +105,7 @@ public class GameManager : MonoBehaviour {
             case Player.Checking:
                 // cursorManager.cursorState = ScriptForCursor.CursorState.Default;
                 if (Input.GetKeyDown(KeyCode.Escape)) {
-                    buttonManager.Cancel();
+                    buttonManager.CancelSurrender();
                 } else if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) {
                     buttonManager.SurrenderSkill();
                 }
@@ -416,7 +430,9 @@ public class GameManager : MonoBehaviour {
     #region IsMoveComplete()系列
     private GameObject[,,] cubeSelectBoard = new GameObject[5, 5, 5];
     private GameObject clickedCube = null;
+    public GameObject errorSkillCanvas;
     private bool isHoldingTriangle = false;
+    private bool isOTriangleUsed, isXTriangleUsed, isOSpinUsed, isXSpinUsed, isOFlipUsed, isXFlipUsed;
 
     bool IsMoveComplete() {
         // 判斷滑鼠點擊Cube
@@ -425,7 +441,7 @@ public class GameManager : MonoBehaviour {
             RaycastHit hit;
 
             if (Physics.Raycast(ray, out hit)) {
-                GameObject clickedObject = hit.collider.gameObject;            
+                GameObject clickedObject = hit.collider.gameObject;
                 //點擊時讓原本被點過的SelectCube消失
                 if (clickedObject.name.Contains("Cube")) {
                     clickedCube = clickedObject;
@@ -446,18 +462,64 @@ public class GameManager : MonoBehaviour {
             if (Input.GetKeyDown(key)) {
                 switch (key) {
                     case KeyCode.W:
-                        isHoldingTriangle = true;
+                        if ((currentTurn == Player.O && isOTriangleUsed == false) || (currentTurn == Player.X && isXTriangleUsed == false)) {
+                            isHoldingTriangle = true;
+                        } else {
+                            if (errorInputCanvas.activeSelf) {
+                                errorInputCanvas.SetActive(false);
+                            }
+                            errorSkillCanvas.SetActive(true);
+                            StartCoroutine(DelayedSetNotActive(errorSkillCanvas, 1.5f));
+                        }
                         return false;
                     case KeyCode.A:
-                        isHoldingTriangle = false;
-                        // spin();
+                        if (isHoldingTriangle) {
+                            isHoldingTriangle = false;
+                        }
+                        if ((currentTurn == Player.O && isOSpinUsed == false) || (currentTurn == Player.X && isXSpinUsed == false)) {
+                            if (Spin()) {
+                                if (currentTurn == Player.O) {
+                                    isOSpinUsed = true;
+                                    OSpinButton.SetActive(false);
+                                } else {
+                                    isXSpinUsed = true;
+                                    XSpinButton.SetActive(false);
+                                }
+                            }
+                        } else {
+                            if (errorInputCanvas.activeSelf) {
+                                errorInputCanvas.SetActive(false);
+                            }
+                            errorSkillCanvas.SetActive(true);
+                            StartCoroutine(DelayedSetNotActive(errorSkillCanvas, 1.5f));
+                        }
                         return true;
                     case KeyCode.S:
-                        isHoldingTriangle = false;
-                        // UpsideDown();
+                        if (isHoldingTriangle) {
+                            isHoldingTriangle = false;
+                        }
+                        if ((currentTurn == Player.O && isOFlipUsed == false) || (currentTurn == Player.X && isXFlipUsed == false)) {
+                            if (Flip()) {
+                                if (currentTurn == Player.O) {
+                                    isOFlipUsed = true;
+                                    OFlipButton.SetActive(false);
+                                } else {
+                                    isXFlipUsed = true;
+                                    XFlipButton.SetActive(false);
+                                }
+                            }
+                        } else {
+                            if (errorInputCanvas.activeSelf) {
+                                errorInputCanvas.SetActive(false);
+                            }
+                            errorSkillCanvas.SetActive(true);
+                            StartCoroutine(DelayedSetNotActive(errorSkillCanvas, 1.5f));
+                        }
                         return true;
                     case KeyCode.Q:
-                        isHoldingTriangle = false;
+                        if (isHoldingTriangle) {
+                            isHoldingTriangle = false;
+                        }
                         surrenderButton.onClick.Invoke();
                         return false;
 
@@ -467,7 +529,9 @@ public class GameManager : MonoBehaviour {
                         return InputOX(false, clickedCube?.name);
 
                     case KeyCode.Escape:
-                        isHoldingTriangle = false;
+                        if (isHoldingTriangle) {
+                            isHoldingTriangle = false;
+                        }
                         clickedCube = null;
                         DestroyAllSelect();
                         return false;
@@ -476,26 +540,37 @@ public class GameManager : MonoBehaviour {
         }
         return false;
     }
+
+    bool Spin() {
+        return false;
+    }
+
+    bool Flip() {
+        return false;
+    }
     #endregion
 
     #region inputOX()系列
-    public GameObject ErrorCanvas;
+    public GameObject errorInputCanvas;
     // 輸入O或X
-    bool InputOX(bool pressUpArrow, string clickedCubeNName) { // true: up, false: down
+    bool InputOX(bool pressUpArrow, string clickedCubeName) { // true: up, false: down
         //非點選方塊時無效
-        if (clickedCubeNName == null || !clickedCubeNName.Contains("Cube")) {
+        if (clickedCubeName == null || !clickedCubeName.Contains("Cube")) {
             return false;
         }
         int emptyCubeCount = 0;
-        int i = clickedCubeNName[1] - '0', k = clickedCubeNName[7] - '0';
+        int i = clickedCubeName[1] - '0', k = clickedCubeName[7] - '0';
         for (int y = 0; y < 3; y++) {
             if (countBoard[i, y, k] == 0) {
                 emptyCubeCount++;
             }
         }
         if (emptyCubeCount == 0) {
-            ErrorCanvas.SetActive(true);
-            StartCoroutine(DelayedSetNotActive(1.5f));
+            if (errorSkillCanvas.activeSelf) {
+                errorSkillCanvas.SetActive(false);
+            }
+            errorInputCanvas.SetActive(true);
+            StartCoroutine(DelayedSetNotActive(errorInputCanvas, 1.5f));
             return false;
         }
         if (pressUpArrow) {
@@ -535,8 +610,11 @@ public class GameManager : MonoBehaviour {
             }
         } else {
             if (cubeBoard[i, 0, k].name.Contains("Triangle")) {
-                ErrorCanvas.SetActive(true);
-                StartCoroutine(DelayedSetNotActive(1.5f));
+                if (errorSkillCanvas.activeSelf) {
+                    errorSkillCanvas.SetActive(false);
+                }
+                errorInputCanvas.SetActive(true);
+                StartCoroutine(DelayedSetNotActive(errorInputCanvas, 1.5f));
                 return false;
             }
 
@@ -573,12 +651,22 @@ public class GameManager : MonoBehaviour {
                 }
             }
         }
+        if (isHoldingTriangle) {
+            isHoldingTriangle = false;
+            if (currentTurn == Player.O) {
+                isOTriangleUsed = true;
+                OTriangleButton.SetActive(false);
+            } else {
+                isXTriangleUsed = true;
+                XTriangleButton.SetActive(false);
+            }
+        }
         return true;
     }
 
-    IEnumerator DelayedSetNotActive(float delayTime) {
+    IEnumerator DelayedSetNotActive(GameObject canvas, float delayTime) {
         yield return new WaitForSeconds(delayTime);  // 延遲指定的時間
-        ErrorCanvas.SetActive(false);
+        canvas.SetActive(false);
     }
     string nameCube(int i, int j, int k, int cubeType) {
         if (cubeType == 1) {

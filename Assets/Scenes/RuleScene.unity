@@ -709,7 +709,7 @@ MonoBehaviour:
 
     A: Spin
 
-    S: UpsideDown
+    S: Flip
 
     Q:
     Surrender
@@ -1228,7 +1228,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aebc296da78b6cb4189ab6e5d3277686, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gameManager: {fileID: 0}
 --- !u!1 &989461463
 GameObject:
   m_ObjectHideFlags: 0
@@ -1748,7 +1747,7 @@ MonoBehaviour:
     moved beyond the third layer due to the triangle will disappear after the rotation.
 
 
-    UpsideDown:
+    Flip:
 
     When
     using the skill, all items will be flipped upside down. After the flip, the effects

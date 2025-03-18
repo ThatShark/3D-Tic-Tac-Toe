@@ -21,31 +21,36 @@ public class ScriptForButton : MonoBehaviour {
         gameManager.ResetScene();
     }
 
-    public void TriangleSkill () {
-        
+    public void TriangleSkill() {
+
     }
 
-    public void SpinSkill () {
-        
+    public void SpinSkill() {
+
     }
 
-    public void UpsideDownSkill () {
-        
+    public void UpsideDownSkill() {
+
     }
 
-    private GameManager.Player nowTurn;
-    public void SurrenderSkill () {
-        gameManager.winner = ((nowTurn == GameManager.Player.O) ? GameManager.Player.X : GameManager.Player.O);
+    public GameManager.Player nowTurn;
+    public void SurrenderSkill() {
+        if (nowTurn == GameManager.Player.O) {
+            gameManager.winner = GameManager.Player.X;
+        } else {
+            gameManager.winner = GameManager.Player.O;
+        }
         gameManager.currentTurn = GameManager.Player.Neither;
     }
 
-    public void Check() {
+    public void CheckIfSurrender() {
         nowTurn = gameManager.currentTurn;
         gameManager.currentTurn = GameManager.Player.Checking;
         gameManager.checkBox.SetActive(true);
     }
-    public void Cancel () {
+    public void CancelSurrender() {
         gameManager.currentTurn = nowTurn;
         gameManager.checkBox.SetActive(false);
+        Debug.Log(gameManager.currentTurn);
     }
 }
