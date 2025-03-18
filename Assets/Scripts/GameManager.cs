@@ -30,7 +30,7 @@ public class GameManager : MonoBehaviour {
     #region ResetScene()系列
     public GameObject emptyCube;
     private int[,,] countBoard;
-    private GameObject[,,] cubeBoard = new GameObject[4, 3, 3]; // 座標[7*(i-1), 7*(j-1), 7*(k-1)]
+    private GameObject[,,] cubeBoard = new GameObject[3, 4, 3]; // 座標[7*(i-1), 7*(j-1), 7*(k-1)]
     public void ResetScene() {
         XWinText.SetActive(true);
         OWinText.SetActive(true);
@@ -54,8 +54,8 @@ public class GameManager : MonoBehaviour {
         isOFlipUsed = false;
         isXFlipUsed = false;
 
-        for (int x = 0; x < 4; x++) { // 清除舊方塊
-            for (int y = 0; y < 3; y++) {
+        for (int x = 0; x < 3; x++) { // 清除舊方塊
+            for (int y = 0; y < 4; y++) {
                 for (int z = 0; z < 3; z++) {
                     Destroy(cubeBoard[x, y, z]);
                     if (cubeSelectBoard[x, y, z] != null) {
@@ -65,13 +65,13 @@ public class GameManager : MonoBehaviour {
                 }
             }
         }
-        countBoard = new int[4, 3, 3];
+        countBoard = new int[3, 4, 3];
 
-        for (int x = 0; x < 4; x++) {
-            for (int y = 0; y < 3; y++) {
+        for (int x = 0; x < 3; x++) {
+            for (int y = 0; y < 4; y++) {
                 for (int z = 0; z < 3; z++) {
                     GameObject cube = Instantiate(emptyCube, new Vector3(7 * (x - 1), 7 * (y - 1), 7 * (z - 1)), Quaternion.identity);
-                    if (x == 3) {
+                    if (y == 3) {
                         Destroy(cubeBoard[x, y, z]);
                     } else {
                         cube.SetActive(true);
@@ -294,23 +294,23 @@ public class GameManager : MonoBehaviour {
         // 檢查每一層的行和列
         for (int i = 0; i < 3; i++) {
             // 檢查行
-            if (Mathf.Abs(countBoard[layer, i, 0] + countBoard[layer, i, 1] + countBoard[layer, i, 2]) == 3) {
-                vs += countBoard[layer, i, 0];
+            if (Mathf.Abs(countBoard[i, layer, 0] + countBoard[i, layer, 1] + countBoard[i, layer, 2]) == 3) {
+                vs += countBoard[i, layer, 0];
             }
 
             // 檢查列
-            if (Mathf.Abs(countBoard[layer, 0, i] + countBoard[layer, 1, i] + countBoard[layer, 2, i]) == 3) {
-                vs += countBoard[layer, 0, i];
+            if (Mathf.Abs(countBoard[0, layer, i] + countBoard[1, layer, i] + countBoard[2, layer, i]) == 3) {
+                vs += countBoard[0, layer, i];
             }
         }
 
         // 檢查對角線
-        if (Mathf.Abs(countBoard[layer, 0, 0] + countBoard[layer, 1, 1] + countBoard[layer, 2, 2]) == 3) {
-            vs += countBoard[layer, 0, 0];
+        if (Mathf.Abs(countBoard[0, layer, 0] + countBoard[1, layer, 1] + countBoard[2, layer, 2]) == 3) {
+            vs += countBoard[0, layer, 0];
         }
 
-        if (Mathf.Abs(countBoard[layer, 0, 2] + countBoard[layer, 1, 1] + countBoard[layer, 2, 0]) == 3) {
-            vs += countBoard[layer, 0, 2];
+        if (Mathf.Abs(countBoard[0, layer, 2] + countBoard[1, layer, 1] + countBoard[2, layer, 0]) == 3) {
+            vs += countBoard[0, layer, 2];
         }
         return vs;
     }
@@ -331,7 +331,7 @@ public class GameManager : MonoBehaviour {
             }
 
             // 特殊第四層
-            if (Mathf.Abs(countBoard[1, i, col] + countBoard[2, i, col] + countBoard[3, i, col]) == 3) {
+            if (Mathf.Abs(countBoard[i, 1, col] + countBoard[i, 2, col] + countBoard[i, 3, col]) == 3) {
                 vs += countBoard[1, i, col];
             }
         }
@@ -341,7 +341,7 @@ public class GameManager : MonoBehaviour {
             vs += countBoard[0, 0, col];
         }
 
-        if (Mathf.Abs(countBoard[1, 0, col] + countBoard[2, 1, col] + countBoard[3, 2, col]) == 3) {
+        if (Mathf.Abs(countBoard[0, 1, col] + countBoard[1, 2, col] + countBoard[2, 3, col]) == 3) {
             vs += countBoard[0, 0, col];
         }
 
@@ -350,7 +350,7 @@ public class GameManager : MonoBehaviour {
         }
 
 
-        if (Mathf.Abs(countBoard[1, 2, col] + countBoard[2, 1, col] + countBoard[2, 0, col]) == 3) {
+        if (Mathf.Abs(countBoard[2, 1, col] + countBoard[1, 2, col] + countBoard[0, 3, col]) == 3) {
             vs += countBoard[1, 2, col];
         }
 
@@ -363,32 +363,32 @@ public class GameManager : MonoBehaviour {
         // 檢查每一行的行和列
         for (int i = 0; i < 3; i++) {
             // 檢查行
-            if (Mathf.Abs(countBoard[i, row, 0] + countBoard[i, row, 1] + countBoard[i, row, 2]) == 3) {
-                vs += countBoard[i, row, 0];
+            if (Mathf.Abs(countBoard[row, i, 0] + countBoard[row, i, 1] + countBoard[row, i, 2]) == 3) {
+                vs += countBoard[row, i, 0];
             }
 
             // 檢查列
-            if (Mathf.Abs(countBoard[0, row, i] + countBoard[1, row, i] + countBoard[2, row, i]) == 3) {
-                vs += countBoard[0, row, i];
+            if (Mathf.Abs(countBoard[row, 0, i] + countBoard[row, 1, i] + countBoard[row, 2, i]) == 3) {
+                vs += countBoard[row, 0, i];
             }
-            if (Mathf.Abs(countBoard[1, row, i] + countBoard[2, row, i] + countBoard[3, row, i]) == 3) {
-                vs += countBoard[1, row, i];
+            if (Mathf.Abs(countBoard[row, 1, i] + countBoard[row, 2, i] + countBoard[row, 3, i]) == 3) {
+                vs += countBoard[row, 1, i];
             }
         }
 
         // 檢查對角線
-        if (Mathf.Abs(countBoard[0, row, 0] + countBoard[1, row, 1] + countBoard[2, row, 2]) == 3) {
-            vs += countBoard[0, row, 0];
+        if (Mathf.Abs(countBoard[row, 0, 0] + countBoard[row, 1, 1] + countBoard[row, 2, 2]) == 3) {
+            vs += countBoard[row, 0, 0];
         }
-        if (Mathf.Abs(countBoard[1, row, 0] + countBoard[2, row, 1] + countBoard[3, row, 2]) == 3) {
-            vs += countBoard[0, row, 0];
+        if (Mathf.Abs(countBoard[row, 1, 0] + countBoard[row, 2, 1] + countBoard[row, 3, 2]) == 3) {
+            vs += countBoard[row, 0, 0];
         }
 
-        if (Mathf.Abs(countBoard[0, row, 2] + countBoard[1, row, 1] + countBoard[2, row, 0]) == 3) {
-            vs += countBoard[0, row, 2];
+        if (Mathf.Abs(countBoard[row, 0, 2] + countBoard[row, 1, 1] + countBoard[row, 2, 0]) == 3) {
+            vs += countBoard[row, 0, 2];
         }
-        if (Mathf.Abs(countBoard[1, row, 2] + countBoard[2, row, 1] + countBoard[3, row, 0]) == 3) {
-            vs += countBoard[1, row, 2];
+        if (Mathf.Abs(countBoard[row, 1, 2] + countBoard[row, 2, 1] + countBoard[row, 3, 0]) == 3) {
+            vs += countBoard[row, 1, 2];
         }
 
         return vs;
@@ -409,17 +409,17 @@ public class GameManager : MonoBehaviour {
         if (Mathf.Abs(countBoard[2, 0, 0] + countBoard[1, 1, 1] + countBoard[0, 2, 2]) == 3) {
             vs += countBoard[2, 0, 0];
         }
-        if (Mathf.Abs(countBoard[1, 0, 0] + countBoard[2, 1, 1] + countBoard[3, 2, 2]) == 3) {
-            vs += countBoard[1, 0, 0];
+        if (Mathf.Abs(countBoard[0, 1, 0] + countBoard[1, 2, 1] + countBoard[2, 3, 2]) == 3) {
+            vs += countBoard[0, 1, 0];
         }
-        if (Mathf.Abs(countBoard[1, 0, 2] + countBoard[2, 1, 1] + countBoard[3, 2, 0]) == 3) {
-            vs += countBoard[1, 0, 2];
+        if (Mathf.Abs(countBoard[0, 1, 2] + countBoard[1, 2, 1] + countBoard[2, 3, 0]) == 3) {
+            vs += countBoard[0, 1, 2];
         }
-        if (Mathf.Abs(countBoard[1, 2, 0] + countBoard[2, 1, 1] + countBoard[3, 0, 2]) == 3) {
-            vs += countBoard[1, 2, 0];
+        if (Mathf.Abs(countBoard[2, 1, 0] + countBoard[1, 2, 1] + countBoard[0, 3, 2]) == 3) {
+            vs += countBoard[2, 1, 0];
         }
-        if (Mathf.Abs(countBoard[3, 0, 0] + countBoard[2, 1, 1] + countBoard[1, 2, 2]) == 3) {
-            vs += countBoard[3, 0, 0];
+        if (Mathf.Abs(countBoard[0, 3, 0] + countBoard[1, 2, 1] + countBoard[2, 1, 2]) == 3) {
+            vs += countBoard[0, 3, 0];
         }
 
         return vs;
@@ -524,9 +524,15 @@ public class GameManager : MonoBehaviour {
                         return false;
 
                     case KeyCode.UpArrow:
-                        return InputOX(true, clickedCube?.name);
+                        if (isHoldingTriangle) {
+                            errorInputCanvas.SetActive(true);
+                            StartCoroutine(DelayedSetNotActive(errorInputCanvas, 1.5f));
+                        } else {
+                            return InputOX(true, clickedCube.name);
+                        }
+                        break;
                     case KeyCode.DownArrow:
-                        return InputOX(false, clickedCube?.name);
+                        return InputOX(false, clickedCube.name);
 
                     case KeyCode.Escape:
                         if (isHoldingTriangle) {
@@ -620,18 +626,18 @@ public class GameManager : MonoBehaviour {
 
             if (isHoldingTriangle && countBoard[i, 0, k] != 0) {
                 cubeBoard[i, 3, k] = Instantiate(cubeBoard[i, 2, k], new Vector3(7 * (i - 1), 14, 7 * (k - 1)), Quaternion.identity);
-                cubeBoard[i, 3, k].name = nameCube(i, 3, k, countBoard[i, 2, k]);
+                cubeBoard[i, 3, k].name = NameCube(i, 3, k, countBoard[i, 2, k]);
                 countBoard[i, 3, k] = countBoard[i, 2, k];
             }
 
             Destroy(cubeBoard[i, 2, k]);
             cubeBoard[i, 2, k] = Instantiate(cubeBoard[i, 1, k], new Vector3(7 * (i - 1), 7, 7 * (k - 1)), Quaternion.identity);
-            cubeBoard[i, 2, k].name = nameCube(i, 2, k, countBoard[i, 1, k]);
+            cubeBoard[i, 2, k].name = NameCube(i, 2, k, countBoard[i, 1, k]);
             countBoard[i, 2, k] = countBoard[i, 1, k];
 
             Destroy(cubeBoard[i, 1, k]);
             cubeBoard[i, 1, k] = Instantiate(cubeBoard[i, 0, k], new Vector3(7 * (i - 1), 0, 7 * (k - 1)), Quaternion.identity);
-            cubeBoard[i, 1, k].name = nameCube(i, 1, k, countBoard[i, 0, k]);
+            cubeBoard[i, 1, k].name = NameCube(i, 1, k, countBoard[i, 0, k]);
             countBoard[i, 1, k] = countBoard[i, 0, k];
 
             Destroy(cubeBoard[i, 0, k]);
@@ -668,7 +674,7 @@ public class GameManager : MonoBehaviour {
         yield return new WaitForSeconds(delayTime);  // 延遲指定的時間
         canvas.SetActive(false);
     }
-    string nameCube(int i, int j, int k, int cubeType) {
+    string NameCube(int i, int j, int k, int cubeType) {
         if (cubeType == 1) {
             return $"({i}, {j}, {k})OCube";
         } else if (cubeType == -1) {
