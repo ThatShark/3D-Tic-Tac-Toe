@@ -171,6 +171,7 @@ public class GameManager : MonoBehaviour {
                         SetLayerActive(2);
                         break;
                 }
+                Debug.Log("IsNumberPress" + cubeBoard[1, 0, 0].name);
                 SelectCubeInstantiate(clickedCube?.name);
             }
         }
@@ -237,6 +238,7 @@ public class GameManager : MonoBehaviour {
             currentTurn = Player.Neither;
         } else if (IsMoveComplete()) {
             clickedCube = null;
+            currentNumber = 0;
             DestroyAllSelect();
             AllCubeActive();
             if (currentTurn == Player.O) {
@@ -429,6 +431,7 @@ public class GameManager : MonoBehaviour {
                     clickedCube = clickedObject;
                 }
                 DestroyAllSelect();
+                Debug.Log("IsMoveComplete" + cubeBoard[1, 0, 0].name);
                 SelectCubeInstantiate(clickedCube?.name);
             }
         }
@@ -473,8 +476,9 @@ public class GameManager : MonoBehaviour {
     #region inputOX()系列
     // 輸入O或X
     bool InputOX(bool pressUpArrow, string clickedCubeNName) { // true: up, false: down
+        Debug.Log("InputOX" + clickedCubeNName);
         //非點選方塊時無效
-        if (!clickedCubeNName.Contains("Cube")) {
+        if (clickedCubeNName == null || !clickedCubeNName.Contains("Cube")) {
             return false;
         }
 
@@ -491,7 +495,6 @@ public class GameManager : MonoBehaviour {
         }
 
         if (pressUpArrow) {
-            Debug.Log("pressUpArrow");
             if (countBoard[i, 1, k] != 0) {
                 Destroy(cubeBoard[i, 2, k]);
                 if (currentTurn == Player.O) {
@@ -527,15 +530,14 @@ public class GameManager : MonoBehaviour {
                 }
             }
         } else {
-            Debug.Log("pressDownArrow");
             Destroy(cubeBoard[i, 2, k]);
             cubeBoard[i, 2, k] = Instantiate(cubeBoard[i, 1, k], new Vector3(7 * (i - 1), 7, 7 * (k - 1)), Quaternion.identity);
-            cubeBoard[i, 2, k].name = cubeBoard[i, 1, k].name;
+            cubeBoard[i, 2, k].name = nameCube(i, 2, k, countBoard[i, 1, k]);
             countBoard[i, 2, k] = countBoard[i, 1, k];
 
             Destroy(cubeBoard[i, 1, k]);
             cubeBoard[i, 1, k] = Instantiate(cubeBoard[i, 0, k], new Vector3(7 * (i - 1), 0, 7 * (k - 1)), Quaternion.identity);
-            cubeBoard[i, 1, k].name = cubeBoard[i, 0, k].name;
+            cubeBoard[i, 1, k].name = nameCube(i, 1, k, countBoard[i, 0, k]);
             countBoard[i, 1, k] = countBoard[i, 0, k];
 
             Destroy(cubeBoard[i, 0, k]);
@@ -552,13 +554,23 @@ public class GameManager : MonoBehaviour {
         return true;
     }
 
+    string nameCube(int i, int j, int k, int cubeType) {
+        if (cubeType == 1) {
+            return $"({i}, {j}, {k})OCube";
+        } else if (cubeType == -1) {
+            return $"({i}, {j}, {k})XCube";
+        } else {
+            return $"({i}, {j}, {k})EmptyCube";
+        }
+
+    }
+
     #endregion
 
     #region SelectCubeInstantiate()系列
-    private GameObject tempSelectCube;
-
     //設定cube根據點擊激活變為selectCube
     void SelectCubeInstantiate(string clickedCubeName) {
+        Debug.Log("SelectCubeInstantiate"+clickedCubeName);
         if (clickedCubeName == null) {
             return;
         }
