@@ -71,11 +71,8 @@ public class GameManager : MonoBehaviour {
             for (int y = 0; y < 4; y++) {
                 for (int z = 0; z < 3; z++) {
                     GameObject cube = Instantiate(emptyCube, new Vector3(7 * (x - 1), 7 * (y - 1), 7 * (z - 1)), Quaternion.identity);
-                    if (y == 3) {
-                        Destroy(cubeBoard[x, y, z]);
-                    } else {
-                        cube.SetActive(true);
-                    } // 先把3x3建出來
+                    cube.SetActive(true);
+                    // 先把3x3建出來
                     cubeBoard[x, y, z] = cube; // 存入 cubeBoard 陣列
                     cube.name = $"({x}, {y}, {z})EmptyCube";
                 }
@@ -197,6 +194,9 @@ public class GameManager : MonoBehaviour {
             for (int z = 0; z < 3; z++) {
                 cubeBoard[(x + 1) % 3, y, z].SetActive(false);
                 cubeBoard[(x + 2) % 3, y, z].SetActive(false);
+                if (y == 3 && cubeBoard[x, y, z] != null) {
+                    cubeBoard[x, 3, z].SetActive(true);
+                }
             }
         }
     }
@@ -207,6 +207,9 @@ public class GameManager : MonoBehaviour {
             for (int y = 0; y < 3; y++) {
                 cubeBoard[x, y, (z + 1) % 3].SetActive(false);
                 cubeBoard[x, y, (z + 2) % 3].SetActive(false);
+                if (y == 3 && cubeBoard[x, y, z] != null) {
+                    cubeBoard[x, 3, z].SetActive(true);
+                }
             }
         }
     }
@@ -227,6 +230,10 @@ public class GameManager : MonoBehaviour {
             for (int y = 0; y < 3; y++) {
                 for (int z = 0; z < 3; z++) {
                     cubeBoard[x, y, z].SetActive(true);
+                    if (y == 3 && cubeBoard[x, y, z] != null) {
+                        cubeBoard[x, 3, z].SetActive(true);
+                    }
+
                 }
             }
         }
@@ -235,7 +242,7 @@ public class GameManager : MonoBehaviour {
 
     void DestroyAllSelect() {
         for (int x = 0; x < 3; x++) {
-            for (int y = 0; y < 3; y++) {
+            for (int y = 0; y < 4; y++) {
                 for (int z = 0; z < 3; z++) {
                     if (cubeSelectBoard[x, y, z] != null) {
                         Destroy(cubeSelectBoard[x, y, z]);
@@ -571,7 +578,7 @@ public class GameManager : MonoBehaviour {
                 emptyCubeCount++;
             }
         }
-        if (emptyCubeCount == 0) {
+        if (emptyCubeCount == 0 && !isHoldingTriangle) {
             if (errorSkillCanvas.activeSelf) {
                 errorSkillCanvas.SetActive(false);
             }
@@ -695,6 +702,15 @@ public class GameManager : MonoBehaviour {
         }
         int i = clickedCubeName[1] - '0', k = clickedCubeName[7] - '0';
         int tempNumber;
+        int emptyCubeCount = 0;
+        for (int y = 0; y < 4; y++) {
+            if (countBoard[i, y, k] == 0) {
+                emptyCubeCount++;
+            }
+        }
+        if (emptyCubeCount == 0) {
+            return;
+        }
         switch (currentNumber) {
             case 1:
             case 2:
@@ -703,6 +719,9 @@ public class GameManager : MonoBehaviour {
                 if (clickedCubeName.Contains($"({tempNumber}") && clickedCubeName.Contains($"{k})")) {
                     for (int j = 0; j < 3; j++) {
                         InstantiateSelectCube(tempNumber, j, k, countBoard[tempNumber, j, k]);
+                    }
+                    if (cubeBoard[tempNumber, 3, k] != null) {
+                        InstantiateSelectCube(tempNumber, 3, k, countBoard[tempNumber, 3, k]);
                     }
                 }
                 break;
@@ -715,6 +734,9 @@ public class GameManager : MonoBehaviour {
                     for (int j = 0; j < 3; j++) {
                         InstantiateSelectCube(i, j, tempNumber, countBoard[i, j, tempNumber]);
                     }
+                    if (cubeBoard[i, 3, tempNumber] != null) {
+                        InstantiateSelectCube(i, 3, tempNumber, countBoard[i, 3, tempNumber]);
+                    }
                 }
                 break;
 
@@ -726,8 +748,11 @@ public class GameManager : MonoBehaviour {
                 break;
 
             case 0:
-                for (int j = 0; j < 3; j++) {
+                for (int j = 0; j < 4; j++) {
                     InstantiateSelectCube(i, j, k, countBoard[i, j, k]);
+                    if (cubeBoard[i, 3, k] != null) {
+                        InstantiateSelectCube(i, 3, k, countBoard[i, 3, k]);
+                    }
                 }
                 break;
         }
