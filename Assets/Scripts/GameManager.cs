@@ -60,7 +60,7 @@ public class GameManager : MonoBehaviour {
                 for (int z = 0; z < 3; z++) {
                     GameObject cube = Instantiate(emptyCube, new Vector3(7 * (x - 1), 7 * (y - 1), 7 * (z - 1)), Quaternion.identity);
                     if (x == 3) {
-                        cube.SetActive(false);
+                        Destroy(cubeBoard[x, y, z]);
                     } else {
                         cube.SetActive(true);
                     } // 先把3x3建出來
@@ -416,6 +416,7 @@ public class GameManager : MonoBehaviour {
     #region IsMoveComplete()系列
     private GameObject[,,] cubeSelectBoard = new GameObject[5, 5, 5];
     private GameObject clickedCube = null;
+    private bool isHoldingTriangle = false;
 
     bool IsMoveComplete() {
         // 判斷滑鼠點擊Cube
@@ -445,15 +446,18 @@ public class GameManager : MonoBehaviour {
             if (Input.GetKeyDown(key)) {
                 switch (key) {
                     case KeyCode.W:
-                    // isHoldingTriangle = true;
-                    // return false;
+                        isHoldingTriangle = true;
+                        return false;
                     case KeyCode.A:
+                        isHoldingTriangle = false;
                         // spin();
                         return true;
                     case KeyCode.S:
+                        isHoldingTriangle = false;
                         // UpsideDown();
                         return true;
                     case KeyCode.Q:
+                        isHoldingTriangle = false;
                         surrenderButton.onClick.Invoke();
                         return false;
 
@@ -463,6 +467,7 @@ public class GameManager : MonoBehaviour {
                         return InputOX(false, clickedCube?.name);
 
                     case KeyCode.Escape:
+                        isHoldingTriangle = false;
                         clickedCube = null;
                         DestroyAllSelect();
                         return false;
@@ -529,6 +534,18 @@ public class GameManager : MonoBehaviour {
                 }
             }
         } else {
+            if (cubeBoard[i, 0, k].name.Contains("Triangle")) {
+                ErrorCanvas.SetActive(true);
+                StartCoroutine(DelayedSetNotActive(1.5f));
+                return false;
+            }
+
+            if (isHoldingTriangle && countBoard[i, 0, k] != 0) {
+                cubeBoard[i, 3, k] = Instantiate(cubeBoard[i, 2, k], new Vector3(7 * (i - 1), 14, 7 * (k - 1)), Quaternion.identity);
+                cubeBoard[i, 3, k].name = nameCube(i, 3, k, countBoard[i, 2, k]);
+                countBoard[i, 3, k] = countBoard[i, 2, k];
+            }
+
             Destroy(cubeBoard[i, 2, k]);
             cubeBoard[i, 2, k] = Instantiate(cubeBoard[i, 1, k], new Vector3(7 * (i - 1), 7, 7 * (k - 1)), Quaternion.identity);
             cubeBoard[i, 2, k].name = nameCube(i, 2, k, countBoard[i, 1, k]);
@@ -540,14 +557,20 @@ public class GameManager : MonoBehaviour {
             countBoard[i, 1, k] = countBoard[i, 0, k];
 
             Destroy(cubeBoard[i, 0, k]);
-            if (currentTurn == Player.O) {
-                cubeBoard[i, 0, k] = Instantiate(OCube, new Vector3(7 * (i - 1), -7, 7 * (k - 1)), Quaternion.identity);
-                cubeBoard[i, 0, k].name = $"({i}, 0, {k})OCube";
-                countBoard[i, 0, k] = 1;
-            } else if (currentTurn == Player.X) {
-                cubeBoard[i, 0, k] = Instantiate(XCube, new Vector3(7 * (i - 1), -7, 7 * (k - 1)), Quaternion.identity);
-                cubeBoard[i, 0, k].name = $"({i}, 0, {k})XCube";
-                countBoard[i, 0, k] = -1;
+            if (isHoldingTriangle) {
+                cubeBoard[i, 0, k] = Instantiate(TriangleCube, new Vector3(7 * (i - 1), -7, 7 * (k - 1)), Quaternion.identity);
+                cubeBoard[i, 0, k].name = $"({i}, 0, {k})TriangleCube";
+                countBoard[i, 0, k] = 10;
+            } else {
+                if (currentTurn == Player.O) {
+                    cubeBoard[i, 0, k] = Instantiate(OCube, new Vector3(7 * (i - 1), -7, 7 * (k - 1)), Quaternion.identity);
+                    cubeBoard[i, 0, k].name = $"({i}, 0, {k})OCube";
+                    countBoard[i, 0, k] = 1;
+                } else if (currentTurn == Player.X) {
+                    cubeBoard[i, 0, k] = Instantiate(XCube, new Vector3(7 * (i - 1), -7, 7 * (k - 1)), Quaternion.identity);
+                    cubeBoard[i, 0, k].name = $"({i}, 0, {k})XCube";
+                    countBoard[i, 0, k] = -1;
+                }
             }
         }
         return true;
@@ -624,6 +647,8 @@ public class GameManager : MonoBehaviour {
             tempSelectCube = Instantiate(SelectOCube, position, Quaternion.identity);
         } else if (cubeType == -1) {
             tempSelectCube = Instantiate(SelectXCube, position, Quaternion.identity);
+        } else if (cubeType == 10) {
+            tempSelectCube = Instantiate(SelectTriangleCube, position, Quaternion.identity);
         } else {
             tempSelectCube = Instantiate(SelectEmptyCube, position, Quaternion.identity);
         }
@@ -636,6 +661,8 @@ public class GameManager : MonoBehaviour {
             cubeSelectBoard[i, j, k].name = $"({i}, {j}, {k})SelectOCube";
         } else if (cubeType == -1) {
             cubeSelectBoard[i, j, k].name = $"({i}, {j}, {k})SelectXCube";
+        } else if (cubeType == 10) {
+            cubeSelectBoard[i, j, k].name = $"({i}, {j}, {k})SelectTriangleCube";
         } else {
             cubeSelectBoard[i, j, k].name = $"({i}, {j}, {k})SelectEmptyCube";
         }
