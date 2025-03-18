@@ -317,6 +317,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameManager: {fileID: 2003290119}
+  nowTurn: 0
 --- !u!114 &118895422
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -708,6 +709,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameManager: {fileID: 2003290119}
+  nowTurn: 0
 --- !u!1001 &199829704
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1320,6 +1322,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameManager: {fileID: 0}
+  nowTurn: 0
 --- !u!1 &300323247
 GameObject:
   m_ObjectHideFlags: 0
@@ -1618,6 +1621,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameManager: {fileID: 2003290119}
+  nowTurn: 0
 --- !u!114 &329647105
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2351,6 +2355,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameManager: {fileID: 0}
+  nowTurn: 0
 --- !u!1 &670774921
 GameObject:
   m_ObjectHideFlags: 0
@@ -2486,6 +2491,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameManager: {fileID: 0}
+  nowTurn: 0
 --- !u!1 &814422378
 GameObject:
   m_ObjectHideFlags: 0
@@ -2539,6 +2545,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameManager: {fileID: 2003290119}
+  nowTurn: 0
 --- !u!114 &814422381
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3144,7 +3151,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 178594642}
+      - m_Target: {fileID: 962801627}
         m_TargetAssemblyTypeName: ScriptForButton, Assembly-CSharp
         m_MethodName: Check
         m_Mode: 1
@@ -3207,6 +3214,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameManager: {fileID: 2003290119}
+  nowTurn: 0
 --- !u!1 &975214575
 GameObject:
   m_ObjectHideFlags: 0
@@ -4000,6 +4008,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameManager: {fileID: 0}
+  nowTurn: 0
 --- !u!1 &1187650133
 GameObject:
   m_ObjectHideFlags: 0
@@ -4604,6 +4613,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameManager: {fileID: 2003290119}
+  nowTurn: 0
 --- !u!114 &1454724980
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5438,6 +5448,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameManager: {fileID: 0}
+  nowTurn: 0
 --- !u!1 &2003290117
 GameObject:
   m_ObjectHideFlags: 0
@@ -5775,6 +5786,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameManager: {fileID: 0}
+  nowTurn: 0
 --- !u!1 &2133674674
 GameObject:
   m_ObjectHideFlags: 0
