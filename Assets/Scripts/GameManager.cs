@@ -57,7 +57,11 @@ public class GameManager : MonoBehaviour {
         for (int x = 0; x < 3; x++) { // 清除舊方塊
             for (int y = 0; y < 4; y++) {
                 for (int z = 0; z < 3; z++) {
-                    Destroy(cubeBoard[x, y, z]);
+                    if (cubeSelectBoard[x, y, z] != null) {
+                        Destroy(cubeBoard[x, y, z]);
+                        cubeBoard[x, y, z] = null;
+                    }
+
                     if (cubeSelectBoard[x, y, z] != null) {
                         Destroy(cubeSelectBoard[x, y, z]);
                         cubeSelectBoard[x, y, z] = null;
@@ -66,6 +70,11 @@ public class GameManager : MonoBehaviour {
             }
         }
         countBoard = new int[3, 4, 3];
+        for (int i = 0; i < 3; i++) {
+            for (int k = 0; k < 3; k++) {
+                countBoard[i, 3, k] = 20;
+            }
+        }
 
         for (int x = 0; x < 3; x++) {
             for (int y = 0; y < 3; y++) {
@@ -756,11 +765,12 @@ public class GameManager : MonoBehaviour {
                 break;
 
             case 0:
-                for (int j = 0; j < 4; j++) {
+                for (int j = 0; j < 3; j++) {
                     InstantiateSelectCube(i, j, k, countBoard[i, j, k]);
-                    if (cubeBoard[i, 3, k] != null) {
-                        InstantiateSelectCube(i, 3, k, countBoard[i, 3, k]);
-                    }
+                    
+                }
+                if (cubeBoard[i, 3, k] != null) {
+                    InstantiateSelectCube(i, 3, k, countBoard[i, 3, k]);
                 }
                 break;
         }
@@ -769,7 +779,6 @@ public class GameManager : MonoBehaviour {
     void InstantiateSelectCube(int i, int j, int k, int cubeType) {
         GameObject tempSelectCube;
         Vector3 position = cubeBoard[i, j, k].transform.position;
-
         if (cubeType == 1) {
             tempSelectCube = Instantiate(SelectOCube, position, Quaternion.identity);
         } else if (cubeType == -1) {
