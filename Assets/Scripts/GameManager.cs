@@ -73,7 +73,7 @@ public class GameManager : MonoBehaviour {
         countBoard = new int[3, 4, 3];
         for (int i = 0; i < 3; i++) {
             for (int k = 0; k < 3; k++) {
-                countBoard[i, 3, k] = 20;
+                countBoard[i, 3, k] = 0;
             }
         }
 
@@ -119,12 +119,24 @@ public class GameManager : MonoBehaviour {
                 }
                 break;
             default:
-                if (currentTurn == Player.O) {
-                    // cursorManager.cursorState = ScriptForCursor.CursorState.O;
+                if (isFlipping) {
+                    Flip();
+                    if (currentTurn == Player.O) {
+                        isOFlipUsed = true;
+                        OFlipButton.SetActive(false);
+                    } else {
+                        isXFlipUsed = true;
+                        XFlipButton.SetActive(false);
+                    }
                 } else {
-                    // cursorManager.cursorState = ScriptForCursor.CursorState.X;
+                    if (currentTurn == Player.O) {
+                        // cursorManager.cursorState = ScriptForCursor.CursorState.O;
+                    } else {
+                        // cursorManager.cursorState = ScriptForCursor.CursorState.X;
+                    }
+                    IsNumberPress();
                 }
-                IsNumberPress();
+                
                 CheckIfNextTurn();
                 break;
         }
@@ -463,7 +475,7 @@ public class GameManager : MonoBehaviour {
     private GameObject[,,] cubeSelectBoard = new GameObject[5, 5, 5];
     private GameObject clickedCube = null;
     public GameObject errorSkillCanvas, triangleHoldingCanvas, continueCanvas;
-    private bool isHoldingTriangle = false;
+    private bool isHoldingTriangle = false, isFlipping = false;
     private bool isOTriangleUsed, isXTriangleUsed, isOSpinUsed, isXSpinUsed, isOFlipUsed, isXFlipUsed;
 
     bool IsMoveComplete() {
@@ -493,6 +505,10 @@ public class GameManager : MonoBehaviour {
             if (Input.GetKeyDown(key)) {
                 switch (key) {
                     case KeyCode.W:
+                        if (isFlipping) {
+                            isFlipping = false;
+                            continueCanvas.SetActive(false);
+                        }
                         if ((currentTurn == Player.O && isOTriangleUsed == false) || (currentTurn == Player.X && isXTriangleUsed == false)) {
                             isHoldingTriangle = true;
                             triangleHoldingCanvas.SetActive(true);
@@ -509,39 +525,33 @@ public class GameManager : MonoBehaviour {
                             isHoldingTriangle = false;
                             triangleHoldingCanvas.SetActive(false);
                         }
-                        if ((currentTurn == Player.O && isOSpinUsed == false) || (currentTurn == Player.X && isXSpinUsed == false)) {
-                            if (SpinSkill()) {
-                                if (currentTurn == Player.O) {
-                                    isOSpinUsed = true;
-                                    OSpinButton.SetActive(false);
-                                } else {
-                                    isXSpinUsed = true;
-                                    XSpinButton.SetActive(false);
-                                }
-                            }
-                        } else {
-                            if (errorInputCanvas.activeSelf) {
-                                errorInputCanvas.SetActive(false);
-                            }
-                            errorSkillCanvas.SetActive(true);
-                            StartCoroutine(DelayedSetNotActive(errorSkillCanvas, 1.5f));
-                        }
-                        return true;
+                        // if ((currentTurn == Player.O && isOSpinUsed == false) || (currentTurn == Player.X && isXSpinUsed == false)) {
+                        //     if (Spin()) {
+                        //         if (currentTurn == Player.O) {
+                        //             isOSpinUsed = true;
+                        //             OSpinButton.SetActive(false);
+                        //         } else {
+                        //             isXSpinUsed = true;
+                        //             XSpinButton.SetActive(false);
+                        //         }
+                        //     }
+                        // } else {
+                        //     if (errorInputCanvas.activeSelf) {
+                        //         errorInputCanvas.SetActive(false);
+                        //     }
+                        //     errorSkillCanvas.SetActive(true);
+                        //     StartCoroutine(DelayedSetNotActive(errorSkillCanvas, 1.5f));
+                        // }
+                        // return true;
+                        return false;
                     case KeyCode.S:
                         if (isHoldingTriangle) {
                             isHoldingTriangle = false;
                             triangleHoldingCanvas.SetActive(false);
                         }
                         if ((currentTurn == Player.O && isOFlipUsed == false) || (currentTurn == Player.X && isXFlipUsed == false)) {
-                            if (FlipSkill()) {
-                                if (currentTurn == Player.O) {
-                                    isOFlipUsed = true;
-                                    OFlipButton.SetActive(false);
-                                } else {
-                                    isXFlipUsed = true;
-                                    XFlipButton.SetActive(false);
-                                }
-                            }
+                            isFlipping = true;
+                            continueCanvas.SetActive(true);
                         } else {
                             if (errorInputCanvas.activeSelf) {
                                 errorInputCanvas.SetActive(false);
@@ -549,7 +559,7 @@ public class GameManager : MonoBehaviour {
                             errorSkillCanvas.SetActive(true);
                             StartCoroutine(DelayedSetNotActive(errorSkillCanvas, 1.5f));
                         }
-                        return true;
+                        return false;
                     case KeyCode.Q:
                         if (isHoldingTriangle) {
                             isHoldingTriangle = false;
@@ -577,36 +587,28 @@ public class GameManager : MonoBehaviour {
         }
         return false;
     }
-    #endregion
 
-    #region button系列
-    public void TrianglePress() {
-        isHoldingTriangle = true;
-        triangleHoldingCanvas.SetActive(true);
+    void Spin() {
+        return;
     }
 
-    public bool SpinSkill() {
-        return false;
-    }
-
-    public bool FlipSkill() {
-        continueCanvas.SetActive(true);
+    void Flip() {
         if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) {
             DestroyAllSelect();
             continueCanvas.SetActive(false);
-            int[] tempCountBoard = new int[3];
             for (int i = 0; i < 3; i++) {
                 for (int k = 0; k < 3; k++) {
-                    if (countBoard[i, 3, k] != 20) {
-                        tempCountBoard[0] = countBoard[i, 3, k];
-                        tempCountBoard[1] = countBoard[i, 2, k];
-                        tempCountBoard[2] = countBoard[i, 1, k];
+                    int[] tempCountBoard = new int[3];
+                    int index = 0;
+                    countBoard[i, 3, k] = 0;
+                    for (int j = 3; j >= 0 && index < 3; j--) {
+                        if (countBoard[i, j, k] != 0) {
+                            tempCountBoard[index] = countBoard[i, j, k];
+                            index++;
+                        }
+                    }
+                    if (countBoard[i, 3, k] != 0) {
                         Destroy(cubeBoard[i, 3, k]);
-                        countBoard[i, 3, k] = 20;
-                    } else {
-                        tempCountBoard[0] = countBoard[i, 2, k];
-                        tempCountBoard[1] = countBoard[i, 1, k];
-                        tempCountBoard[2] = countBoard[i, 0, k];
                     }
                     Destroy(cubeBoard[i, 2, k]);
                     InstantiateCube(i, 2, k, tempCountBoard[2]);
@@ -616,15 +618,13 @@ public class GameManager : MonoBehaviour {
                     InstantiateCube(i, 0, k, tempCountBoard[0]);
                 }
             }
-            return true;
-        } else {
-            continueCanvas.SetActive(false);
-            return false;
+            isFlipping = false;
         }
     }
 
     void InstantiateCube(int i, int j, int k, int cubeType) {
         Vector3 position = new Vector3(7*(i-1), 7*(j-1), 7*(k-1));
+        countBoard[i, j, k] = cubeType;
         if (cubeType == 1) {
             cubeBoard[i, j, k] = Instantiate(OCube, position, Quaternion.identity);
         } else if (cubeType == -1) {
@@ -644,6 +644,30 @@ public class GameManager : MonoBehaviour {
         } else {
             cubeBoard[i, j, k].name = $"({i}, {j}, {k})EmptyCube";
         }
+    }
+    #endregion
+
+    #region button系列
+    public void TrianglePress() {
+        if (isFlipping) {
+            isFlipping = false;
+            continueCanvas.SetActive(false);
+        }
+        isHoldingTriangle = true;
+        triangleHoldingCanvas.SetActive(true);
+    }
+
+    private bool SpinPress() {
+        return false;
+    }
+
+    public void FlipPress() {
+        if (isHoldingTriangle) {
+            isHoldingTriangle = false;
+            triangleHoldingCanvas.SetActive(false);
+        }
+        isFlipping = true;
+        continueCanvas.SetActive(true);
     }
 
     Player nowTurn;
@@ -694,7 +718,7 @@ public class GameManager : MonoBehaviour {
             if (isHoldingTriangle) {
                 if (countBoard[i, 3, k] != 0) {
                     Destroy(cubeBoard[i, 3, k]);
-                    countBoard[i, 3, k] = 20;
+                    countBoard[i, 3, k] = 0;
                 }
 
                 Destroy(cubeBoard[i, 2, k]);
@@ -814,7 +838,14 @@ public class GameManager : MonoBehaviour {
         return true;
     }
 
+    bool stop = false;
     IEnumerator DelayedSetNotActive(GameObject canvas, float delayTime) {
+        if (delayTime < 0) {
+            stop = true;
+            while(stop) {
+                yield return new WaitForSeconds(1f);
+            }
+        }
         yield return new WaitForSeconds(delayTime);  // 延遲指定的時間
         canvas.SetActive(false);
     }
