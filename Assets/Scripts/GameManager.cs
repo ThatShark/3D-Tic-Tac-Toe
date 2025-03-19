@@ -28,7 +28,7 @@ public class GameManager : MonoBehaviour {
     }
 
     #region ResetScene()系列
-    public GameObject emptyCube;
+    public GameObject EmptyCube;
     private int[,,] countBoard;
     private GameObject[,,] cubeBoard = new GameObject[3, 4, 3]; // 座標[7*(i-1), 7*(j-1), 7*(k-1)]
     public void ResetScene() {
@@ -80,7 +80,7 @@ public class GameManager : MonoBehaviour {
         for (int x = 0; x < 3; x++) {
             for (int y = 0; y < 3; y++) {
                 for (int z = 0; z < 3; z++) {
-                    GameObject cube = Instantiate(emptyCube, new Vector3(7 * (x - 1), 7 * (y - 1), 7 * (z - 1)), Quaternion.identity);
+                    GameObject cube = Instantiate(EmptyCube, new Vector3(7 * (x - 1), 7 * (y - 1), 7 * (z - 1)), Quaternion.identity);
                     cube.SetActive(true);// 先把3x3建出來
                     cubeBoard[x, y, z] = cube; // 存入 cubeBoard 陣列
                     cube.name = $"({x}, {y}, {z})EmptyCube";
@@ -475,13 +475,12 @@ public class GameManager : MonoBehaviour {
             if (Physics.Raycast(ray, out hit)) {
                 GameObject clickedObject = hit.collider.gameObject;
                 //點擊時讓原本被點過的SelectCube消失
-                if (clickedObject.name.Contains("Cube")) {
+                if (!clickedObject.name.Contains("Select") && clickedObject.name.Contains("Cube")) {
                     clickedCube = clickedObject;
                 }
-                if (!clickedObject.name.Contains("Select")) {
-                    DestroyAllSelect();
-                    SelectCubeInstantiate(clickedCube?.name);
-                }
+                DestroyAllSelect();
+                SelectCubeInstantiate(clickedCube?.name);
+                
             }
         }
         foreach (KeyCode key in new KeyCode[] {
@@ -560,15 +559,10 @@ public class GameManager : MonoBehaviour {
                         return false;
 
                     case KeyCode.UpArrow:
-                        if (isHoldingTriangle) {
-                            errorInputCanvas.SetActive(true);
-                            StartCoroutine(DelayedSetNotActive(errorInputCanvas, 1.5f));
-                        } else {
-                            return InputOX(true, clickedCube.name);
-                        }
-                        break;
+                        return InputOX(true, clickedCube?.name);
+
                     case KeyCode.DownArrow:
-                        return InputOX(false, clickedCube.name);
+                        return InputOX(false, clickedCube?.name);
 
                     case KeyCode.Escape:
                         if (isHoldingTriangle) {
@@ -645,40 +639,72 @@ public class GameManager : MonoBehaviour {
             return false;
         }
         if (pressUpArrow) {
-            if (countBoard[i, 1, k] != 0) {
+            if (isHoldingTriangle) {
+                if (countBoard[i, 3, k] != 0) {
+                    Destroy(cubeBoard[i, 3, k]);
+                    countBoard[i, 3, k] = 20;
+                }
+
                 Destroy(cubeBoard[i, 2, k]);
-                if (currentTurn == Player.O) {
-                    cubeBoard[i, 2, k] = Instantiate(OCube, new Vector3(7 * (i - 1), 7, 7 * (k - 1)), Quaternion.identity);
-                    cubeBoard[i, 2, k].name = $"({i}, 2, {k})OCube";
-                    countBoard[i, 2, k] = 1;
-                } else if (currentTurn == Player.X) {
-                    cubeBoard[i, 2, k] = Instantiate(XCube, new Vector3(7 * (i - 1), 7, 7 * (k - 1)), Quaternion.identity);
-                    cubeBoard[i, 2, k].name = $"({i}, 2, {k})XCube";
-                    countBoard[i, 2, k] = -1;
-                }
-            } else if (countBoard[i, 0, k] != 0) {
+                cubeBoard[i, 2, k] = Instantiate(EmptyCube, new Vector3(7 * (i - 1), 7, 7 * (k - 1)), Quaternion.identity);
+                cubeBoard[i, 2, k].name = $"({i}, 2, {k})EmptyCube";
+                countBoard[i, 2, k] = 0;
+
+
                 Destroy(cubeBoard[i, 1, k]);
-                if (currentTurn == Player.O) {
-                    cubeBoard[i, 1, k] = Instantiate(OCube, new Vector3(7 * (i - 1), 0, 7 * (k - 1)), Quaternion.identity);
-                    cubeBoard[i, 1, k].name = $"({i}, 1, {k})OCube";
-                    countBoard[i, 1, k] = 1;
-                } else if (currentTurn == Player.X) {
-                    cubeBoard[i, 1, k] = Instantiate(XCube, new Vector3(7 * (i - 1), 0, 7 * (k - 1)), Quaternion.identity);
-                    cubeBoard[i, 1, k].name = $"({i}, 1, {k})XCube";
-                    countBoard[i, 1, k] = -1;
+                if (countBoard[i, 0, k] == 10) {
+                    cubeBoard[i, 1, k] = Instantiate(TriangleCube, new Vector3(7 * (i - 1), 0, 7 * (k - 1)), Quaternion.identity);
+                    cubeBoard[i, 1, k].name = $"({i}, 1, {k})TriangleCube";
+                    countBoard[i, 1, k] = 10;
+                } else {
+                    cubeBoard[i, 1, k] = Instantiate(EmptyCube, new Vector3(7 * (i - 1), 0, 7 * (k - 1)), Quaternion.identity);
+                    cubeBoard[i, 1, k].name = $"({i}, 1, {k})EmptyCube";
+                    countBoard[i, 1, k] = 0;
+                    
+                    Destroy(cubeBoard[i, 0, k]);
+                    cubeBoard[i, 0, k] = Instantiate(TriangleCube, new Vector3(7 * (i - 1), -7, 7 * (k - 1)), Quaternion.identity);
+                    cubeBoard[i, 0, k].name = $"({i}, 0, {k})TriangleCube";
+                    countBoard[i, 0, k] = 10;
                 }
+                
             } else {
-                Destroy(cubeBoard[i, 0, k]);
-                if (currentTurn == Player.O) {
-                    cubeBoard[i, 0, k] = Instantiate(OCube, new Vector3(7 * (i - 1), -7, 7 * (k - 1)), Quaternion.identity);
-                    cubeBoard[i, 0, k].name = $"({i}, 0, {k})OCube";
-                    countBoard[i, 0, k] = 1;
-                } else if (currentTurn == Player.X) {
-                    cubeBoard[i, 0, k] = Instantiate(XCube, new Vector3(7 * (i - 1), -7, 7 * (k - 1)), Quaternion.identity);
-                    cubeBoard[i, 0, k].name = $"({i}, 0, {k})XCube";
-                    countBoard[i, 0, k] = -1;
+                if (countBoard[i, 1, k] != 0) {
+                    Destroy(cubeBoard[i, 2, k]);
+                    if (currentTurn == Player.O) {
+                        cubeBoard[i, 2, k] = Instantiate(OCube, new Vector3(7 * (i - 1), 7, 7 * (k - 1)), Quaternion.identity);
+                        cubeBoard[i, 2, k].name = $"({i}, 2, {k})OCube";
+                        countBoard[i, 2, k] = 1;
+                    } else if (currentTurn == Player.X) {
+                        cubeBoard[i, 2, k] = Instantiate(XCube, new Vector3(7 * (i - 1), 7, 7 * (k - 1)), Quaternion.identity);
+                        cubeBoard[i, 2, k].name = $"({i}, 2, {k})XCube";
+                        countBoard[i, 2, k] = -1;
+                    }
+                } else if (countBoard[i, 0, k] != 0) {
+                    Destroy(cubeBoard[i, 1, k]);
+                    if (currentTurn == Player.O) {
+                        cubeBoard[i, 1, k] = Instantiate(OCube, new Vector3(7 * (i - 1), 0, 7 * (k - 1)), Quaternion.identity);
+                        cubeBoard[i, 1, k].name = $"({i}, 1, {k})OCube";
+                        countBoard[i, 1, k] = 1;
+                    } else if (currentTurn == Player.X) {
+                        cubeBoard[i, 1, k] = Instantiate(XCube, new Vector3(7 * (i - 1), 0, 7 * (k - 1)), Quaternion.identity);
+                        cubeBoard[i, 1, k].name = $"({i}, 1, {k})XCube";
+                        countBoard[i, 1, k] = -1;
+                    }
+                } else {
+                    Destroy(cubeBoard[i, 0, k]);
+                    if (currentTurn == Player.O) {
+                        cubeBoard[i, 0, k] = Instantiate(OCube, new Vector3(7 * (i - 1), -7, 7 * (k - 1)), Quaternion.identity);
+                        cubeBoard[i, 0, k].name = $"({i}, 0, {k})OCube";
+                        countBoard[i, 0, k] = 1;
+                    } else if (currentTurn == Player.X) {
+                        cubeBoard[i, 0, k] = Instantiate(XCube, new Vector3(7 * (i - 1), -7, 7 * (k - 1)), Quaternion.identity);
+                        cubeBoard[i, 0, k].name = $"({i}, 0, {k})XCube";
+                        countBoard[i, 0, k] = -1;
+                    }
                 }
             }
+
+            
         } else {
             if (cubeBoard[i, 0, k].name.Contains("Triangle")) {
                 if (errorSkillCanvas.activeSelf) {
