@@ -43,6 +43,7 @@ public class GameManager : MonoBehaviour {
         XSpinButton.SetActive(true);
         XFlipButton.SetActive(true);
         XCanvas.SetActive(false);
+        triangleHoldingCanvas.SetActive(false);
 
         currentTurn = Player.O;
         winner = Player.Neither;
@@ -57,7 +58,7 @@ public class GameManager : MonoBehaviour {
         for (int x = 0; x < 3; x++) { // 清除舊方塊
             for (int y = 0; y < 4; y++) {
                 for (int z = 0; z < 3; z++) {
-                    if (cubeSelectBoard[x, y, z] != null) {
+                    if (cubeBoard[x, y, z] != null) {
                         Destroy(cubeBoard[x, y, z]);
                         cubeBoard[x, y, z] = null;
                     }
@@ -99,7 +100,9 @@ public class GameManager : MonoBehaviour {
                 checkBox.SetActive(false);
                 OCanvas.SetActive(false);
                 XCanvas.SetActive(false);
+                triangleHoldingCanvas.SetActive(false);
                 endScene.SetActive(true);
+                
                 ((winner == Player.O) ? XWinText : OWinText).SetActive(false);
                 if (Input.GetKeyDown(KeyCode.Escape)) {
                     buttonManager.SwitchSceneTo(0);
@@ -110,9 +113,9 @@ public class GameManager : MonoBehaviour {
             case Player.Checking:
                 // cursorManager.cursorState = ScriptForCursor.CursorState.Default;
                 if (Input.GetKeyDown(KeyCode.Escape)) {
-                    buttonManager.CancelSurrender();
+                    CancelSurrender();
                 } else if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) {
-                    buttonManager.SurrenderSkill();
+                    SurrenderSkill();
                 }
                 break;
             default:
@@ -198,15 +201,16 @@ public class GameManager : MonoBehaviour {
 
     //設定只激活一行
     void SetRowActive(int x) {
-        for (int y = 0; y < 3; y++) {
-            for (int z = 0; z < 3; z++) {
+        for (int z = 0; z < 3; z++) {
+            for (int y = 0; y < 3; y++) {
                 cubeBoard[(x + 1) % 3, y, z].SetActive(false);
                 cubeBoard[(x + 2) % 3, y, z].SetActive(false);
             }
-        }
-        for (int z = 0; z < 3; z++) {
-            if (cubeBoard[x, 3, z] != null) {
-                cubeBoard[x, 3, z].SetActive(true);
+            if (cubeBoard[(x + 1) % 3, 3, z] != null) {
+                cubeBoard[(x + 1) % 3, 3, z].SetActive(false);
+            }
+            if (cubeBoard[(x + 2) % 3, 3, z] != null) {
+                cubeBoard[(x + 2) % 3, 3, z].SetActive(false);
             }
         }
     }
@@ -218,10 +222,11 @@ public class GameManager : MonoBehaviour {
                 cubeBoard[x, y, (z + 1) % 3].SetActive(false);
                 cubeBoard[x, y, (z + 2) % 3].SetActive(false);
             }
-        }
-        for (int x = 0; x < 3; x++) {
-            if (cubeBoard[x, 3, z] != null) {
-                cubeBoard[x, 3, z].SetActive(true);
+            if (cubeBoard[x, 3, (z + 1) % 3] != null) {
+                cubeBoard[x, 3, (z + 1) % 3].SetActive(false);
+            }
+            if (cubeBoard[x, 3, (z + 2) % 3] != null) {
+                cubeBoard[x, 3, (z + 2) % 3].SetActive(false);
             }
         }
     }
@@ -232,11 +237,14 @@ public class GameManager : MonoBehaviour {
             for (int z = 0; z < 3; z++) {
                 cubeBoard[x, (y + 1) % 3, z].SetActive(false);
                 cubeBoard[x, (y + 2) % 3, z].SetActive(false);
+                if (cubeBoard[x, 3, z] != null) {
+                    cubeBoard[x, 3, z].SetActive(false);
+                }
             }
         }
     }
 
-    //激活3*3*3所有方塊
+    //激活所有方塊
     void AllCubeActive() {
         for (int x = 0; x < 3; x++) {
             for (int y = 0; y < 3; y++) {
@@ -454,7 +462,7 @@ public class GameManager : MonoBehaviour {
     #region IsMoveComplete()系列
     private GameObject[,,] cubeSelectBoard = new GameObject[5, 5, 5];
     private GameObject clickedCube = null;
-    public GameObject errorSkillCanvas;
+    public GameObject errorSkillCanvas, triangleHoldingCanvas;
     private bool isHoldingTriangle = false;
     private bool isOTriangleUsed, isXTriangleUsed, isOSpinUsed, isXSpinUsed, isOFlipUsed, isXFlipUsed;
 
@@ -488,6 +496,7 @@ public class GameManager : MonoBehaviour {
                     case KeyCode.W:
                         if ((currentTurn == Player.O && isOTriangleUsed == false) || (currentTurn == Player.X && isXTriangleUsed == false)) {
                             isHoldingTriangle = true;
+                            triangleHoldingCanvas.SetActive(true);
                         } else {
                             if (errorInputCanvas.activeSelf) {
                                 errorInputCanvas.SetActive(false);
@@ -499,6 +508,7 @@ public class GameManager : MonoBehaviour {
                     case KeyCode.A:
                         if (isHoldingTriangle) {
                             isHoldingTriangle = false;
+                            triangleHoldingCanvas.SetActive(false);
                         }
                         if ((currentTurn == Player.O && isOSpinUsed == false) || (currentTurn == Player.X && isXSpinUsed == false)) {
                             if (Spin()) {
@@ -521,6 +531,7 @@ public class GameManager : MonoBehaviour {
                     case KeyCode.S:
                         if (isHoldingTriangle) {
                             isHoldingTriangle = false;
+                            triangleHoldingCanvas.SetActive(false);
                         }
                         if ((currentTurn == Player.O && isOFlipUsed == false) || (currentTurn == Player.X && isXFlipUsed == false)) {
                             if (Flip()) {
@@ -543,6 +554,7 @@ public class GameManager : MonoBehaviour {
                     case KeyCode.Q:
                         if (isHoldingTriangle) {
                             isHoldingTriangle = false;
+                            triangleHoldingCanvas.SetActive(false);
                         }
                         surrenderButton.onClick.Invoke();
                         return false;
@@ -561,6 +573,7 @@ public class GameManager : MonoBehaviour {
                     case KeyCode.Escape:
                         if (isHoldingTriangle) {
                             isHoldingTriangle = false;
+                            triangleHoldingCanvas.SetActive(false);
                         }
                         clickedCube = null;
                         DestroyAllSelect();
@@ -577,6 +590,34 @@ public class GameManager : MonoBehaviour {
 
     bool Flip() {
         return false;
+    }
+    #endregion
+
+    #region button系列
+
+    public void TrianglePress() {
+        isHoldingTriangle = true;
+        triangleHoldingCanvas.SetActive(true);
+    }
+
+    Player nowTurn;
+    public void SurrenderSkill() {
+        if (nowTurn == Player.O) {
+            winner = Player.X;
+        } else {
+            winner = Player.O;
+        }
+        currentTurn = Player.Neither;
+    }
+
+    public void CheckIfSurrender() {
+        nowTurn = currentTurn;
+        currentTurn = Player.Checking;
+        checkBox.SetActive(true);
+    }
+    public void CancelSurrender() {
+        currentTurn = nowTurn;
+        checkBox.SetActive(false);
     }
     #endregion
 
@@ -648,7 +689,7 @@ public class GameManager : MonoBehaviour {
                 return false;
             }
 
-            if (isHoldingTriangle && countBoard[i, 0, k] != 0) {
+            if (isHoldingTriangle && countBoard[i, 2, k] != 0) {
                 cubeBoard[i, 3, k] = Instantiate(cubeBoard[i, 2, k], new Vector3(7 * (i - 1), 14, 7 * (k - 1)), Quaternion.identity);
                 cubeBoard[i, 3, k].name = NameCube(i, 3, k, countBoard[i, 2, k]);
                 countBoard[i, 3, k] = countBoard[i, 2, k];
@@ -683,6 +724,7 @@ public class GameManager : MonoBehaviour {
         }
         if (isHoldingTriangle) {
             isHoldingTriangle = false;
+            triangleHoldingCanvas.SetActive(false);
             if (currentTurn == Player.O) {
                 isOTriangleUsed = true;
                 OTriangleButton.SetActive(false);
@@ -719,15 +761,15 @@ public class GameManager : MonoBehaviour {
         }
         int i = clickedCubeName[1] - '0', k = clickedCubeName[7] - '0';
         int tempNumber;
-        int emptyCubeCount = 0;
-        for (int y = 0; y < 4; y++) {
-            if (countBoard[i, y, k] == 0) {
-                emptyCubeCount++;
-            }
-        }
-        if (emptyCubeCount == 0) {
-            return;
-        }
+        //int emptyCubeCount = 0;
+        // for (int y = 0; y < 4; y++) {
+        //     if (countBoard[i, y, k] == 0) {
+        //         emptyCubeCount++;
+        //     }
+        // }
+        // if (emptyCubeCount == 0) {
+        //     return;
+        // }
         switch (currentNumber) {
             case 1:
             case 2:
