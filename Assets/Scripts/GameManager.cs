@@ -462,7 +462,7 @@ public class GameManager : MonoBehaviour {
     #region IsMoveComplete()系列
     private GameObject[,,] cubeSelectBoard = new GameObject[5, 5, 5];
     private GameObject clickedCube = null;
-    public GameObject errorSkillCanvas, triangleHoldingCanvas;
+    public GameObject errorSkillCanvas, triangleHoldingCanvas, continueCanvas;
     private bool isHoldingTriangle = false;
     private bool isOTriangleUsed, isXTriangleUsed, isOSpinUsed, isXSpinUsed, isOFlipUsed, isXFlipUsed;
 
@@ -510,7 +510,7 @@ public class GameManager : MonoBehaviour {
                             triangleHoldingCanvas.SetActive(false);
                         }
                         if ((currentTurn == Player.O && isOSpinUsed == false) || (currentTurn == Player.X && isXSpinUsed == false)) {
-                            if (Spin()) {
+                            if (SpinSkill()) {
                                 if (currentTurn == Player.O) {
                                     isOSpinUsed = true;
                                     OSpinButton.SetActive(false);
@@ -533,7 +533,7 @@ public class GameManager : MonoBehaviour {
                             triangleHoldingCanvas.SetActive(false);
                         }
                         if ((currentTurn == Player.O && isOFlipUsed == false) || (currentTurn == Player.X && isXFlipUsed == false)) {
-                            if (Flip()) {
+                            if (FlipSkill()) {
                                 if (currentTurn == Player.O) {
                                     isOFlipUsed = true;
                                     OFlipButton.SetActive(false);
@@ -577,21 +577,73 @@ public class GameManager : MonoBehaviour {
         }
         return false;
     }
-
-    bool Spin() {
-        return false;
-    }
-
-    bool Flip() {
-        return false;
-    }
     #endregion
 
     #region button系列
-
     public void TrianglePress() {
         isHoldingTriangle = true;
         triangleHoldingCanvas.SetActive(true);
+    }
+
+    public bool SpinSkill() {
+        return false;
+    }
+
+    public bool FlipSkill() {
+        continueCanvas.SetActive(true);
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) {
+            DestroyAllSelect();
+            continueCanvas.SetActive(false);
+            int[] tempCountBoard = new int[3];
+            for (int i = 0; i < 3; i++) {
+                for (int k = 0; k < 3; k++) {
+                    if (countBoard[i, 3, k] != 20) {
+                        tempCountBoard[0] = countBoard[i, 3, k];
+                        tempCountBoard[1] = countBoard[i, 2, k];
+                        tempCountBoard[2] = countBoard[i, 1, k];
+                        Destroy(cubeBoard[i, 3, k]);
+                        countBoard[i, 3, k] = 20;
+                    } else {
+                        tempCountBoard[0] = countBoard[i, 2, k];
+                        tempCountBoard[1] = countBoard[i, 1, k];
+                        tempCountBoard[2] = countBoard[i, 0, k];
+                    }
+                    Destroy(cubeBoard[i, 2, k]);
+                    InstantiateCube(i, 2, k, tempCountBoard[2]);
+                    Destroy(cubeBoard[i, 1, k]);
+                    InstantiateCube(i, 1, k, tempCountBoard[1]);
+                    Destroy(cubeBoard[i, 0, k]);
+                    InstantiateCube(i, 0, k, tempCountBoard[0]);
+                }
+            }
+            return true;
+        } else {
+            continueCanvas.SetActive(false);
+            return false;
+        }
+    }
+
+    void InstantiateCube(int i, int j, int k, int cubeType) {
+        Vector3 position = new Vector3(7*(i-1), 7*(j-1), 7*(k-1));
+        if (cubeType == 1) {
+            cubeBoard[i, j, k] = Instantiate(OCube, position, Quaternion.identity);
+        } else if (cubeType == -1) {
+            cubeBoard[i, j, k] = Instantiate(XCube, position, Quaternion.identity);
+        } else if (cubeType == 10) {
+            cubeBoard[i, j, k] = Instantiate(TriangleCube, position, Quaternion.identity);
+        } else {
+            cubeBoard[i, j, k] = Instantiate(EmptyCube, position, Quaternion.identity);
+        }
+
+        if (cubeType == 1) {
+            cubeBoard[i, j, k].name = $"({i}, {j}, {k})OCube";
+        } else if (cubeType == -1) {
+            cubeBoard[i, j, k].name = $"({i}, {j}, {k})XCube";
+        } else if (cubeType == 10) {
+            cubeBoard[i, j, k].name = $"({i}, {j}, {k})TriangleCube";
+        } else {
+            cubeBoard[i, j, k].name = $"({i}, {j}, {k})EmptyCube";
+        }
     }
 
     Player nowTurn;
@@ -846,7 +898,7 @@ public class GameManager : MonoBehaviour {
 
     void InstantiateSelectCube(int i, int j, int k, int cubeType) {
         GameObject tempSelectCube;
-        Vector3 position = cubeBoard[i, j, k].transform.position;
+        Vector3 position = new Vector3(7*(i-1), 7*(j-1), 7*(k-1));
         if (cubeType == 1) {
             tempSelectCube = Instantiate(SelectOCube, position, Quaternion.identity);
         } else if (cubeType == -1) {
