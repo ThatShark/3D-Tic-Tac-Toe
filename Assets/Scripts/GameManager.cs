@@ -752,29 +752,51 @@ public class GameManager : MonoBehaviour {
                 XSpinButton.SetActive(false);
             }
         }
+        int[,,] temptempCountBoard = new int[3, 3, 3];
+        int count = 0;
+        GameObject[,,] temptempCubeBoard = new GameObject[3, 3, 3];
 
         for (int i = 0; i < 3; i++) {
             for (int k = 0; k < 3; k++) {
-                if (tempCountBoard[i, 0, k] == 0 && tempCountBoard[i, 1, k] != 0) {
-                    tempCountBoard[i, 0, k] = tempCountBoard[i, 1, k];
-                    tempCubeBoard[i, 0, k] = tempCubeBoard[i, 1, k];
+                for (int j = 0; j < 3; j++) {
+                    if (tempCountBoard[i, j, k] != 0) {
+                        temptempCountBoard[i, count, k] = tempCountBoard[i, j, k];
+                        tempCountBoard[i, j, k] = 0;
+                        temptempCubeBoard[i, count, k] = tempCubeBoard[i, j, k];
+                        tempCubeBoard[i, j, k] = null;
+                        count++;
+                    }
                 }
-                if (tempCountBoard[i, 1, k] == 0 && tempCountBoard[i, 2, k] != 0) {
-                    tempCountBoard[i, 1, k] = tempCountBoard[i, 2, k];
-                    tempCubeBoard[i, 1, k] = tempCubeBoard[i, 2, k];
-                }
+                count = 0;
             }
         }
+
+        //for (int i = 0; i < 3; i++) {
+        //    for (int k = 0; k < 3; k++) {
+        //        if (tempCountBoard[i, 0, k] == 0 && tempCountBoard[i, 1, k] != 0) {
+        //            tempCountBoard[i, 0, k] = tempCountBoard[i, 1, k];
+        //            tempCountBoard[i, 1, k] = 0;
+        //            tempCubeBoard[i, 0, k] = tempCubeBoard[i, 1, k];
+        //            tempCubeBoard[i, 1, k] = null;
+        //        }
+        //        if (tempCountBoard[i, 1, k] == 0 && tempCountBoard[i, 2, k] != 0) {
+        //            tempCountBoard[i, 1, k] = tempCountBoard[i, 2, k];
+        //            tempCountBoard[i, 2, k] = 0;
+        //            tempCubeBoard[i, 1, k] = tempCubeBoard[i, 2, k];
+        //            tempCubeBoard[i, 2, k] = null;
+        //        }
+        //    }
+        //}
         DestroyAllSelect();
 
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 for (int k = 0; k < 3; k++) {
                     Destroy(cubeBoard[i, j, k]);
-                    cubeBoard[i, j, k] = tempCubeBoard[i, j, k];
-                    tempCubeBoard[i, j, k] = null;
-                    countBoard[i, j, k] = tempCountBoard[i, j, k];
-                    tempCountBoard[i, j, k] = 0;
+                    cubeBoard[i, j, k] = temptempCubeBoard[i, j, k];
+                    temptempCubeBoard[i, j, k] = null;
+                    countBoard[i, j, k] = temptempCountBoard[i, j, k];
+                    temptempCountBoard[i, j, k] = 0;
                     InstantiateCube(i, j, k, countBoard[i, j, k]);
                 }
             }
