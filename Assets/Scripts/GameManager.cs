@@ -29,7 +29,7 @@ public class GameManager : MonoBehaviour {
 
     #region ResetScene()系列
     public GameObject EmptyCube;
-    private int[,,] countBoard;
+    private int[,,] cubeTypeBoard;
     private GameObject[,,] cubeBoard = new GameObject[3, 4, 3]; // 座標[7*(i-1), 7*(j-1), 7*(k-1)]
     public void ResetScene() {
         XWinText.SetActive(true);
@@ -71,10 +71,10 @@ public class GameManager : MonoBehaviour {
                 }
             }
         }
-        countBoard = new int[3, 4, 3];
+        cubeTypeBoard = new int[3, 4, 3];
         for (int i = 0; i < 3; i++) {
             for (int k = 0; k < 3; k++) {
-                countBoard[i, 3, k] = 0;
+                cubeTypeBoard[i, 3, k] = 0;
             }
         }
 
@@ -121,10 +121,14 @@ public class GameManager : MonoBehaviour {
                 }
                 break;
             default:
-                if (currentTurn == Player.O) {
-                    // cursorManager.cursorState = ScriptForCursor.CursorState.O;
+                if (isHoldingTriangle) {
+                    // cursorManager.cursorState = ScriptForCursor.CursorState.Triangle;
                 } else {
-                    // cursorManager.cursorState = ScriptForCursor.CursorState.X;
+                    if (currentTurn == Player.O) {
+                        // cursorManager.cursorState = ScriptForCursor.CursorState.O;
+                    } else {
+                        // cursorManager.cursorState = ScriptForCursor.CursorState.X;
+                    }
                 }
                 IsNumberPress();
                 CheckIfNextTurn();
@@ -326,23 +330,23 @@ public class GameManager : MonoBehaviour {
         // 檢查每一層的行和列
         for (int i = 0; i < 3; i++) {
             // 檢查行
-            if (Mathf.Abs(countBoard[i, layer, 0] + countBoard[i, layer, 1] + countBoard[i, layer, 2]) == 3) {
-                vs += countBoard[i, layer, 0];
+            if (Mathf.Abs(cubeTypeBoard[i, layer, 0] + cubeTypeBoard[i, layer, 1] + cubeTypeBoard[i, layer, 2]) == 3) {
+                vs += cubeTypeBoard[i, layer, 0];
             }
 
             // 檢查列
-            if (Mathf.Abs(countBoard[0, layer, i] + countBoard[1, layer, i] + countBoard[2, layer, i]) == 3) {
-                vs += countBoard[0, layer, i];
+            if (Mathf.Abs(cubeTypeBoard[0, layer, i] + cubeTypeBoard[1, layer, i] + cubeTypeBoard[2, layer, i]) == 3) {
+                vs += cubeTypeBoard[0, layer, i];
             }
         }
 
         // 檢查對角線
-        if (Mathf.Abs(countBoard[0, layer, 0] + countBoard[1, layer, 1] + countBoard[2, layer, 2]) == 3) {
-            vs += countBoard[0, layer, 0];
+        if (Mathf.Abs(cubeTypeBoard[0, layer, 0] + cubeTypeBoard[1, layer, 1] + cubeTypeBoard[2, layer, 2]) == 3) {
+            vs += cubeTypeBoard[0, layer, 0];
         }
 
-        if (Mathf.Abs(countBoard[0, layer, 2] + countBoard[1, layer, 1] + countBoard[2, layer, 0]) == 3) {
-            vs += countBoard[0, layer, 2];
+        if (Mathf.Abs(cubeTypeBoard[0, layer, 2] + cubeTypeBoard[1, layer, 1] + cubeTypeBoard[2, layer, 0]) == 3) {
+            vs += cubeTypeBoard[0, layer, 2];
         }
         return vs;
     }
@@ -353,37 +357,37 @@ public class GameManager : MonoBehaviour {
         // 檢查每一列的行和列
         for (int i = 0; i < 3; i++) {
             // 檢查行
-            if (Mathf.Abs(countBoard[i, 0, col] + countBoard[i, 1, col] + countBoard[i, 2, col]) == 3) {
-                vs += countBoard[i, 0, col];
+            if (Mathf.Abs(cubeTypeBoard[i, 0, col] + cubeTypeBoard[i, 1, col] + cubeTypeBoard[i, 2, col]) == 3) {
+                vs += cubeTypeBoard[i, 0, col];
             }
 
             // 檢查列
-            if (Mathf.Abs(countBoard[0, i, col] + countBoard[1, i, col] + countBoard[2, i, col]) == 3) {
-                vs += countBoard[0, i, col];
+            if (Mathf.Abs(cubeTypeBoard[0, i, col] + cubeTypeBoard[1, i, col] + cubeTypeBoard[2, i, col]) == 3) {
+                vs += cubeTypeBoard[0, i, col];
             }
 
             // 特殊第四層
-            if (Mathf.Abs(countBoard[i, 1, col] + countBoard[i, 2, col] + countBoard[i, 3, col]) == 3) {
-                vs += countBoard[1, i, col];
+            if (Mathf.Abs(cubeTypeBoard[i, 1, col] + cubeTypeBoard[i, 2, col] + cubeTypeBoard[i, 3, col]) == 3) {
+                vs += cubeTypeBoard[1, i, col];
             }
         }
 
         // 檢查對角線
-        if (Mathf.Abs(countBoard[0, 0, col] + countBoard[1, 1, col] + countBoard[2, 2, col]) == 3) {
-            vs += countBoard[0, 0, col];
+        if (Mathf.Abs(cubeTypeBoard[0, 0, col] + cubeTypeBoard[1, 1, col] + cubeTypeBoard[2, 2, col]) == 3) {
+            vs += cubeTypeBoard[0, 0, col];
         }
 
-        if (Mathf.Abs(countBoard[0, 1, col] + countBoard[1, 2, col] + countBoard[2, 3, col]) == 3) {
-            vs += countBoard[0, 0, col];
+        if (Mathf.Abs(cubeTypeBoard[0, 1, col] + cubeTypeBoard[1, 2, col] + cubeTypeBoard[2, 3, col]) == 3) {
+            vs += cubeTypeBoard[0, 0, col];
         }
 
-        if (Mathf.Abs(countBoard[0, 2, col] + countBoard[1, 1, col] + countBoard[2, 0, col]) == 3) {
-            vs += countBoard[0, 2, col];
+        if (Mathf.Abs(cubeTypeBoard[0, 2, col] + cubeTypeBoard[1, 1, col] + cubeTypeBoard[2, 0, col]) == 3) {
+            vs += cubeTypeBoard[0, 2, col];
         }
 
 
-        if (Mathf.Abs(countBoard[2, 1, col] + countBoard[1, 2, col] + countBoard[0, 3, col]) == 3) {
-            vs += countBoard[1, 2, col];
+        if (Mathf.Abs(cubeTypeBoard[2, 1, col] + cubeTypeBoard[1, 2, col] + cubeTypeBoard[0, 3, col]) == 3) {
+            vs += cubeTypeBoard[1, 2, col];
         }
 
         return vs;
@@ -395,32 +399,32 @@ public class GameManager : MonoBehaviour {
         // 檢查每一行的行和列
         for (int i = 0; i < 3; i++) {
             // 檢查行
-            if (Mathf.Abs(countBoard[row, i, 0] + countBoard[row, i, 1] + countBoard[row, i, 2]) == 3) {
-                vs += countBoard[row, i, 0];
+            if (Mathf.Abs(cubeTypeBoard[row, i, 0] + cubeTypeBoard[row, i, 1] + cubeTypeBoard[row, i, 2]) == 3) {
+                vs += cubeTypeBoard[row, i, 0];
             }
 
             // 檢查列
-            if (Mathf.Abs(countBoard[row, 0, i] + countBoard[row, 1, i] + countBoard[row, 2, i]) == 3) {
-                vs += countBoard[row, 0, i];
+            if (Mathf.Abs(cubeTypeBoard[row, 0, i] + cubeTypeBoard[row, 1, i] + cubeTypeBoard[row, 2, i]) == 3) {
+                vs += cubeTypeBoard[row, 0, i];
             }
-            if (Mathf.Abs(countBoard[row, 1, i] + countBoard[row, 2, i] + countBoard[row, 3, i]) == 3) {
-                vs += countBoard[row, 1, i];
+            if (Mathf.Abs(cubeTypeBoard[row, 1, i] + cubeTypeBoard[row, 2, i] + cubeTypeBoard[row, 3, i]) == 3) {
+                vs += cubeTypeBoard[row, 1, i];
             }
         }
 
         // 檢查對角線
-        if (Mathf.Abs(countBoard[row, 0, 0] + countBoard[row, 1, 1] + countBoard[row, 2, 2]) == 3) {
-            vs += countBoard[row, 0, 0];
+        if (Mathf.Abs(cubeTypeBoard[row, 0, 0] + cubeTypeBoard[row, 1, 1] + cubeTypeBoard[row, 2, 2]) == 3) {
+            vs += cubeTypeBoard[row, 0, 0];
         }
-        if (Mathf.Abs(countBoard[row, 1, 0] + countBoard[row, 2, 1] + countBoard[row, 3, 2]) == 3) {
-            vs += countBoard[row, 0, 0];
+        if (Mathf.Abs(cubeTypeBoard[row, 1, 0] + cubeTypeBoard[row, 2, 1] + cubeTypeBoard[row, 3, 2]) == 3) {
+            vs += cubeTypeBoard[row, 0, 0];
         }
 
-        if (Mathf.Abs(countBoard[row, 0, 2] + countBoard[row, 1, 1] + countBoard[row, 2, 0]) == 3) {
-            vs += countBoard[row, 0, 2];
+        if (Mathf.Abs(cubeTypeBoard[row, 0, 2] + cubeTypeBoard[row, 1, 1] + cubeTypeBoard[row, 2, 0]) == 3) {
+            vs += cubeTypeBoard[row, 0, 2];
         }
-        if (Mathf.Abs(countBoard[row, 1, 2] + countBoard[row, 2, 1] + countBoard[row, 3, 0]) == 3) {
-            vs += countBoard[row, 1, 2];
+        if (Mathf.Abs(cubeTypeBoard[row, 1, 2] + cubeTypeBoard[row, 2, 1] + cubeTypeBoard[row, 3, 0]) == 3) {
+            vs += cubeTypeBoard[row, 1, 2];
         }
 
         return vs;
@@ -429,29 +433,29 @@ public class GameManager : MonoBehaviour {
     // 檢查 3D 對角線是否有玩家獲勝
     int Check3DDiagonals() {
         int vs = 0;
-        if (Mathf.Abs(countBoard[0, 0, 0] + countBoard[1, 1, 1] + countBoard[2, 2, 2]) == 3) {
-            vs += countBoard[0, 0, 0];
+        if (Mathf.Abs(cubeTypeBoard[0, 0, 0] + cubeTypeBoard[1, 1, 1] + cubeTypeBoard[2, 2, 2]) == 3) {
+            vs += cubeTypeBoard[0, 0, 0];
         }
-        if (Mathf.Abs(countBoard[0, 0, 2] + countBoard[1, 1, 1] + countBoard[2, 2, 0]) == 3) {
-            vs += countBoard[0, 0, 2];
+        if (Mathf.Abs(cubeTypeBoard[0, 0, 2] + cubeTypeBoard[1, 1, 1] + cubeTypeBoard[2, 2, 0]) == 3) {
+            vs += cubeTypeBoard[0, 0, 2];
         }
-        if (Mathf.Abs(countBoard[0, 2, 0] + countBoard[1, 1, 1] + countBoard[2, 0, 2]) == 3) {
-            vs += countBoard[0, 2, 0];
+        if (Mathf.Abs(cubeTypeBoard[0, 2, 0] + cubeTypeBoard[1, 1, 1] + cubeTypeBoard[2, 0, 2]) == 3) {
+            vs += cubeTypeBoard[0, 2, 0];
         }
-        if (Mathf.Abs(countBoard[2, 0, 0] + countBoard[1, 1, 1] + countBoard[0, 2, 2]) == 3) {
-            vs += countBoard[2, 0, 0];
+        if (Mathf.Abs(cubeTypeBoard[2, 0, 0] + cubeTypeBoard[1, 1, 1] + cubeTypeBoard[0, 2, 2]) == 3) {
+            vs += cubeTypeBoard[2, 0, 0];
         }
-        if (Mathf.Abs(countBoard[0, 1, 0] + countBoard[1, 2, 1] + countBoard[2, 3, 2]) == 3) {
-            vs += countBoard[0, 1, 0];
+        if (Mathf.Abs(cubeTypeBoard[0, 1, 0] + cubeTypeBoard[1, 2, 1] + cubeTypeBoard[2, 3, 2]) == 3) {
+            vs += cubeTypeBoard[0, 1, 0];
         }
-        if (Mathf.Abs(countBoard[0, 1, 2] + countBoard[1, 2, 1] + countBoard[2, 3, 0]) == 3) {
-            vs += countBoard[0, 1, 2];
+        if (Mathf.Abs(cubeTypeBoard[0, 1, 2] + cubeTypeBoard[1, 2, 1] + cubeTypeBoard[2, 3, 0]) == 3) {
+            vs += cubeTypeBoard[0, 1, 2];
         }
-        if (Mathf.Abs(countBoard[2, 1, 0] + countBoard[1, 2, 1] + countBoard[0, 3, 2]) == 3) {
-            vs += countBoard[2, 1, 0];
+        if (Mathf.Abs(cubeTypeBoard[2, 1, 0] + cubeTypeBoard[1, 2, 1] + cubeTypeBoard[0, 3, 2]) == 3) {
+            vs += cubeTypeBoard[2, 1, 0];
         }
-        if (Mathf.Abs(countBoard[0, 3, 0] + countBoard[1, 2, 1] + countBoard[2, 1, 2]) == 3) {
-            vs += countBoard[0, 3, 0];
+        if (Mathf.Abs(cubeTypeBoard[0, 3, 0] + cubeTypeBoard[1, 2, 1] + cubeTypeBoard[2, 1, 2]) == 3) {
+            vs += cubeTypeBoard[0, 3, 0];
         }
 
         return vs;
@@ -493,24 +497,9 @@ public class GameManager : MonoBehaviour {
                 switch (key) {
                     case KeyCode.W:
                         TrianglePress();
-                        isFlipping = false;
                         return false;
                     case KeyCode.A:
                         SpinPress();
-                        isFlipping = false;
-                        if (isHoldingTriangle) {
-                            isHoldingTriangle = false;
-                            triangleHoldingCanvas.SetActive(false);
-                        }
-                        if ((currentTurn == Player.O && isOFlipUsed == true) || (currentTurn == Player.X && isXFlipUsed == false)) {
-                            if (errorInputCanvas.activeSelf) {
-                                errorInputCanvas.SetActive(false);
-                                errorSkillCanvas.SetActive(true);
-                                StartCoroutine(DelayedSetNotActive(errorSkillCanvas, 1.5f));
-                            }
-                            return false;
-                        }
-
                         return false;
                     case KeyCode.S:
                         FlipPress();
@@ -564,8 +553,6 @@ public class GameManager : MonoBehaviour {
                     case KeyCode.KeypadEnter:
                         if (isFlipping) {
                             Flip();
-                            isFlipping = false;
-                            continueCanvas.SetActive(false);
                             return true;
                         }
                         return false;
@@ -576,294 +563,133 @@ public class GameManager : MonoBehaviour {
     }
 
     void Spin(string spinDirection) {
-        int[,,] tempCountBoard = new int[3, 3, 3];
+        int[,,] tempCubeTypeBoard = new int[3, 3, 3];
         GameObject[,,] tempCubeBoard = new GameObject[3, 3, 3];
-
-        if (spinDirection == "LeftArrow") {
-            for (int i = 0; i < 3; i++) {
-                for (int j = 0; j < 3; j++) {
-                    for (int k = 0; k < 3; k++) {
-                        if (i == 0) {
-                            if (j == 0) {
-                                tempCountBoard[i, j, k] = countBoard[i, j + 2, k];
-                                tempCubeBoard[i, j, k] = cubeBoard[i, j + 2, k];
-                            } else if (j == 1) {
-                                tempCountBoard[i, j, k] = countBoard[i + 1, j + 1, k];
-                                tempCubeBoard[i, j, k] = cubeBoard[i + 1, j + 1, k];
-                            } else if (j == 2) {
-                                tempCountBoard[i, j, k] = countBoard[i + 2, j, k];
-                                tempCubeBoard[i, j, k] = cubeBoard[i + 2, j, k];
-                            }
-                        } else if (i == 1) {
-                            if (j == 0) {
-                                tempCountBoard[i, j, k] = countBoard[i - 1, j + 1, k];
-                                tempCubeBoard[i, j, k] = cubeBoard[i - 1, j + 1, k];
-                            } else if (j == 1) {
-                                tempCountBoard[i, j, k] = countBoard[i, j, k];
-                                tempCubeBoard[i, j, k] = cubeBoard[i, j, k];
-                            } else if (j == 2) {
-                                tempCountBoard[i, j, k] = countBoard[i + 1, j - 1, k];
-                                tempCubeBoard[i, j, k] = cubeBoard[i + 1, j - 1, k];
-                            }
-                        } else if (i == 2) {
-                            if (j == 0) {
-                                tempCountBoard[i, j, k] = countBoard[i - 2, j, k];
-                                tempCubeBoard[i, j, k] = cubeBoard[i - 2, j, k];
-                            } else if (j == 1) {
-                                tempCountBoard[i, j, k] = countBoard[i - 1, j - 1, k];
-                                tempCubeBoard[i, j, k] = cubeBoard[i - 1, j - 1, k];
-                            } else if (j == 2) {
-                                tempCountBoard[i, j, k] = countBoard[i, j - 2, k];
-                                tempCubeBoard[i, j, k] = cubeBoard[i, j - 2, k];
-                            }
-                        }
-                    }
-                }
-            }
-            if (currentTurn == Player.O) {
-                isOSpinUsed = true;
-                OSpinButton.SetActive(false);
-            } else {
-                isXSpinUsed = true;
-                XSpinButton.SetActive(false);
-            }
-        } else if (spinDirection == "RightArrow") {
-            for (int i = 0; i < 3; i++) {
-                for (int j = 0; j < 3; j++) {
-                    for (int k = 0; k < 3; k++) {
-                        if (i == 0) {
-                            if (j == 0) {
-                                tempCountBoard[i, j, k] = countBoard[i + 2, j, k];
-                                tempCubeBoard[i, j, k] = cubeBoard[i + 2, j, k];
-                            } else if (j == 1) {
-                                tempCountBoard[i, j, k] = countBoard[i + 1, j - 1, k];
-                                tempCubeBoard[i, j, k] = cubeBoard[i + 1, j - 1, k];
-                            } else if (j == 2) {
-                                tempCountBoard[i, j, k] = countBoard[i, j - 2, k];
-                                tempCubeBoard[i, j, k] = cubeBoard[i, j - 2, k];
-                            }
-                        } else if (i == 1) {
-                            if (j == 0) {
-                                tempCountBoard[i, j, k] = countBoard[i + 1, j + 1, k];
-                                tempCubeBoard[i, j, k] = cubeBoard[i + 1, j + 1, k];
-                            } else if (j == 1) {
-                                tempCountBoard[i, j, k] = countBoard[i, j, k];
-                                tempCubeBoard[i, j, k] = cubeBoard[i, j, k];
-                            } else if (j == 2) {
-                                tempCountBoard[i, j, k] = countBoard[i - 1, j - 1, k];
-                                tempCubeBoard[i, j, k] = cubeBoard[i - 1, j - 1, k];
-                            }
-                        } else if (i == 2) {
-                            if (j == 0) {
-                                tempCountBoard[i, j, k] = countBoard[i, j + 2, k];
-                                tempCubeBoard[i, j, k] = cubeBoard[i, j + 2, k];
-                            } else if (j == 1) {
-                                tempCountBoard[i, j, k] = countBoard[i - 1, j + 1, k];
-                                tempCubeBoard[i, j, k] = cubeBoard[i - 1, j + 1, k];
-                            } else if (j == 2) {
-                                tempCountBoard[i, j, k] = countBoard[i - 2, j, k];
-                                tempCubeBoard[i, j, k] = cubeBoard[i - 2, j, k];
-                            }
-                        }
-                    }
-                }
-            }
-            if (currentTurn == Player.O) {
-                isOSpinUsed = true;
-                OSpinButton.SetActive(false);
-            } else {
-                isXSpinUsed = true;
-                XSpinButton.SetActive(false);
-            }
-        } else if (spinDirection == "UpArrow") {
-            for (int i = 0; i < 3; i++) {
-
-                tempCountBoard[i, 0, 0] = countBoard[i, 2, 0];
-                tempCubeBoard[i, 0, 0] = cubeBoard[i, 2, 0];
-
-                tempCountBoard[i, 0, 1] = countBoard[i, 1, 0];
-                tempCubeBoard[i, 0, 1] = cubeBoard[i, 1, 0];
-
-                tempCountBoard[i, 0, 2] = countBoard[i, 0, 0];
-                tempCubeBoard[i, 0, 2] = cubeBoard[i, 0, 0];
-
-                tempCountBoard[i, 1, 0] = countBoard[i, 2, 1];
-                tempCubeBoard[i, 1, 0] = cubeBoard[i, 2, 1];
-
-                tempCountBoard[i, 1, 1] = countBoard[i, 1, 1];
-                tempCubeBoard[i, 1, 1] = cubeBoard[i, 1, 1];
-
-                tempCountBoard[i, 1, 2] = countBoard[i, 0, 1];
-                tempCubeBoard[i, 1, 2] = cubeBoard[i, 0, 1];
-
-                tempCountBoard[i, 2, 0] = countBoard[i, 2, 2];
-                tempCubeBoard[i, 2, 0] = cubeBoard[i, 2, 2];
-
-                tempCountBoard[i, 2, 1] = countBoard[i, 1, 2];
-                tempCubeBoard[i, 2, 1] = cubeBoard[i, 1, 2];
-
-                tempCountBoard[i, 2, 2] = countBoard[i, 0, 2];
-                tempCubeBoard[i, 2, 2] = cubeBoard[i, 0, 2];
-            }
-
-
-
-            if (currentTurn == Player.O) {
-                isOSpinUsed = true;
-                OSpinButton.SetActive(false);
-            } else {
-                isXSpinUsed = true;
-                XSpinButton.SetActive(false);
-            }
-        } else if (spinDirection == "DownArrow") {
-            for (int i = 0; i < 3; i++) {
-                tempCountBoard[i, 0, 0] = countBoard[i, 0, 2];
-                tempCubeBoard[i, 0, 0] = cubeBoard[i, 0, 2];
-
-                tempCountBoard[i, 0, 1] = countBoard[i, 1, 2];
-                tempCubeBoard[i, 0, 1] = cubeBoard[i, 1, 2];
-                tempCountBoard[i, 0, 2] = countBoard[i, 2, 2];
-                tempCubeBoard[i, 0, 2] = cubeBoard[i, 2, 2];
-
-                tempCountBoard[i, 1, 0] = countBoard[i, 0, 1];
-                tempCubeBoard[i, 1, 0] = cubeBoard[i, 0, 1];
-
-                tempCountBoard[i, 1, 1] = countBoard[i, 1, 1];
-                tempCubeBoard[i, 1, 1] = cubeBoard[i, 1, 1];
-
-                tempCountBoard[i, 1, 2] = countBoard[i, 2, 1];
-                tempCubeBoard[i, 1, 2] = cubeBoard[i, 2, 1];
-
-                tempCountBoard[i, 2, 0] = countBoard[i, 0, 0];
-                tempCubeBoard[i, 2, 0] = cubeBoard[i, 0, 0];
-
-                tempCountBoard[i, 2, 1] = countBoard[i, 1, 0];
-                tempCubeBoard[i, 2, 1] = cubeBoard[i, 1, 0];
-
-                tempCountBoard[i, 2, 2] = countBoard[i, 2, 0];
-                tempCubeBoard[i, 2, 2] = cubeBoard[i, 2, 0];
-            }
-
-            if (currentTurn == Player.O) {
-                isOSpinUsed = true;
-                OSpinButton.SetActive(false);
-            } else {
-                isXSpinUsed = true;
-                XSpinButton.SetActive(false);
-            }
-        }
-        int[,,] temptempCountBoard = new int[3, 3, 3];
-        int count = 0;
-        GameObject[,,] temptempCubeBoard = new GameObject[3, 3, 3];
-
+        // 旋轉
         for (int i = 0; i < 3; i++) {
             for (int k = 0; k < 3; k++) {
                 for (int j = 0; j < 3; j++) {
-                    if (tempCountBoard[i, j, k] != 0) {
-                        temptempCountBoard[i, count, k] = tempCountBoard[i, j, k];
-                        tempCountBoard[i, j, k] = 0;
-                        temptempCubeBoard[i, count, k] = tempCubeBoard[i, j, k];
-                        tempCubeBoard[i, j, k] = null;
-                        count++;
-                    }
+                    (int newI, int newJ, int newK) = GetRotatedIndex(i, j, k, spinDirection);
+                    tempCubeTypeBoard[newI, newJ, newK] = cubeTypeBoard[i, j, k];
+                    cubeTypeBoard[i, j, k] = 0;
+                    Destroy(cubeBoard[i, j, k]);
                 }
-                count = 0;
+                if (cubeTypeBoard[i, 3, k] != 0) {
+                    cubeTypeBoard[i, 3, k] = 0;
+                    Destroy(cubeBoard[i, 3, k]);
+                }
             }
         }
-
-        //for (int i = 0; i < 3; i++) {
-        //    for (int k = 0; k < 3; k++) {
-        //        if (tempCountBoard[i, 0, k] == 0 && tempCountBoard[i, 1, k] != 0) {
-        //            tempCountBoard[i, 0, k] = tempCountBoard[i, 1, k];
-        //            tempCountBoard[i, 1, k] = 0;
-        //            tempCubeBoard[i, 0, k] = tempCubeBoard[i, 1, k];
-        //            tempCubeBoard[i, 1, k] = null;
-        //        }
-        //        if (tempCountBoard[i, 1, k] == 0 && tempCountBoard[i, 2, k] != 0) {
-        //            tempCountBoard[i, 1, k] = tempCountBoard[i, 2, k];
-        //            tempCountBoard[i, 2, k] = 0;
-        //            tempCubeBoard[i, 1, k] = tempCubeBoard[i, 2, k];
-        //            tempCubeBoard[i, 2, k] = null;
-        //        }
-        //    }
-        //}
-        DestroyAllSelect();
-
+        // 三角形
+        for (int i = 0; i < 3; i++) {
+            for (int k = 0; k < 3; k++) {
+                if (tempCubeTypeBoard[i, 2, k] == 10) {
+                    for (int j = 0; j < 2; j++) {
+                        if (tempCubeTypeBoard[i, j, k] != 10) {
+                            tempCubeTypeBoard[i, j, k] = 0;
+                        }
+                    }
+                } else if (tempCubeTypeBoard[i, 1, k] == 10) {
+                    if (tempCubeTypeBoard[i, 1, k] != 10) {
+                        tempCubeTypeBoard[i, 1, k] = 0;
+                    }
+                }
+            }
+        }
+        // 重力
+        for (int i = 0; i < 3; i++) {
+            for (int k = 0; k < 3; k++) {
+                int index = 0;
+                for (int j = 0; j < 3; j++) {
+                    if (tempCubeTypeBoard[i, j, k] != 0) {
+                        cubeTypeBoard[i, index, k] = tempCubeTypeBoard[i, j, k];
+                        index++;
+                    }
+                }
+            }
+        }
+        // 生成
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 for (int k = 0; k < 3; k++) {
-                    Destroy(cubeBoard[i, j, k]);
-                    cubeBoard[i, j, k] = temptempCubeBoard[i, j, k];
-                    temptempCubeBoard[i, j, k] = null;
-                    countBoard[i, j, k] = temptempCountBoard[i, j, k];
-                    temptempCountBoard[i, j, k] = 0;
-                    InstantiateCube(i, j, k, countBoard[i, j, k]);
+                    InstantiateCube(i, j, k, cubeTypeBoard[i, j, k]);
                 }
             }
         }
 
-        for (int i = 0; i < 3; i++) {
-            for (int j = 2; j >= 0; j--) {
-                for (int k = 0; k < 3; k++) {
-                    if (countBoard[i, j, k] == 0 && countBoard[i, j + 1, k] != 0) {
-                        tempCountBoard[i, j, k] = tempCountBoard[i, j + 1, k];
-                        tempCubeBoard[i, j, k] = tempCubeBoard[i, j + 1, k];
-                    }
-                }
-            }
-        }
-
+        DestroyAllSelect();
         AllCubeActive();
         isSpinning = false;
+        // Canvas.SetActive(false);
+        if (currentTurn == Player.O) {
+            isOSpinUsed = true;
+            OSpinButton.SetActive(false);
+        } else {
+            isXSpinUsed = true;
+            XSpinButton.SetActive(false);
+        }
+    }
+
+    (int, int, int) GetRotatedIndex(int i, int j, int k, string direction) {
+        return direction switch {
+            "LeftArrow" => (2 - j, i, k),
+            "RightArrow" => (j, 2 - i, k),
+            "UpArrow" => (i, 2 - k, j),
+            "DownArrow" => (i, k, 2 - j),
+            _ => (i, j, k)
+        };
     }
 
     void Flip() {
         DestroyAllSelect();
         for (int i = 0; i < 3; i++) {
             for (int k = 0; k < 3; k++) {
-                int[] tempCountBoard = new int[3] { 0, 0, 0 };
+                int[] tempCubeTypeBoard = new int[3] { 0, 0, 0 };
                 int index = 0;
-                if (countBoard[i, 0, k] == 10) {
-                    if (countBoard[i, 3, k] != 0) {
+                if (cubeTypeBoard[i, 0, k] == 10) {
+                    if (cubeTypeBoard[i, 3, k] != 0) {
                         Destroy(cubeBoard[i, 3, k]);
-                        countBoard[i, 3, k] = 0;
+                        cubeTypeBoard[i, 3, k] = 0;
                     }
-                    countBoard[i, 2, k] = 0;
-                    if (countBoard[i, 1, k] != 10) {
-                        countBoard[i, 1, k] = 0;
+                    cubeTypeBoard[i, 2, k] = 0;
+                    if (cubeTypeBoard[i, 1, k] != 10) {
+                        cubeTypeBoard[i, 1, k] = 0;
                     }
                     for (int j = 1; j >= 0; j--) {
-                        if (countBoard[i, j, k] == 10) {
-                            tempCountBoard[index] = countBoard[i, j, k];
+                        if (cubeTypeBoard[i, j, k] == 10) {
+                            tempCubeTypeBoard[index] = cubeTypeBoard[i, j, k];
                             index++;
                         }
                     }
                 } else {
-                    for (int j = 3; j >= 0 && index < 3; j--) {
-                        if (countBoard[i, j, k] != 0) {
-                            tempCountBoard[index] = countBoard[i, j, k];
+                    for (int j = 2; j >= 0; j--) {
+                        if (cubeTypeBoard[i, j, k] != 0) {
+                            tempCubeTypeBoard[index] = cubeTypeBoard[i, j, k];
                             index++;
                         }
                     }
-                    if (countBoard[i, 3, k] != 0) {
-                        Destroy(cubeBoard[i, 3, k]);
-                        countBoard[i, 3, k] = 0;
-                    }
                 }
-                Destroy(cubeBoard[i, 2, k]);
-                InstantiateCube(i, 2, k, tempCountBoard[2]);
-                Destroy(cubeBoard[i, 1, k]);
-                InstantiateCube(i, 1, k, tempCountBoard[1]);
-                Destroy(cubeBoard[i, 0, k]);
-                InstantiateCube(i, 0, k, tempCountBoard[0]);
+                for (int j = 0; j < 3; j++) {
+                    Destroy(cubeBoard[i, j, k]);
+                    InstantiateCube(i, j, k, tempCubeTypeBoard[j]);
+                }
             }
         }
         AllCubeActive();
+        isFlipping = false;
+        continueCanvas.SetActive(false);
+        if (currentTurn == Player.O) {
+            isOFlipUsed = true;
+            OFlipButton.SetActive(false);
+        } else {
+            isXFlipUsed = true;
+            XFlipButton.SetActive(false);
+        }
     }
 
     void InstantiateCube(int i, int j, int k, int cubeType) {
         Vector3 position = new Vector3(7 * (i - 1), 7 * (j - 1), 7 * (k - 1));
-        countBoard[i, j, k] = cubeType;
+        cubeTypeBoard[i, j, k] = cubeType;
         if (cubeType == 1) {
             cubeBoard[i, j, k] = Instantiate(OCube, position, Quaternion.identity);
             cubeBoard[i, j, k].name = $"({i}, {j}, {k})OCube";
@@ -902,7 +728,7 @@ public class GameManager : MonoBehaviour {
         }
     }
 
-    private void SpinPress() {
+    public void SpinPress() {
         if (isHoldingTriangle) {
             isHoldingTriangle = false;
             triangleHoldingCanvas.SetActive(false);
@@ -953,7 +779,6 @@ public class GameManager : MonoBehaviour {
         }
         currentTurn = Player.Neither;
     }
-
     public void CheckIfSurrender() {
         if (isHoldingTriangle) {
             isHoldingTriangle = false;
@@ -988,7 +813,7 @@ public class GameManager : MonoBehaviour {
         int emptyCubeCount = 0;
         int i = clickedCubeName[1] - '0', k = clickedCubeName[7] - '0';
         for (int y = 0; y < 3; y++) {
-            if (countBoard[i, y, k] == 0) {
+            if (cubeTypeBoard[i, y, k] == 0) {
                 emptyCubeCount++;
             }
         }
@@ -1002,71 +827,58 @@ public class GameManager : MonoBehaviour {
         }
         if (pressUpArrow) {
             if (isHoldingTriangle) {
-                if (countBoard[i, 3, k] != 0) {
+                if (cubeTypeBoard[i, 3, k] != 0) {
                     Destroy(cubeBoard[i, 3, k]);
-                    countBoard[i, 3, k] = 0;
+                    cubeTypeBoard[i, 3, k] = 0;
                 }
 
                 Destroy(cubeBoard[i, 2, k]);
-                cubeBoard[i, 2, k] = Instantiate(EmptyCube, new Vector3(7 * (i - 1), 7, 7 * (k - 1)), Quaternion.identity);
-                cubeBoard[i, 2, k].name = $"({i}, 2, {k})EmptyCube";
-                countBoard[i, 2, k] = 0;
-
+                InstantiateCube(i, 2, k, 0);
+                cubeTypeBoard[i, 2, k] = 0;
 
                 Destroy(cubeBoard[i, 1, k]);
-                if (countBoard[i, 0, k] == 10) {
-                    cubeBoard[i, 1, k] = Instantiate(TriangleCube, new Vector3(7 * (i - 1), 0, 7 * (k - 1)), Quaternion.identity);
-                    cubeBoard[i, 1, k].name = $"({i}, 1, {k})TriangleCube";
-                    countBoard[i, 1, k] = 10;
+                if (cubeTypeBoard[i, 0, k] == 10) {
+                    InstantiateCube(i, 1, k, 10);
+                    cubeTypeBoard[i, 1, k] = 10;
                 } else {
-                    cubeBoard[i, 1, k] = Instantiate(EmptyCube, new Vector3(7 * (i - 1), 0, 7 * (k - 1)), Quaternion.identity);
-                    cubeBoard[i, 1, k].name = $"({i}, 1, {k})EmptyCube";
-                    countBoard[i, 1, k] = 0;
+                    InstantiateCube(i, 1, k, 0);
+                    cubeTypeBoard[i, 1, k] = 0;
 
                     Destroy(cubeBoard[i, 0, k]);
-                    cubeBoard[i, 0, k] = Instantiate(TriangleCube, new Vector3(7 * (i - 1), -7, 7 * (k - 1)), Quaternion.identity);
-                    cubeBoard[i, 0, k].name = $"({i}, 0, {k})TriangleCube";
-                    countBoard[i, 0, k] = 10;
+                    InstantiateCube(i, 0, k, 10);
+                    cubeTypeBoard[i, 0, k] = 10;
                 }
 
             } else {
-                if (countBoard[i, 1, k] != 0) {
+                if (cubeTypeBoard[i, 1, k] != 0) {
                     Destroy(cubeBoard[i, 2, k]);
                     if (currentTurn == Player.O) {
-                        cubeBoard[i, 2, k] = Instantiate(OCube, new Vector3(7 * (i - 1), 7, 7 * (k - 1)), Quaternion.identity);
-                        cubeBoard[i, 2, k].name = $"({i}, 2, {k})OCube";
-                        countBoard[i, 2, k] = 1;
+                        InstantiateCube(i, 2, k, 1);
+                        cubeTypeBoard[i, 2, k] = 1;
                     } else if (currentTurn == Player.X) {
-                        cubeBoard[i, 2, k] = Instantiate(XCube, new Vector3(7 * (i - 1), 7, 7 * (k - 1)), Quaternion.identity);
-                        cubeBoard[i, 2, k].name = $"({i}, 2, {k})XCube";
-                        countBoard[i, 2, k] = -1;
+                        InstantiateCube(i, 2, k, -1);
+                        cubeTypeBoard[i, 2, k] = -1;
                     }
-                } else if (countBoard[i, 0, k] != 0) {
+                } else if (cubeTypeBoard[i, 0, k] != 0) {
                     Destroy(cubeBoard[i, 1, k]);
                     if (currentTurn == Player.O) {
-                        cubeBoard[i, 1, k] = Instantiate(OCube, new Vector3(7 * (i - 1), 0, 7 * (k - 1)), Quaternion.identity);
-                        cubeBoard[i, 1, k].name = $"({i}, 1, {k})OCube";
-                        countBoard[i, 1, k] = 1;
+                        InstantiateCube(i, 1, k, 1);
+                        cubeTypeBoard[i, 1, k] = 1;
                     } else if (currentTurn == Player.X) {
-                        cubeBoard[i, 1, k] = Instantiate(XCube, new Vector3(7 * (i - 1), 0, 7 * (k - 1)), Quaternion.identity);
-                        cubeBoard[i, 1, k].name = $"({i}, 1, {k})XCube";
-                        countBoard[i, 1, k] = -1;
+                        InstantiateCube(i, 1, k, -1);
+                        cubeTypeBoard[i, 1, k] = -1;
                     }
                 } else {
                     Destroy(cubeBoard[i, 0, k]);
                     if (currentTurn == Player.O) {
-                        cubeBoard[i, 0, k] = Instantiate(OCube, new Vector3(7 * (i - 1), -7, 7 * (k - 1)), Quaternion.identity);
-                        cubeBoard[i, 0, k].name = $"({i}, 0, {k})OCube";
-                        countBoard[i, 0, k] = 1;
+                        InstantiateCube(i, 0, k, 1);
+                        cubeTypeBoard[i, 0, k] = 1;
                     } else if (currentTurn == Player.X) {
-                        cubeBoard[i, 0, k] = Instantiate(XCube, new Vector3(7 * (i - 1), -7, 7 * (k - 1)), Quaternion.identity);
-                        cubeBoard[i, 0, k].name = $"({i}, 0, {k})XCube";
-                        countBoard[i, 0, k] = -1;
+                        InstantiateCube(i, 0, k, -1);
+                        cubeTypeBoard[i, 0, k] = -1;
                     }
                 }
             }
-
-
         } else {
             if (cubeBoard[i, 0, k].name.Contains("Triangle")) {
                 if (errorSkillCanvas.activeSelf) {
@@ -1077,36 +889,30 @@ public class GameManager : MonoBehaviour {
                 return false;
             }
 
-            if (isHoldingTriangle && countBoard[i, 2, k] != 0) {
-                cubeBoard[i, 3, k] = Instantiate(cubeBoard[i, 2, k], new Vector3(7 * (i - 1), 14, 7 * (k - 1)), Quaternion.identity);
-                cubeBoard[i, 3, k].name = NameCube(i, 3, k, countBoard[i, 2, k]);
-                countBoard[i, 3, k] = countBoard[i, 2, k];
+            if (isHoldingTriangle && cubeTypeBoard[i, 2, k] != 0) {
+                InstantiateCube(i, 3, k, cubeTypeBoard[i, 2, k]);
+                cubeTypeBoard[i, 3, k] = cubeTypeBoard[i, 2, k];
             }
 
             Destroy(cubeBoard[i, 2, k]);
-            cubeBoard[i, 2, k] = Instantiate(cubeBoard[i, 1, k], new Vector3(7 * (i - 1), 7, 7 * (k - 1)), Quaternion.identity);
-            cubeBoard[i, 2, k].name = NameCube(i, 2, k, countBoard[i, 1, k]);
-            countBoard[i, 2, k] = countBoard[i, 1, k];
+            InstantiateCube(i, 2, k, cubeTypeBoard[i, 1, k]);
+            cubeTypeBoard[i, 2, k] = cubeTypeBoard[i, 1, k];
 
             Destroy(cubeBoard[i, 1, k]);
-            cubeBoard[i, 1, k] = Instantiate(cubeBoard[i, 0, k], new Vector3(7 * (i - 1), 0, 7 * (k - 1)), Quaternion.identity);
-            cubeBoard[i, 1, k].name = NameCube(i, 1, k, countBoard[i, 0, k]);
-            countBoard[i, 1, k] = countBoard[i, 0, k];
+            InstantiateCube(i, 1, k, cubeTypeBoard[i, 0, k]);
+            cubeTypeBoard[i, 1, k] = cubeTypeBoard[i, 0, k];
 
             Destroy(cubeBoard[i, 0, k]);
             if (isHoldingTriangle) {
-                cubeBoard[i, 0, k] = Instantiate(TriangleCube, new Vector3(7 * (i - 1), -7, 7 * (k - 1)), Quaternion.identity);
-                cubeBoard[i, 0, k].name = $"({i}, 0, {k})TriangleCube";
-                countBoard[i, 0, k] = 10;
+                InstantiateCube(i, 0, k, 10);
+                cubeTypeBoard[i, 0, k] = 10;
             } else {
                 if (currentTurn == Player.O) {
-                    cubeBoard[i, 0, k] = Instantiate(OCube, new Vector3(7 * (i - 1), -7, 7 * (k - 1)), Quaternion.identity);
-                    cubeBoard[i, 0, k].name = $"({i}, 0, {k})OCube";
-                    countBoard[i, 0, k] = 1;
+                    InstantiateCube(i, 0, k, 1);
+                    cubeTypeBoard[i, 0, k] = 1;
                 } else if (currentTurn == Player.X) {
-                    cubeBoard[i, 0, k] = Instantiate(XCube, new Vector3(7 * (i - 1), -7, 7 * (k - 1)), Quaternion.identity);
-                    cubeBoard[i, 0, k].name = $"({i}, 0, {k})XCube";
-                    countBoard[i, 0, k] = -1;
+                    InstantiateCube(i, 0, k, -1);
+                    cubeTypeBoard[i, 0, k] = -1;
                 }
             }
         }
@@ -1135,17 +941,6 @@ public class GameManager : MonoBehaviour {
         yield return new WaitForSeconds(delayTime);  // 延遲指定的時間
         canvas.SetActive(false);
     }
-    string NameCube(int i, int j, int k, int cubeType) {
-        if (cubeType == 1) {
-            return $"({i}, {j}, {k})OCube";
-        } else if (cubeType == -1) {
-            return $"({i}, {j}, {k})XCube";
-        } else {
-            return $"({i}, {j}, {k})EmptyCube";
-        }
-
-    }
-
     #endregion
 
     #region SelectCubeInstantiate()系列
@@ -1156,15 +951,6 @@ public class GameManager : MonoBehaviour {
         }
         int i = clickedCubeName[1] - '0', k = clickedCubeName[7] - '0';
         int tempNumber;
-        //int emptyCubeCount = 0;
-        // for (int y = 0; y < 4; y++) {
-        //     if (countBoard[i, y, k] == 0) {
-        //         emptyCubeCount++;
-        //     }
-        // }
-        // if (emptyCubeCount == 0) {
-        //     return;
-        // }
         switch (currentNumber) {
             case 1:
             case 2:
@@ -1172,10 +958,10 @@ public class GameManager : MonoBehaviour {
                 tempNumber = currentNumber - 1;
                 if (clickedCubeName.Contains($"({tempNumber}") && clickedCubeName.Contains($"{k})")) {
                     for (int j = 0; j < 3; j++) {
-                        InstantiateSelectCube(tempNumber, j, k, countBoard[tempNumber, j, k]);
+                        InstantiateSelectCube(tempNumber, j, k, cubeTypeBoard[tempNumber, j, k]);
                     }
                     if (cubeBoard[tempNumber, 3, k] != null) {
-                        InstantiateSelectCube(tempNumber, 3, k, countBoard[tempNumber, 3, k]);
+                        InstantiateSelectCube(tempNumber, 3, k, cubeTypeBoard[tempNumber, 3, k]);
                     }
                 }
                 break;
@@ -1186,10 +972,10 @@ public class GameManager : MonoBehaviour {
                 tempNumber = currentNumber - 4;
                 if (clickedCubeName.Contains($"({i}") && clickedCubeName.Contains($"{tempNumber})")) {
                     for (int j = 0; j < 3; j++) {
-                        InstantiateSelectCube(i, j, tempNumber, countBoard[i, j, tempNumber]);
+                        InstantiateSelectCube(i, j, tempNumber, cubeTypeBoard[i, j, tempNumber]);
                     }
                     if (cubeBoard[i, 3, tempNumber] != null) {
-                        InstantiateSelectCube(i, 3, tempNumber, countBoard[i, 3, tempNumber]);
+                        InstantiateSelectCube(i, 3, tempNumber, cubeTypeBoard[i, 3, tempNumber]);
                     }
                 }
                 break;
@@ -1198,16 +984,16 @@ public class GameManager : MonoBehaviour {
             case 8:
             case 9:
                 tempNumber = currentNumber - 7;
-                InstantiateSelectCube(i, tempNumber, k, countBoard[i, tempNumber, k]);
+                InstantiateSelectCube(i, tempNumber, k, cubeTypeBoard[i, tempNumber, k]);
                 break;
 
             case 0:
                 for (int j = 0; j < 3; j++) {
-                    InstantiateSelectCube(i, j, k, countBoard[i, j, k]);
+                    InstantiateSelectCube(i, j, k, cubeTypeBoard[i, j, k]);
 
                 }
                 if (cubeBoard[i, 3, k] != null) {
-                    InstantiateSelectCube(i, 3, k, countBoard[i, 3, k]);
+                    InstantiateSelectCube(i, 3, k, cubeTypeBoard[i, 3, k]);
                 }
                 break;
         }
