@@ -44,6 +44,7 @@ public class GameManager : MonoBehaviour {
         XFlipButton.SetActive(true);
         XCanvas.SetActive(false);
         triangleHoldingCanvas.SetActive(false);
+        continueCanvas.SetActive(false);
 
         currentTurn = Player.O;
         winner = Player.Neither;
@@ -101,6 +102,7 @@ public class GameManager : MonoBehaviour {
                 OCanvas.SetActive(false);
                 XCanvas.SetActive(false);
                 triangleHoldingCanvas.SetActive(false);
+                continueCanvas.SetActive(false);
                 endScene.SetActive(true);
 
                 ((winner == Player.O) ? XWinText : OWinText).SetActive(false);
@@ -119,33 +121,19 @@ public class GameManager : MonoBehaviour {
                 }
                 break;
             default:
-                if (isFlipping) {
-                    Flip();
-                    if (currentTurn == Player.O) {
-                        isOFlipUsed = true;
-                        OFlipButton.SetActive(false);
-                    } else {
-                        isXFlipUsed = true;
-                        XFlipButton.SetActive(false);
-                    }
+                if (currentTurn == Player.O) {
+                    // cursorManager.cursorState = ScriptForCursor.CursorState.O;
                 } else {
-                    if (currentTurn == Player.O) {
-                        // cursorManager.cursorState = ScriptForCursor.CursorState.O;
-                    } else {
-                        // cursorManager.cursorState = ScriptForCursor.CursorState.X;
-                    }
-                    IsNumberPress();
+                    // cursorManager.cursorState = ScriptForCursor.CursorState.X;
                 }
-
+                IsNumberPress();
                 CheckIfNextTurn();
                 break;
         }
     }
 
     #region IsNumberPress()系列
-    public UnityEngine.UI.Button surrenderButton;
     private int currentNumber = 0;
-
     void IsNumberPress() {
         foreach (KeyCode key in new KeyCode[] {
             KeyCode.Alpha0, KeyCode.Alpha1, KeyCode.Alpha2, KeyCode.Alpha3, KeyCode.Alpha4,
@@ -475,10 +463,8 @@ public class GameManager : MonoBehaviour {
     private GameObject[,,] cubeSelectBoard = new GameObject[5, 5, 5];
     private GameObject clickedCube = null;
     public GameObject errorSkillCanvas, triangleHoldingCanvas, continueCanvas;
-    private bool isHoldingTriangle = false, isFlipping = false;
+    private bool isHoldingTriangle = false, isSpinning = false, isFlipping = false;
     private bool isOTriangleUsed, isXTriangleUsed, isOSpinUsed = false, isXSpinUsed = false, isOFlipUsed, isXFlipUsed;
-
-    private int spinCount = 0;
     bool IsMoveComplete() {
         // 判斷滑鼠點擊Cube
         if (Input.GetMouseButtonDown(0)) {
@@ -501,86 +487,61 @@ public class GameManager : MonoBehaviour {
 
             KeyCode.UpArrow, KeyCode.DownArrow, KeyCode.RightArrow, KeyCode.LeftArrow,
 
-            KeyCode.Escape,
+            KeyCode.Escape, KeyCode.Return, KeyCode.KeypadEnter
         }) {
             if (Input.GetKeyDown(key)) {
                 switch (key) {
                     case KeyCode.W:
-                        if (isFlipping) {
-                            isFlipping = false;
-                            continueCanvas.SetActive(false);
-                        }
-                        if ((currentTurn == Player.O && isOTriangleUsed == false) || (currentTurn == Player.X && isXTriangleUsed == false)) {
-                            isHoldingTriangle = true;
-                            triangleHoldingCanvas.SetActive(true);
-                        } else {
-                            if (errorInputCanvas.activeSelf) {
-                                errorInputCanvas.SetActive(false);
-                            }
-                            errorSkillCanvas.SetActive(true);
-                            StartCoroutine(DelayedSetNotActive(errorSkillCanvas, 1.5f));
-                        }
+                        TrianglePress();
+                        isFlipping = false;
                         return false;
                     case KeyCode.A:
-                        spinCount++;
-                        print("jivndlifjndfb");
+                        SpinPress();
+                        isFlipping = false;
                         if (isHoldingTriangle) {
                             isHoldingTriangle = false;
                             triangleHoldingCanvas.SetActive(false);
                         }
-                        if (isOFlipUsed == true) {
+                        if ((currentTurn == Player.O && isOFlipUsed == true) || (currentTurn == Player.X && isXFlipUsed == false)) {
                             if (errorInputCanvas.activeSelf) {
                                 errorInputCanvas.SetActive(false);
-
-                                StartCoroutine(DelayedSetNotActive(errorInputCanvas, 1.5f));
+                                errorSkillCanvas.SetActive(true);
+                                StartCoroutine(DelayedSetNotActive(errorSkillCanvas, 1.5f));
                             }
                             return false;
                         }
-                        
+
                         return false;
                     case KeyCode.S:
-                        if (isHoldingTriangle) {
-                            isHoldingTriangle = false;
-                            triangleHoldingCanvas.SetActive(false);
-                        }
-                        if ((currentTurn == Player.O && isOFlipUsed == false) || (currentTurn == Player.X && isXFlipUsed == false)) {
-                            isFlipping = true;
-                            continueCanvas.SetActive(true);
-                        } else {
-                            if (errorInputCanvas.activeSelf) {
-                                errorInputCanvas.SetActive(false);
-                            }
-                            errorSkillCanvas.SetActive(true);
-                            StartCoroutine(DelayedSetNotActive(errorSkillCanvas, 1.5f));
-                        }
+                        FlipPress();
                         return false;
                     case KeyCode.Q:
-                        if (isHoldingTriangle) {
-                            isHoldingTriangle = false;
-                            triangleHoldingCanvas.SetActive(false);
-                        }
-                        surrenderButton.onClick.Invoke();
+                        CheckIfSurrender();
                         return false;
 
                     case KeyCode.UpArrow:
-                        if (spinCount != 0 && (isOSpinUsed == false || isXSpinUsed == false)) {
-                            return Spin("UpArrow");
+                        if (isSpinning && (isOSpinUsed == false || isXSpinUsed == false)) {
+                            Spin("UpArrow");
+                            return true;
                         }
                         return InputOX(true, clickedCube?.name);
 
                     case KeyCode.DownArrow:
-                        if (spinCount != 0 && (isOSpinUsed == false || isXSpinUsed == false)) {
-                            return Spin("DownArrow");
+                        if (isSpinning && (isOSpinUsed == false || isXSpinUsed == false)) {
+                            Spin("DownArrow");
+                            return true;
                         }
                         return InputOX(false, clickedCube?.name);
                     case KeyCode.RightArrow:
-                        if (spinCount != 0 && (isOSpinUsed == false || isXSpinUsed == false)) {
-                            return Spin("RightArrow");
+                        if (isSpinning && (isOSpinUsed == false || isXSpinUsed == false)) {
+                            Spin("RightArrow");
+                            return true;
                         }
                         return false;
                     case KeyCode.LeftArrow:
-                        if (spinCount != 0 && (isOSpinUsed == false || isXSpinUsed == false)) {
-                            return Spin("LeftArrow");
+                        if (isSpinning && (isOSpinUsed == false || isXSpinUsed == false)) {
+                            Spin("LeftArrow");
+                            return true;
                         }
                         return false;
                     case KeyCode.Escape:
@@ -588,9 +549,25 @@ public class GameManager : MonoBehaviour {
                             isHoldingTriangle = false;
                             triangleHoldingCanvas.SetActive(false);
                         }
+                        if (isSpinning) {
+                            isSpinning = false;
+                            // Canvas.SetActive(false);
+                        }
+                        if (isFlipping) {
+                            isFlipping = false;
+                            continueCanvas.SetActive(false);
+                        }
                         clickedCube = null;
                         DestroyAllSelect();
-                        spinCount = 0;
+                        return false;
+                    case KeyCode.Return:
+                    case KeyCode.KeypadEnter:
+                        if (isFlipping) {
+                            Flip();
+                            isFlipping = false;
+                            continueCanvas.SetActive(false);
+                            return true;
+                        }
                         return false;
                 }
             }
@@ -598,10 +575,9 @@ public class GameManager : MonoBehaviour {
         return false;
     }
 
-    bool Spin(string spinDirection) {
-        int[,,] tempCountBoard = new int[4, 4, 4];
-        GameObject[,,] tempCubeBoard = new GameObject[4, 4, 4];
-
+    void Spin(string spinDirection) {
+        int[,,] tempCountBoard = new int[3, 3, 3];
+        GameObject[,,] tempCubeBoard = new GameObject[3, 3, 3];
 
         if (spinDirection == "LeftArrow") {
             for (int i = 0; i < 3; i++) {
@@ -701,45 +677,37 @@ public class GameManager : MonoBehaviour {
             }
         } else if (spinDirection == "UpArrow") {
             for (int i = 0; i < 3; i++) {
-                for (int j = 0; j < 3; j++) {
-                    for (int k = 0; k < 3; k++) {
-                        if (j == 0) {
-                            if (k == 0) {
-                                tempCountBoard[i, j, k] = countBoard[i, j + 2, k];
-                                tempCubeBoard[i, j, k] = cubeBoard[i, j + 2, k];
-                            } else if (k == 1) {
-                                tempCountBoard[i, j, k] = countBoard[i, j + 1, k - 1];
-                                tempCubeBoard[i, j, k] = cubeBoard[i, j + 1, k - 1];
-                            } else if (k == 2) {
-                                tempCountBoard[i, j, k] = countBoard[i, j, k - 2];
-                                tempCubeBoard[i, j, k] = cubeBoard[i, j, k - 2];
-                            }
-                        } else if (j == 1) {
-                            if (k == 0) {
-                                tempCountBoard[i, j, k] = countBoard[i, j + 1, k + 1];
-                                tempCubeBoard[i, j, k] = cubeBoard[i, j + 1, k + 1];
-                            } else if (k == 1) {
-                                tempCountBoard[i, j, k] = countBoard[i, j, k];
-                                tempCubeBoard[i, j, k] = cubeBoard[i, j, k];
-                            } else if (k == 2) {
-                                tempCountBoard[i, j, k] = countBoard[i, j - 1, k - 1];
-                                tempCubeBoard[i, j, k] = cubeBoard[i, j - 1, k - 1];
-                            }
-                        } else if (j == 2) {
-                            if (k == 0) {
-                                tempCountBoard[i, j, k] = countBoard[i, j, k + 2];
-                                tempCubeBoard[i, j, k] = cubeBoard[i, j, k + 2];
-                            } else if (k == 1) {
-                                tempCountBoard[i, j, k] = countBoard[i, j - 1, k + 1];
-                                tempCubeBoard[i, j, k] = cubeBoard[i, j - 1, k + 1];
-                            } else if (k == 2) {
-                                tempCountBoard[i, j, k] = countBoard[i, j - 2, k];
-                                tempCubeBoard[i, j, k] = cubeBoard[i, j - 2, k];
-                            }
-                        }
-                    }
-                }
+
+                tempCountBoard[i, 0, 0] = countBoard[i, 2, 0];
+                tempCubeBoard[i, 0, 0] = cubeBoard[i, 2, 0];
+
+                tempCountBoard[i, 0, 1] = countBoard[i, 1, 0];
+                tempCubeBoard[i, 0, 1] = cubeBoard[i, 1, 0];
+
+                tempCountBoard[i, 0, 2] = countBoard[i, 0, 0];
+                tempCubeBoard[i, 0, 2] = cubeBoard[i, 0, 0];
+
+                tempCountBoard[i, 1, 0] = countBoard[i, 2, 1];
+                tempCubeBoard[i, 1, 0] = cubeBoard[i, 2, 1];
+
+                tempCountBoard[i, 1, 1] = countBoard[i, 1, 1];
+                tempCubeBoard[i, 1, 1] = cubeBoard[i, 1, 1];
+
+                tempCountBoard[i, 1, 2] = countBoard[i, 0, 1];
+                tempCubeBoard[i, 1, 2] = cubeBoard[i, 0, 1];
+
+                tempCountBoard[i, 2, 0] = countBoard[i, 2, 2];
+                tempCubeBoard[i, 2, 0] = cubeBoard[i, 2, 2];
+
+                tempCountBoard[i, 2, 1] = countBoard[i, 1, 2];
+                tempCubeBoard[i, 2, 1] = cubeBoard[i, 1, 2];
+
+                tempCountBoard[i, 2, 2] = countBoard[i, 0, 2];
+                tempCubeBoard[i, 2, 2] = cubeBoard[i, 0, 2];
             }
+
+
+
             if (currentTurn == Player.O) {
                 isOSpinUsed = true;
                 OSpinButton.SetActive(false);
@@ -749,45 +717,33 @@ public class GameManager : MonoBehaviour {
             }
         } else if (spinDirection == "DownArrow") {
             for (int i = 0; i < 3; i++) {
-                for (int j = 0; j < 3; j++) {
-                    for (int k = 0; k < 3; k++) {
-                        if (j == 0) {
-                            if (k == 0) {
-                                tempCountBoard[i, j, k] = countBoard[i, j, k + 2];
-                                tempCubeBoard[i, j, k] = cubeBoard[i, j, k + 2];
-                            } else if (k == 1) {
-                                tempCountBoard[i, j, k] = countBoard[i, j + 1, k + 1];
-                                tempCubeBoard[i, j, k] = cubeBoard[i, j + 1, k + 1];
-                            } else if (k == 2) {
-                                tempCountBoard[i, j, k] = countBoard[i, j - 2, k];
-                                tempCubeBoard[i, j, k] = cubeBoard[i, j - 2, k];
-                            }
-                        } else if (j == 1) {
-                            if (k == 0) {
-                                tempCountBoard[i, j, k] = countBoard[i, j - 1, k + 1];
-                                tempCubeBoard[i, j, k] = cubeBoard[i, j - 1, k + 1];
-                            } else if (k == 1) {
-                                tempCountBoard[i, j, k] = countBoard[i, j, k];
-                                tempCubeBoard[i, j, k] = cubeBoard[i, j, k];
-                            } else if (k == 2) {
-                                tempCountBoard[i, j, k] = countBoard[i, j + 1, k - 1];
-                                tempCubeBoard[i, j, k] = cubeBoard[i, j + 1, k - 1];
-                            }
-                        } else if (j == 2) {
-                            if (k == 0) {
-                                tempCountBoard[i, j, k] = countBoard[i, j - 2, k];
-                                tempCubeBoard[i, j, k] = cubeBoard[i, j - 2, k];
-                            } else if (k == 1) {
-                                tempCountBoard[i, j, k] = countBoard[i, j - 1, k - 1];
-                                tempCountBoard[i, j, k] = countBoard[i, j - 1, k - 1];
-                            } else if (k == 2) {
-                                tempCountBoard[i, j, k] = countBoard[i, j, k + 2];
-                                tempCubeBoard[i, j, k] = cubeBoard[i, j, k + 2];
-                            }
-                        }
-                    }
-                }
+                tempCountBoard[i, 0, 0] = countBoard[i, 0, 2];
+                tempCubeBoard[i, 0, 0] = cubeBoard[i, 0, 2];
+
+                tempCountBoard[i, 0, 1] = countBoard[i, 1, 2];
+                tempCubeBoard[i, 0, 1] = cubeBoard[i, 1, 2];
+                tempCountBoard[i, 0, 2] = countBoard[i, 2, 2];
+                tempCubeBoard[i, 0, 2] = cubeBoard[i, 2, 2];
+
+                tempCountBoard[i, 1, 0] = countBoard[i, 0, 1];
+                tempCubeBoard[i, 1, 0] = cubeBoard[i, 0, 1];
+
+                tempCountBoard[i, 1, 1] = countBoard[i, 1, 1];
+                tempCubeBoard[i, 1, 1] = cubeBoard[i, 1, 1];
+
+                tempCountBoard[i, 1, 2] = countBoard[i, 2, 1];
+                tempCubeBoard[i, 1, 2] = cubeBoard[i, 2, 1];
+
+                tempCountBoard[i, 2, 0] = countBoard[i, 0, 0];
+                tempCubeBoard[i, 2, 0] = cubeBoard[i, 0, 0];
+
+                tempCountBoard[i, 2, 1] = countBoard[i, 1, 0];
+                tempCubeBoard[i, 2, 1] = cubeBoard[i, 1, 0];
+
+                tempCountBoard[i, 2, 2] = countBoard[i, 2, 0];
+                tempCubeBoard[i, 2, 2] = cubeBoard[i, 2, 0];
             }
+
             if (currentTurn == Player.O) {
                 isOSpinUsed = true;
                 OSpinButton.SetActive(false);
@@ -797,8 +753,18 @@ public class GameManager : MonoBehaviour {
             }
         }
 
-
-
+        for (int i = 0; i < 3; i++) {
+            for (int k = 0; k < 3; k++) {
+                if (tempCountBoard[i, 0, k] == 0 && tempCountBoard[i, 1, k] != 0) {
+                    tempCountBoard[i, 0, k] = tempCountBoard[i, 1, k];
+                    tempCubeBoard[i, 0, k] = tempCubeBoard[i, 1, k];
+                }
+                if (tempCountBoard[i, 1, k] == 0 && tempCountBoard[i, 2, k] != 0) {
+                    tempCountBoard[i, 1, k] = tempCountBoard[i, 2, k];
+                    tempCubeBoard[i, 1, k] = tempCubeBoard[i, 2, k];
+                }
+            }
+        }
         DestroyAllSelect();
 
         for (int i = 0; i < 3; i++) {
@@ -809,42 +775,48 @@ public class GameManager : MonoBehaviour {
                     tempCubeBoard[i, j, k] = null;
                     countBoard[i, j, k] = tempCountBoard[i, j, k];
                     tempCountBoard[i, j, k] = 0;
-                    if(countBoard[i, j, k] == 0) {
-                        GameObject cube = Instantiate(EmptyCube, new Vector3(7 * (i - 1), 7 * (j - 1), 7 * (k - 1)), Quaternion.identity);
-                        cubeBoard[i, j, k] = cube;
-                        cube.name = $"({i}, {j}, {k})EmptyCube";
-                    } else if (countBoard[i, j, k] == 1) {
-                        GameObject cube = Instantiate(OCube, new Vector3(7 * (i - 1), 7 * (j - 1), 7 * (k - 1)), Quaternion.identity);
-                        cubeBoard[i, j, k] = cube;
-                        cube.name = $"({i}, {j}, {k})OCube";
-                    } else if (countBoard[i, j, k] == -1) {
-                        GameObject cube = Instantiate(XCube, new Vector3(7 * (i - 1), 7 * (j - 1), 7 * (k - 1)), Quaternion.identity);
-                        cubeBoard[i, j, k] = cube;
-                        cube.name = $"({i}, {j}, {k})XCube";
-                    } else if (countBoard[i, j, k] == 10) {
-                        GameObject cube = Instantiate(TriangleCube, new Vector3(7 * (i - 1), 7 * (j - 1), 7 * (k - 1)), Quaternion.identity);
-                        cubeBoard[i, j, k] = cube;
-                        cube.name = $"({i}, {j}, {k})TriangleCube";
-                    }
+                    InstantiateCube(i, j, k, countBoard[i, j, k]);
+                }
+            }
+        }
 
+        for (int i = 0; i < 3; i++) {
+            for (int j = 2; j >= 0; j--) {
+                for (int k = 0; k < 3; k++) {
+                    if (countBoard[i, j, k] == 0 && countBoard[i, j + 1, k] != 0) {
+                        tempCountBoard[i, j, k] = tempCountBoard[i, j + 1, k];
+                        tempCubeBoard[i, j, k] = tempCubeBoard[i, j + 1, k];
+                    }
                 }
             }
         }
 
         AllCubeActive();
-        spinCount = 0;
-        return true;
+        isSpinning = false;
     }
 
     void Flip() {
-        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) {
-            DestroyAllSelect();
-            continueCanvas.SetActive(false);
-            for (int i = 0; i < 3; i++) {
-                for (int k = 0; k < 3; k++) {
-                    int[] tempCountBoard = new int[3];
-                    int index = 0;
-                    countBoard[i, 3, k] = 0;
+        DestroyAllSelect();
+        for (int i = 0; i < 3; i++) {
+            for (int k = 0; k < 3; k++) {
+                int[] tempCountBoard = new int[3] { 0, 0, 0 };
+                int index = 0;
+                if (countBoard[i, 0, k] == 10) {
+                    if (countBoard[i, 3, k] != 0) {
+                        Destroy(cubeBoard[i, 3, k]);
+                        countBoard[i, 3, k] = 0;
+                    }
+                    countBoard[i, 2, k] = 0;
+                    if (countBoard[i, 1, k] != 10) {
+                        countBoard[i, 1, k] = 0;
+                    }
+                    for (int j = 1; j >= 0; j--) {
+                        if (countBoard[i, j, k] == 10) {
+                            tempCountBoard[index] = countBoard[i, j, k];
+                            index++;
+                        }
+                    }
+                } else {
                     for (int j = 3; j >= 0 && index < 3; j--) {
                         if (countBoard[i, j, k] != 0) {
                             tempCountBoard[index] = countBoard[i, j, k];
@@ -853,17 +825,18 @@ public class GameManager : MonoBehaviour {
                     }
                     if (countBoard[i, 3, k] != 0) {
                         Destroy(cubeBoard[i, 3, k]);
+                        countBoard[i, 3, k] = 0;
                     }
-                    Destroy(cubeBoard[i, 2, k]);
-                    InstantiateCube(i, 2, k, tempCountBoard[2]);
-                    Destroy(cubeBoard[i, 1, k]);
-                    InstantiateCube(i, 1, k, tempCountBoard[1]);
-                    Destroy(cubeBoard[i, 0, k]);
-                    InstantiateCube(i, 0, k, tempCountBoard[0]);
                 }
+                Destroy(cubeBoard[i, 2, k]);
+                InstantiateCube(i, 2, k, tempCountBoard[2]);
+                Destroy(cubeBoard[i, 1, k]);
+                InstantiateCube(i, 1, k, tempCountBoard[1]);
+                Destroy(cubeBoard[i, 0, k]);
+                InstantiateCube(i, 0, k, tempCountBoard[0]);
             }
-            isFlipping = false;
         }
+        AllCubeActive();
     }
 
     void InstantiateCube(int i, int j, int k, int cubeType) {
@@ -871,38 +844,61 @@ public class GameManager : MonoBehaviour {
         countBoard[i, j, k] = cubeType;
         if (cubeType == 1) {
             cubeBoard[i, j, k] = Instantiate(OCube, position, Quaternion.identity);
-        } else if (cubeType == -1) {
-            cubeBoard[i, j, k] = Instantiate(XCube, position, Quaternion.identity);
-        } else if (cubeType == 10) {
-            cubeBoard[i, j, k] = Instantiate(TriangleCube, position, Quaternion.identity);
-        } else {
-            cubeBoard[i, j, k] = Instantiate(EmptyCube, position, Quaternion.identity);
-        }
-
-        if (cubeType == 1) {
             cubeBoard[i, j, k].name = $"({i}, {j}, {k})OCube";
         } else if (cubeType == -1) {
+            cubeBoard[i, j, k] = Instantiate(XCube, position, Quaternion.identity);
             cubeBoard[i, j, k].name = $"({i}, {j}, {k})XCube";
         } else if (cubeType == 10) {
+            cubeBoard[i, j, k] = Instantiate(TriangleCube, position, Quaternion.identity);
             cubeBoard[i, j, k].name = $"({i}, {j}, {k})TriangleCube";
         } else {
+            cubeBoard[i, j, k] = Instantiate(EmptyCube, position, Quaternion.identity);
             cubeBoard[i, j, k].name = $"({i}, {j}, {k})EmptyCube";
         }
     }
     #endregion
 
-    #region button系列
+    #region Button系列
     public void TrianglePress() {
         if (isFlipping) {
             isFlipping = false;
             continueCanvas.SetActive(false);
         }
-        isHoldingTriangle = true;
-        triangleHoldingCanvas.SetActive(true);
+        if (isSpinning) {
+            isSpinning = false;
+            // Canvas.SetActive(false);
+        }
+        if ((currentTurn == Player.O && isOTriangleUsed == false) || (currentTurn == Player.X && isXTriangleUsed == false)) {
+            isHoldingTriangle = true;
+            triangleHoldingCanvas.SetActive(true);
+        } else {
+            if (errorInputCanvas.activeSelf) {
+                errorInputCanvas.SetActive(false);
+            }
+            errorSkillCanvas.SetActive(true);
+            StartCoroutine(DelayedSetNotActive(errorSkillCanvas, 1.5f));
+        }
     }
 
-    private bool SpinPress() {
-        return false;
+    private void SpinPress() {
+        if (isHoldingTriangle) {
+            isHoldingTriangle = false;
+            triangleHoldingCanvas.SetActive(false);
+        }
+        if (isFlipping) {
+            isFlipping = false;
+            continueCanvas.SetActive(false);
+        }
+        if ((currentTurn == Player.O && isOSpinUsed == false) || (currentTurn == Player.X && isXSpinUsed == false)) {
+            isSpinning = true;
+            // Canvas.SetActive(true);
+        } else {
+            if (errorInputCanvas.activeSelf) {
+                errorInputCanvas.SetActive(false);
+            }
+            errorSkillCanvas.SetActive(true);
+            StartCoroutine(DelayedSetNotActive(errorSkillCanvas, 1.5f));
+        }
     }
 
     public void FlipPress() {
@@ -910,8 +906,20 @@ public class GameManager : MonoBehaviour {
             isHoldingTriangle = false;
             triangleHoldingCanvas.SetActive(false);
         }
-        isFlipping = true;
-        continueCanvas.SetActive(true);
+        if (isSpinning) {
+            isSpinning = false;
+            // Canvas.SetActive(false);
+        }
+        if ((currentTurn == Player.O && isOFlipUsed == false) || (currentTurn == Player.X && isXFlipUsed == false)) {
+            isFlipping = true;
+            continueCanvas.SetActive(true);
+        } else {
+            if (errorInputCanvas.activeSelf) {
+                errorInputCanvas.SetActive(false);
+            }
+            errorSkillCanvas.SetActive(true);
+            StartCoroutine(DelayedSetNotActive(errorSkillCanvas, 1.5f));
+        }
     }
 
     Player nowTurn;
@@ -925,6 +933,18 @@ public class GameManager : MonoBehaviour {
     }
 
     public void CheckIfSurrender() {
+        if (isHoldingTriangle) {
+            isHoldingTriangle = false;
+            triangleHoldingCanvas.SetActive(false);
+        }
+        if (isSpinning) {
+            isSpinning = false;
+            // Canvas.SetActive(false);
+        }
+        if (isFlipping) {
+            isFlipping = false;
+            continueCanvas.SetActive(false);
+        }
         nowTurn = currentTurn;
         currentTurn = Player.Checking;
         checkBox.SetActive(true);
