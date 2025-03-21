@@ -2,29 +2,29 @@ using UnityEngine;
 using System.Collections;
 using TMPro;
 public class TextScaleAnimation : MonoBehaviour {
-    public TextMeshProUGUI textMeshPro; // ��r����
-    public float targetFontSize = 50f;  // �̤j�r��j�p
-    public float animationTime = 0.5f;  // �ʵe����ɶ�
-    private float initialFontSize;      // ��l�r��j�p
+    public TextMeshProUGUI textMeshPro; // 文字物件
+    public float targetFontSize = 50f;  // 最大字體大小
+    public float animationTime = 0.5f;  // 動畫持續時間
+    private float initialFontSize;      // 初始字體大小
 
-    void Start() {
-        initialFontSize = textMeshPro.fontSize; // �O����l�r��j�p
-        StartCoroutine(AnimateFontSizeLoop());  // �}�l�L���`���ʵe
+     void Start() {
+        initialFontSize = textMeshPro.fontSize; // 記錄初始字體大小
+        StartCoroutine(AnimateFontSizeLoop());  // 開始無限循環動畫
     }
 
-    // Coroutine �Ψӹ�{�r��j�p�L���`���ʵe
+    // Coroutine 用來實現字體大小無限循環動畫
     IEnumerator AnimateFontSizeLoop() {
         while (true) {
-            // ��j�ʵe
+            // 放大動畫
             float elapsedTime = 0f;
             while (elapsedTime < animationTime) {
                 textMeshPro.fontSize = Mathf.Lerp(initialFontSize, targetFontSize, elapsedTime / animationTime);
                 elapsedTime += Time.deltaTime;
                 yield return null;
             }
-            textMeshPro.fontSize = targetFontSize;  // �T�O�̲צr��j�p�F��ؼ�
+            textMeshPro.fontSize = targetFontSize;  // 確保最終字體大小達到目標
 
-            // �Y�p�ʵe
+            // 縮小動畫
             elapsedTime = 0f;
             while (elapsedTime < animationTime) {
                 textMeshPro.fontSize = Mathf.Lerp(targetFontSize, initialFontSize, elapsedTime / animationTime);

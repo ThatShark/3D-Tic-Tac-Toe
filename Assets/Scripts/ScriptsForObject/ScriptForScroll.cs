@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 public class ScriptForScroll : MonoBehaviour {
     public ScrollRect scrollRect;
-    public float scrollSensitivity = 1f;  // ï¿½uï¿½ï¿½ï¿½Fï¿½Ó«ï¿½
+    public float scrollSensitivity = 1f;  // ½Õ¾ãºu½üÆF±Ó«×
     void Update() {
         float scrollInput = Input.GetAxis("Mouse ScrollWheel");
 
