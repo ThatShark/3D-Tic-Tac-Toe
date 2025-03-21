@@ -1,16 +1,8 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
-using UnityEditor.Rendering;
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.UIElements;
-using UnityEngine.EventSystems;
-
-using static UnityEditor.Experimental.GraphView.GraphView;
-
 public class GameManager : MonoBehaviour {
+    #region 變數宣告
     public enum Player {
         O,
         X,
@@ -20,6 +12,19 @@ public class GameManager : MonoBehaviour {
     public Player currentTurn, winner;
     // private ScriptForCursor cursorManager;
     private ScriptForButton buttonManager;
+    private int[,,] cubeTypeBoard;
+    private GameObject[,,] cubeBoard = new GameObject[3, 4, 3]; // 座標[7*(i-1), 7*(j-1), 7*(k-1)]
+    private GameObject[,,] cubeSelectBoard = new GameObject[3, 4, 3];
+    public GameObject OCanvas, XCanvas, OWinText, XWinText;
+    public GameObject OTriangleButton, XTriangleButton, OSpinButton, XSpinButton, OFlipButton, XFlipButton;
+    public GameObject errorInputCanvas, errorSkillCanvas, triangleHoldingCanvas, spinContinueCanvas, flipContinueCanvas, checkBox, endScene;
+    public GameObject EmptyCube, OCube, XCube, TriangleCube, SelectEmptyCube, SelectOCube, SelectXCube, SelectTriangleCube;
+    private GameObject clickedCube = null;
+    private bool isHoldingTriangle = false, isSpinning = false, isFlipping = false;
+    private bool isOTriangleUsed, isXTriangleUsed, isOSpinUsed = false, isXSpinUsed = false, isOFlipUsed, isXFlipUsed;
+    #endregion
+
+    #region 主程序
     void Start() {
         currentTurn = Player.O;
         // cursorManager = FindFirstObjectByType<ScriptForCursor>();
@@ -27,10 +32,52 @@ public class GameManager : MonoBehaviour {
         ResetScene();
     }
 
-    #region ResetScene()系列
-    public GameObject EmptyCube;
-    private int[,,] cubeTypeBoard;
-    private GameObject[,,] cubeBoard = new GameObject[3, 4, 3]; // 座標[7*(i-1), 7*(j-1), 7*(k-1)]
+    void Update() {
+        switch (currentTurn) {
+            case Player.Neither:
+                // cursorManager.cursorState = ScriptForCursor.CursorState.Default;
+                checkBox.SetActive(false);
+                OCanvas.SetActive(false);
+                XCanvas.SetActive(false);
+                triangleHoldingCanvas.SetActive(false);
+                spinContinueCanvas.SetActive(false);
+                flipContinueCanvas.SetActive(false);
+                endScene.SetActive(true);
+
+                ((winner == Player.O) ? XWinText : OWinText).SetActive(false);
+                if (Input.GetKeyDown(KeyCode.Escape)) {
+                    buttonManager.SwitchSceneTo(0);
+                } else if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) {
+                    ResetScene();
+                }
+                break;
+            case Player.Checking:
+                // cursorManager.cursorState = ScriptForCursor.CursorState.Default;
+                if (Input.GetKeyDown(KeyCode.Escape)) {
+                    CancelSurrender();
+                } else if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) {
+                    SurrenderSkill();
+                }
+                break;
+            default:
+                if (isHoldingTriangle) {
+                    // cursorManager.cursorState = ScriptForCursor.CursorState.Triangle;
+                } else {
+                    if (currentTurn == Player.O) {
+                        // cursorManager.cursorState = ScriptForCursor.CursorState.O;
+                    } else {
+                        // cursorManager.cursorState = ScriptForCursor.CursorState.X;
+                    }
+                }
+                IsNumberPress();
+                CheckIfNextTurn();
+                break;
+        }
+    }
+    #endregion
+
+    #region 通用方法
+    // 重置場景
     public void ResetScene() {
         XWinText.SetActive(true);
         OWinText.SetActive(true);
@@ -44,7 +91,8 @@ public class GameManager : MonoBehaviour {
         XFlipButton.SetActive(true);
         XCanvas.SetActive(false);
         triangleHoldingCanvas.SetActive(false);
-        continueCanvas.SetActive(false);
+        spinContinueCanvas.SetActive(false);
+        flipContinueCanvas.SetActive(false);
 
         currentTurn = Player.O;
         winner = Player.Neither;
@@ -89,54 +137,139 @@ public class GameManager : MonoBehaviour {
             }
         }
     }
-    #endregion
 
-    public GameObject OCanvas, XCanvas, endScene, OWinText, XWinText, checkBox;
-    public GameObject OTriangleButton, XTriangleButton, OSpinButton, XSpinButton, OFlipButton, XFlipButton;
-    public GameObject OCube, XCube, TriangleCube, SelectEmptyCube, SelectOCube, SelectXCube, SelectTriangleCube;
-    void Update() {
-        switch (currentTurn) {
-            case Player.Neither:
-                // cursorManager.cursorState = ScriptForCursor.CursorState.Default;
-                checkBox.SetActive(false);
-                OCanvas.SetActive(false);
-                XCanvas.SetActive(false);
-                triangleHoldingCanvas.SetActive(false);
-                continueCanvas.SetActive(false);
-                endScene.SetActive(true);
-
-                ((winner == Player.O) ? XWinText : OWinText).SetActive(false);
-                if (Input.GetKeyDown(KeyCode.Escape)) {
-                    buttonManager.SwitchSceneTo(0);
-                } else if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) {
-                    ResetScene();
-                }
-                break;
-            case Player.Checking:
-                // cursorManager.cursorState = ScriptForCursor.CursorState.Default;
-                if (Input.GetKeyDown(KeyCode.Escape)) {
-                    CancelSurrender();
-                } else if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) {
-                    SurrenderSkill();
-                }
-                break;
-            default:
-                if (isHoldingTriangle) {
-                    // cursorManager.cursorState = ScriptForCursor.CursorState.Triangle;
-                } else {
-                    if (currentTurn == Player.O) {
-                        // cursorManager.cursorState = ScriptForCursor.CursorState.O;
-                    } else {
-                        // cursorManager.cursorState = ScriptForCursor.CursorState.X;
+    // 生成cube
+    void InstantiateCube(int i, int j, int k, int cubeType) {
+        Vector3 position = new Vector3(7 * (i - 1), 7 * (j - 1), 7 * (k - 1));
+        cubeTypeBoard[i, j, k] = cubeType;
+        if (cubeType == 1) {
+            cubeBoard[i, j, k] = Instantiate(OCube, position, Quaternion.identity);
+            cubeBoard[i, j, k].name = $"({i}, {j}, {k})OCube";
+        } else if (cubeType == -1) {
+            cubeBoard[i, j, k] = Instantiate(XCube, position, Quaternion.identity);
+            cubeBoard[i, j, k].name = $"({i}, {j}, {k})XCube";
+        } else if (cubeType == 10) {
+            cubeBoard[i, j, k] = Instantiate(TriangleCube, position, Quaternion.identity);
+            cubeBoard[i, j, k].name = $"({i}, {j}, {k})TriangleCube";
+        } else {
+            cubeBoard[i, j, k] = Instantiate(EmptyCube, position, Quaternion.identity);
+            cubeBoard[i, j, k].name = $"({i}, {j}, {k})EmptyCube";
+        }
+    }
+    
+    //設定cube根據點擊激活變為selectCube
+    void SelectCubeInstantiate(string clickedCubeName) {
+        if (clickedCubeName == null) {
+            return;
+        }
+        int i = clickedCubeName[1] - '0', k = clickedCubeName[7] - '0';
+        int tempNumber;
+        switch (currentNumber) {
+            case 1:
+            case 2:
+            case 3:
+                tempNumber = currentNumber - 1;
+                if (clickedCubeName.Contains($"({tempNumber}") && clickedCubeName.Contains($"{k})")) {
+                    for (int j = 0; j < 3; j++) {
+                        InstantiateSelectCube(tempNumber, j, k, cubeTypeBoard[tempNumber, j, k]);
+                    }
+                    if (cubeBoard[tempNumber, 3, k] != null) {
+                        InstantiateSelectCube(tempNumber, 3, k, cubeTypeBoard[tempNumber, 3, k]);
                     }
                 }
-                IsNumberPress();
-                CheckIfNextTurn();
+                break;
+
+            case 4:
+            case 5:
+            case 6:
+                tempNumber = currentNumber - 4;
+                if (clickedCubeName.Contains($"({i}") && clickedCubeName.Contains($"{tempNumber})")) {
+                    for (int j = 0; j < 3; j++) {
+                        InstantiateSelectCube(i, j, tempNumber, cubeTypeBoard[i, j, tempNumber]);
+                    }
+                    if (cubeBoard[i, 3, tempNumber] != null) {
+                        InstantiateSelectCube(i, 3, tempNumber, cubeTypeBoard[i, 3, tempNumber]);
+                    }
+                }
+                break;
+
+            case 7:
+            case 8:
+            case 9:
+                tempNumber = currentNumber - 7;
+                InstantiateSelectCube(i, tempNumber, k, cubeTypeBoard[i, tempNumber, k]);
+                break;
+
+            case 0:
+                for (int j = 0; j < 3; j++) {
+                    InstantiateSelectCube(i, j, k, cubeTypeBoard[i, j, k]);
+
+                }
+                if (cubeBoard[i, 3, k] != null) {
+                    InstantiateSelectCube(i, 3, k, cubeTypeBoard[i, 3, k]);
+                }
                 break;
         }
     }
+    // 生成SelectCube並命名
+    void InstantiateSelectCube(int i, int j, int k, int cubeType) {
+        GameObject tempSelectCube;
+        Vector3 position = new Vector3(7 * (i - 1), 7 * (j - 1), 7 * (k - 1));
+        if (cubeType == 1) {
+            tempSelectCube = Instantiate(SelectOCube, position, Quaternion.identity);
+        } else if (cubeType == -1) {
+            tempSelectCube = Instantiate(SelectXCube, position, Quaternion.identity);
+        } else if (cubeType == 10) {
+            tempSelectCube = Instantiate(SelectTriangleCube, position, Quaternion.identity);
+        } else {
+            tempSelectCube = Instantiate(SelectEmptyCube, position, Quaternion.identity);
+        }
 
-    #region IsNumberPress()系列
+        tempSelectCube.SetActive(true);
+        cubeBoard[i, j, k].SetActive(false);
+        cubeSelectBoard[i, j, k] = tempSelectCube;
+
+        if (cubeType == 1) {
+            cubeSelectBoard[i, j, k].name = $"({i}, {j}, {k})SelectOCube";
+        } else if (cubeType == -1) {
+            cubeSelectBoard[i, j, k].name = $"({i}, {j}, {k})SelectXCube";
+        } else if (cubeType == 10) {
+            cubeSelectBoard[i, j, k].name = $"({i}, {j}, {k})SelectTriangleCube";
+        } else {
+            cubeSelectBoard[i, j, k].name = $"({i}, {j}, {k})SelectEmptyCube";
+        }
+    }
+    
+    // 破壞所有Select方塊
+    void DestroyAllSelect() {
+        for (int x = 0; x < 3; x++) {
+            for (int y = 0; y < 4; y++) {
+                for (int z = 0; z < 3; z++) {
+                    if (cubeSelectBoard[x, y, z] != null) {
+                        Destroy(cubeSelectBoard[x, y, z]);
+                        cubeSelectBoard[x, y, z] = null;
+                        cubeBoard[x, y, z].SetActive(true);
+                    }
+                }
+            }
+        }
+    }
+    
+    // 延遲canvas失活時間
+    IEnumerator DelayedSetNotActive(GameObject canvas, float delayTime) {
+        if (delayTime < 0) {
+            bool stop = true;
+            while (stop) {
+                yield return new WaitForSeconds(1f);
+            }
+        }
+        yield return new WaitForSeconds(delayTime);  // 延遲指定的時間
+        canvas.SetActive(false);
+    }
+    #endregion
+
+    #region 激活/失活方塊
+    // 判斷是否按下數字鍵
     private int currentNumber = 0;
     void IsNumberPress() {
         foreach (KeyCode key in new KeyCode[] {
@@ -202,7 +335,6 @@ public class GameManager : MonoBehaviour {
             }
         }
     }
-
     //設定只激活一行
     void SetRowActive(int x) {
         for (int z = 0; z < 3; z++) {
@@ -218,7 +350,6 @@ public class GameManager : MonoBehaviour {
             }
         }
     }
-
     //設定只激活一列
     void SetColumnActive(int z) {
         for (int x = 0; x < 3; x++) {
@@ -234,7 +365,6 @@ public class GameManager : MonoBehaviour {
             }
         }
     }
-
     //設定只激活一層
     void SetLayerActive(int y) {
         for (int x = 0; x < 3; x++) {
@@ -247,7 +377,6 @@ public class GameManager : MonoBehaviour {
             }
         }
     }
-
     //激活所有方塊
     void AllCubeActive() {
         for (int x = 0; x < 3; x++) {
@@ -268,21 +397,9 @@ public class GameManager : MonoBehaviour {
         }
     }
     #endregion
-
-    void DestroyAllSelect() {
-        for (int x = 0; x < 3; x++) {
-            for (int y = 0; y < 4; y++) {
-                for (int z = 0; z < 3; z++) {
-                    if (cubeSelectBoard[x, y, z] != null) {
-                        Destroy(cubeSelectBoard[x, y, z]);
-                        cubeSelectBoard[x, y, z] = null;
-                        cubeBoard[x, y, z].SetActive(true);
-                    }
-                }
-            }
-        }
-    }
-
+    
+    #region 判斷
+    // 判斷是否下一輪
     void CheckIfNextTurn() {
         if (SomeoneHasWin()) {
             currentTurn = Player.Neither;
@@ -302,8 +419,8 @@ public class GameManager : MonoBehaviour {
             }
         }
     }
-
-    #region SomeonesHasWin()系列
+    #region 判斷獲勝
+    // 檢查是否有玩家獲勝
     public bool SomeoneHasWin() {
         int vs = 0;
         // 檢查每層、列、行以及對角線
@@ -323,7 +440,6 @@ public class GameManager : MonoBehaviour {
             return false;
         }
     }
-
     // 檢查某一層是否有玩家獲勝
     int CheckLayer(int layer) {
         int vs = 0;
@@ -350,7 +466,6 @@ public class GameManager : MonoBehaviour {
         }
         return vs;
     }
-
     // 檢查縱向的列是否有玩家獲勝
     int CheckColumn(int col) {
         int vs = 0;
@@ -392,7 +507,6 @@ public class GameManager : MonoBehaviour {
 
         return vs;
     }
-
     // 檢查橫向的行是否有玩家獲勝
     int CheckRow(int row) {
         int vs = 0;
@@ -429,7 +543,6 @@ public class GameManager : MonoBehaviour {
 
         return vs;
     }
-
     // 檢查 3D 對角線是否有玩家獲勝
     int Check3DDiagonals() {
         int vs = 0;
@@ -460,15 +573,8 @@ public class GameManager : MonoBehaviour {
 
         return vs;
     }
-
     #endregion
-
-    #region IsMoveComplete()系列
-    private GameObject[,,] cubeSelectBoard = new GameObject[5, 5, 5];
-    private GameObject clickedCube = null;
-    public GameObject errorSkillCanvas, triangleHoldingCanvas, continueCanvas;
-    private bool isHoldingTriangle = false, isSpinning = false, isFlipping = false;
-    private bool isOTriangleUsed, isXTriangleUsed, isOSpinUsed = false, isXSpinUsed = false, isOFlipUsed, isXFlipUsed;
+    // 判斷是否完成一次移動
     bool IsMoveComplete() {
         // 判斷滑鼠點擊Cube
         if (Input.GetMouseButtonDown(0)) {
@@ -483,7 +589,6 @@ public class GameManager : MonoBehaviour {
                 }
                 DestroyAllSelect();
                 SelectCubeInstantiate(clickedCube?.name);
-
             }
         }
         foreach (KeyCode key in new KeyCode[] {
@@ -514,7 +619,6 @@ public class GameManager : MonoBehaviour {
                             return true;
                         }
                         return InputOX(true, clickedCube?.name);
-
                     case KeyCode.DownArrow:
                         if (isSpinning && (isOSpinUsed == false || isXSpinUsed == false)) {
                             Spin("DownArrow");
@@ -540,11 +644,11 @@ public class GameManager : MonoBehaviour {
                         }
                         if (isSpinning) {
                             isSpinning = false;
-                            // Canvas.SetActive(false);
+                            spinContinueCanvas.SetActive(false);
                         }
                         if (isFlipping) {
                             isFlipping = false;
-                            continueCanvas.SetActive(false);
+                            flipContinueCanvas.SetActive(false);
                         }
                         clickedCube = null;
                         DestroyAllSelect();
@@ -561,7 +665,54 @@ public class GameManager : MonoBehaviour {
         }
         return false;
     }
-
+    #endregion
+    
+    #region 技能
+    #region Triangle
+    // 當使用Triangle時
+    public void TrianglePress() {
+        if (isFlipping) {
+            isFlipping = false;
+            flipContinueCanvas.SetActive(false);
+        }
+        if (isSpinning) {
+            isSpinning = false;
+            spinContinueCanvas.SetActive(false);
+        }
+        if ((currentTurn == Player.O && isOTriangleUsed == false) || (currentTurn == Player.X && isXTriangleUsed == false)) {
+            isHoldingTriangle = true;
+            triangleHoldingCanvas.SetActive(true);
+        } else {
+            if (errorInputCanvas.activeSelf) {
+                errorInputCanvas.SetActive(false);
+            }
+            errorSkillCanvas.SetActive(true);
+            StartCoroutine(DelayedSetNotActive(errorSkillCanvas, 1.5f));
+        }
+    }
+    #endregion
+    #region Spin
+    // 當使用Spin時
+    public void SpinPress() {
+        if (isHoldingTriangle) {
+            isHoldingTriangle = false;
+            triangleHoldingCanvas.SetActive(false);
+        }
+        if (isFlipping) {
+            isFlipping = false;
+            flipContinueCanvas.SetActive(false);
+        }
+        if ((currentTurn == Player.O && isOSpinUsed == false) || (currentTurn == Player.X && isXSpinUsed == false)) {
+            isSpinning = true;
+            spinContinueCanvas.SetActive(true);
+        } else {
+            if (errorInputCanvas.activeSelf) {
+                errorInputCanvas.SetActive(false);
+            }
+            errorSkillCanvas.SetActive(true);
+            StartCoroutine(DelayedSetNotActive(errorSkillCanvas, 1.5f));
+        }
+    }
     void Spin(string spinDirection) {
         int[,,] tempCubeTypeBoard = new int[3, 3, 3];
         GameObject[,,] tempCubeBoard = new GameObject[3, 3, 3];
@@ -590,8 +741,8 @@ public class GameManager : MonoBehaviour {
                         }
                     }
                 } else if (tempCubeTypeBoard[i, 1, k] == 10) {
-                    if (tempCubeTypeBoard[i, 1, k] != 10) {
-                        tempCubeTypeBoard[i, 1, k] = 0;
+                    if (tempCubeTypeBoard[i, 0, k] != 10) {
+                        tempCubeTypeBoard[i, 0, k] = 0;
                     }
                 }
             }
@@ -629,7 +780,7 @@ public class GameManager : MonoBehaviour {
             XSpinButton.SetActive(false);
         }
     }
-
+    // 取得旋轉座標
     (int, int, int) GetRotatedIndex(int i, int j, int k, string direction) {
         return direction switch {
             "LeftArrow" => (2 - j, i, k),
@@ -639,7 +790,29 @@ public class GameManager : MonoBehaviour {
             _ => (i, j, k)
         };
     }
-
+    #endregion
+    #region Flip
+    // 當使用Flip時
+    public void FlipPress() {
+        if (isHoldingTriangle) {
+            isHoldingTriangle = false;
+            triangleHoldingCanvas.SetActive(false);
+        }
+        if (isSpinning) {
+            isSpinning = false;
+            spinContinueCanvas.SetActive(false);
+        }
+        if ((currentTurn == Player.O && isOFlipUsed == false) || (currentTurn == Player.X && isXFlipUsed == false)) {
+            isFlipping = true;
+            flipContinueCanvas.SetActive(true);
+        } else {
+            if (errorInputCanvas.activeSelf) {
+                errorInputCanvas.SetActive(false);
+            }
+            errorSkillCanvas.SetActive(true);
+            StartCoroutine(DelayedSetNotActive(errorSkillCanvas, 1.5f));
+        }
+    }
     void Flip() {
         DestroyAllSelect();
         for (int i = 0; i < 3; i++) {
@@ -677,7 +850,7 @@ public class GameManager : MonoBehaviour {
         }
         AllCubeActive();
         isFlipping = false;
-        continueCanvas.SetActive(false);
+        flipContinueCanvas.SetActive(false);
         if (currentTurn == Player.O) {
             isOFlipUsed = true;
             OFlipButton.SetActive(false);
@@ -686,91 +859,28 @@ public class GameManager : MonoBehaviour {
             XFlipButton.SetActive(false);
         }
     }
-
-    void InstantiateCube(int i, int j, int k, int cubeType) {
-        Vector3 position = new Vector3(7 * (i - 1), 7 * (j - 1), 7 * (k - 1));
-        cubeTypeBoard[i, j, k] = cubeType;
-        if (cubeType == 1) {
-            cubeBoard[i, j, k] = Instantiate(OCube, position, Quaternion.identity);
-            cubeBoard[i, j, k].name = $"({i}, {j}, {k})OCube";
-        } else if (cubeType == -1) {
-            cubeBoard[i, j, k] = Instantiate(XCube, position, Quaternion.identity);
-            cubeBoard[i, j, k].name = $"({i}, {j}, {k})XCube";
-        } else if (cubeType == 10) {
-            cubeBoard[i, j, k] = Instantiate(TriangleCube, position, Quaternion.identity);
-            cubeBoard[i, j, k].name = $"({i}, {j}, {k})TriangleCube";
-        } else {
-            cubeBoard[i, j, k] = Instantiate(EmptyCube, position, Quaternion.identity);
-            cubeBoard[i, j, k].name = $"({i}, {j}, {k})EmptyCube";
-        }
-    }
     #endregion
-
-    #region Button系列
-    public void TrianglePress() {
-        if (isFlipping) {
-            isFlipping = false;
-            continueCanvas.SetActive(false);
-        }
-        if (isSpinning) {
-            isSpinning = false;
-            // Canvas.SetActive(false);
-        }
-        if ((currentTurn == Player.O && isOTriangleUsed == false) || (currentTurn == Player.X && isXTriangleUsed == false)) {
-            isHoldingTriangle = true;
-            triangleHoldingCanvas.SetActive(true);
-        } else {
-            if (errorInputCanvas.activeSelf) {
-                errorInputCanvas.SetActive(false);
-            }
-            errorSkillCanvas.SetActive(true);
-            StartCoroutine(DelayedSetNotActive(errorSkillCanvas, 1.5f));
-        }
-    }
-
-    public void SpinPress() {
-        if (isHoldingTriangle) {
-            isHoldingTriangle = false;
-            triangleHoldingCanvas.SetActive(false);
-        }
-        if (isFlipping) {
-            isFlipping = false;
-            continueCanvas.SetActive(false);
-        }
-        if ((currentTurn == Player.O && isOSpinUsed == false) || (currentTurn == Player.X && isXSpinUsed == false)) {
-            isSpinning = true;
-            // Canvas.SetActive(true);
-        } else {
-            if (errorInputCanvas.activeSelf) {
-                errorInputCanvas.SetActive(false);
-            }
-            errorSkillCanvas.SetActive(true);
-            StartCoroutine(DelayedSetNotActive(errorSkillCanvas, 1.5f));
-        }
-    }
-
-    public void FlipPress() {
-        if (isHoldingTriangle) {
-            isHoldingTriangle = false;
-            triangleHoldingCanvas.SetActive(false);
-        }
-        if (isSpinning) {
-            isSpinning = false;
-            // Canvas.SetActive(false);
-        }
-        if ((currentTurn == Player.O && isOFlipUsed == false) || (currentTurn == Player.X && isXFlipUsed == false)) {
-            isFlipping = true;
-            continueCanvas.SetActive(true);
-        } else {
-            if (errorInputCanvas.activeSelf) {
-                errorInputCanvas.SetActive(false);
-            }
-            errorSkillCanvas.SetActive(true);
-            StartCoroutine(DelayedSetNotActive(errorSkillCanvas, 1.5f));
-        }
-    }
-
+    #region Surrender
     Player nowTurn;
+    // 檢查是否投降
+    public void CheckIfSurrender() {
+        if (isHoldingTriangle) {
+            isHoldingTriangle = false;
+            triangleHoldingCanvas.SetActive(false);
+        }
+        if (isSpinning) {
+            isSpinning = false;
+            spinContinueCanvas.SetActive(false);
+        }
+        if (isFlipping) {
+            isFlipping = false;
+            flipContinueCanvas.SetActive(false);
+        }
+        nowTurn = currentTurn;
+        currentTurn = Player.Checking;
+        checkBox.SetActive(true);
+    }
+    // 投降
     public void SurrenderSkill() {
         if (nowTurn == Player.O) {
             winner = Player.X;
@@ -779,32 +889,15 @@ public class GameManager : MonoBehaviour {
         }
         currentTurn = Player.Neither;
     }
-    public void CheckIfSurrender() {
-        if (isHoldingTriangle) {
-            isHoldingTriangle = false;
-            triangleHoldingCanvas.SetActive(false);
-        }
-        if (isSpinning) {
-            isSpinning = false;
-            // Canvas.SetActive(false);
-        }
-        if (isFlipping) {
-            isFlipping = false;
-            continueCanvas.SetActive(false);
-        }
-        nowTurn = currentTurn;
-        currentTurn = Player.Checking;
-        checkBox.SetActive(true);
-    }
+    // 取消投降
     public void CancelSurrender() {
         currentTurn = nowTurn;
         checkBox.SetActive(false);
     }
     #endregion
+    #endregion
 
-    #region inputOX()系列
-    public GameObject errorInputCanvas;
-    // 輸入O或X
+    #region 輸入O或X或Triangle
     bool InputOX(bool pressUpArrow, string clickedCubeName) { // true: up, false: down
         //非點選方塊時無效
         if (clickedCubeName == null || !clickedCubeName.Contains("Cube")) {
@@ -834,19 +927,15 @@ public class GameManager : MonoBehaviour {
 
                 Destroy(cubeBoard[i, 2, k]);
                 InstantiateCube(i, 2, k, 0);
-                cubeTypeBoard[i, 2, k] = 0;
 
                 Destroy(cubeBoard[i, 1, k]);
                 if (cubeTypeBoard[i, 0, k] == 10) {
                     InstantiateCube(i, 1, k, 10);
-                    cubeTypeBoard[i, 1, k] = 10;
                 } else {
                     InstantiateCube(i, 1, k, 0);
-                    cubeTypeBoard[i, 1, k] = 0;
 
                     Destroy(cubeBoard[i, 0, k]);
                     InstantiateCube(i, 0, k, 10);
-                    cubeTypeBoard[i, 0, k] = 10;
                 }
 
             } else {
@@ -854,28 +943,22 @@ public class GameManager : MonoBehaviour {
                     Destroy(cubeBoard[i, 2, k]);
                     if (currentTurn == Player.O) {
                         InstantiateCube(i, 2, k, 1);
-                        cubeTypeBoard[i, 2, k] = 1;
                     } else if (currentTurn == Player.X) {
                         InstantiateCube(i, 2, k, -1);
-                        cubeTypeBoard[i, 2, k] = -1;
                     }
                 } else if (cubeTypeBoard[i, 0, k] != 0) {
                     Destroy(cubeBoard[i, 1, k]);
                     if (currentTurn == Player.O) {
                         InstantiateCube(i, 1, k, 1);
-                        cubeTypeBoard[i, 1, k] = 1;
                     } else if (currentTurn == Player.X) {
                         InstantiateCube(i, 1, k, -1);
-                        cubeTypeBoard[i, 1, k] = -1;
                     }
                 } else {
                     Destroy(cubeBoard[i, 0, k]);
                     if (currentTurn == Player.O) {
                         InstantiateCube(i, 0, k, 1);
-                        cubeTypeBoard[i, 0, k] = 1;
                     } else if (currentTurn == Player.X) {
                         InstantiateCube(i, 0, k, -1);
-                        cubeTypeBoard[i, 0, k] = -1;
                     }
                 }
             }
@@ -891,28 +974,22 @@ public class GameManager : MonoBehaviour {
 
             if (isHoldingTriangle && cubeTypeBoard[i, 2, k] != 0) {
                 InstantiateCube(i, 3, k, cubeTypeBoard[i, 2, k]);
-                cubeTypeBoard[i, 3, k] = cubeTypeBoard[i, 2, k];
             }
 
             Destroy(cubeBoard[i, 2, k]);
             InstantiateCube(i, 2, k, cubeTypeBoard[i, 1, k]);
-            cubeTypeBoard[i, 2, k] = cubeTypeBoard[i, 1, k];
 
             Destroy(cubeBoard[i, 1, k]);
             InstantiateCube(i, 1, k, cubeTypeBoard[i, 0, k]);
-            cubeTypeBoard[i, 1, k] = cubeTypeBoard[i, 0, k];
 
             Destroy(cubeBoard[i, 0, k]);
             if (isHoldingTriangle) {
                 InstantiateCube(i, 0, k, 10);
-                cubeTypeBoard[i, 0, k] = 10;
             } else {
                 if (currentTurn == Player.O) {
                     InstantiateCube(i, 0, k, 1);
-                    cubeTypeBoard[i, 0, k] = 1;
                 } else if (currentTurn == Player.X) {
                     InstantiateCube(i, 0, k, -1);
-                    cubeTypeBoard[i, 0, k] = -1;
                 }
             }
         }
@@ -928,103 +1005,6 @@ public class GameManager : MonoBehaviour {
             }
         }
         return true;
-    }
-
-    bool stop = false;
-    IEnumerator DelayedSetNotActive(GameObject canvas, float delayTime) {
-        if (delayTime < 0) {
-            stop = true;
-            while (stop) {
-                yield return new WaitForSeconds(1f);
-            }
-        }
-        yield return new WaitForSeconds(delayTime);  // 延遲指定的時間
-        canvas.SetActive(false);
-    }
-    #endregion
-
-    #region SelectCubeInstantiate()系列
-    //設定cube根據點擊激活變為selectCube
-    void SelectCubeInstantiate(string clickedCubeName) {
-        if (clickedCubeName == null) {
-            return;
-        }
-        int i = clickedCubeName[1] - '0', k = clickedCubeName[7] - '0';
-        int tempNumber;
-        switch (currentNumber) {
-            case 1:
-            case 2:
-            case 3:
-                tempNumber = currentNumber - 1;
-                if (clickedCubeName.Contains($"({tempNumber}") && clickedCubeName.Contains($"{k})")) {
-                    for (int j = 0; j < 3; j++) {
-                        InstantiateSelectCube(tempNumber, j, k, cubeTypeBoard[tempNumber, j, k]);
-                    }
-                    if (cubeBoard[tempNumber, 3, k] != null) {
-                        InstantiateSelectCube(tempNumber, 3, k, cubeTypeBoard[tempNumber, 3, k]);
-                    }
-                }
-                break;
-
-            case 4:
-            case 5:
-            case 6:
-                tempNumber = currentNumber - 4;
-                if (clickedCubeName.Contains($"({i}") && clickedCubeName.Contains($"{tempNumber})")) {
-                    for (int j = 0; j < 3; j++) {
-                        InstantiateSelectCube(i, j, tempNumber, cubeTypeBoard[i, j, tempNumber]);
-                    }
-                    if (cubeBoard[i, 3, tempNumber] != null) {
-                        InstantiateSelectCube(i, 3, tempNumber, cubeTypeBoard[i, 3, tempNumber]);
-                    }
-                }
-                break;
-
-            case 7:
-            case 8:
-            case 9:
-                tempNumber = currentNumber - 7;
-                InstantiateSelectCube(i, tempNumber, k, cubeTypeBoard[i, tempNumber, k]);
-                break;
-
-            case 0:
-                for (int j = 0; j < 3; j++) {
-                    InstantiateSelectCube(i, j, k, cubeTypeBoard[i, j, k]);
-
-                }
-                if (cubeBoard[i, 3, k] != null) {
-                    InstantiateSelectCube(i, 3, k, cubeTypeBoard[i, 3, k]);
-                }
-                break;
-        }
-    }
-
-    void InstantiateSelectCube(int i, int j, int k, int cubeType) {
-        GameObject tempSelectCube;
-        Vector3 position = new Vector3(7 * (i - 1), 7 * (j - 1), 7 * (k - 1));
-        if (cubeType == 1) {
-            tempSelectCube = Instantiate(SelectOCube, position, Quaternion.identity);
-        } else if (cubeType == -1) {
-            tempSelectCube = Instantiate(SelectXCube, position, Quaternion.identity);
-        } else if (cubeType == 10) {
-            tempSelectCube = Instantiate(SelectTriangleCube, position, Quaternion.identity);
-        } else {
-            tempSelectCube = Instantiate(SelectEmptyCube, position, Quaternion.identity);
-        }
-
-        tempSelectCube.SetActive(true);
-        cubeBoard[i, j, k].SetActive(false);
-        cubeSelectBoard[i, j, k] = tempSelectCube;
-
-        if (cubeType == 1) {
-            cubeSelectBoard[i, j, k].name = $"({i}, {j}, {k})SelectOCube";
-        } else if (cubeType == -1) {
-            cubeSelectBoard[i, j, k].name = $"({i}, {j}, {k})SelectXCube";
-        } else if (cubeType == 10) {
-            cubeSelectBoard[i, j, k].name = $"({i}, {j}, {k})SelectTriangleCube";
-        } else {
-            cubeSelectBoard[i, j, k].name = $"({i}, {j}, {k})SelectEmptyCube";
-        }
     }
     #endregion
 }

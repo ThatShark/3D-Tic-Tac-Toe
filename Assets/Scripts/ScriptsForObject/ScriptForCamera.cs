@@ -1,5 +1,4 @@
 using UnityEngine;
-
 public class ScriptForCamera : MonoBehaviour {
     public Transform target; // 旋轉中心目標
     private Camera c;

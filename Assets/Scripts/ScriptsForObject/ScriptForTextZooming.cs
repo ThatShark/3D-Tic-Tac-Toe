@@ -1,31 +1,30 @@
 using UnityEngine;
 using System.Collections;
 using TMPro;
-
 public class TextScaleAnimation : MonoBehaviour {
-    public TextMeshProUGUI textMeshPro; // ¤å¦rª«¥ó
-    public float targetFontSize = 50f;  // ³Ì¤j¦rÅé¤j¤p
-    public float animationTime = 0.5f;  // °Êµe«ùÄò®É¶¡
-    private float initialFontSize;      // ªì©l¦rÅé¤j¤p
+    public TextMeshProUGUI textMeshPro; // ï¿½ï¿½rï¿½ï¿½ï¿½ï¿½
+    public float targetFontSize = 50f;  // ï¿½Ì¤jï¿½rï¿½ï¿½jï¿½p
+    public float animationTime = 0.5f;  // ï¿½Êµeï¿½ï¿½ï¿½ï¿½É¶ï¿½
+    private float initialFontSize;      // ï¿½ï¿½lï¿½rï¿½ï¿½jï¿½p
 
     void Start() {
-        initialFontSize = textMeshPro.fontSize; // °O¿ýªì©l¦rÅé¤j¤p
-        StartCoroutine(AnimateFontSizeLoop());  // ¶}©lµL­­´`Àô°Êµe
+        initialFontSize = textMeshPro.fontSize; // ï¿½Oï¿½ï¿½ï¿½ï¿½lï¿½rï¿½ï¿½jï¿½p
+        StartCoroutine(AnimateFontSizeLoop());  // ï¿½}ï¿½lï¿½Lï¿½ï¿½ï¿½`ï¿½ï¿½ï¿½Êµe
     }
 
-    // Coroutine ¥Î¨Ó¹ê²{¦rÅé¤j¤pµL­­´`Àô°Êµe
+    // Coroutine ï¿½Î¨Ó¹ï¿½{ï¿½rï¿½ï¿½jï¿½pï¿½Lï¿½ï¿½ï¿½`ï¿½ï¿½ï¿½Êµe
     IEnumerator AnimateFontSizeLoop() {
         while (true) {
-            // ©ñ¤j°Êµe
+            // ï¿½ï¿½jï¿½Êµe
             float elapsedTime = 0f;
             while (elapsedTime < animationTime) {
                 textMeshPro.fontSize = Mathf.Lerp(initialFontSize, targetFontSize, elapsedTime / animationTime);
                 elapsedTime += Time.deltaTime;
                 yield return null;
             }
-            textMeshPro.fontSize = targetFontSize;  // ½T«O³Ì²×¦rÅé¤j¤p¹F¨ì¥Ø¼Ð
+            textMeshPro.fontSize = targetFontSize;  // ï¿½Tï¿½Oï¿½Ì²×¦rï¿½ï¿½jï¿½pï¿½Fï¿½ï¿½Ø¼ï¿½
 
-            // ÁY¤p°Êµe
+            // ï¿½Yï¿½pï¿½Êµe
             elapsedTime = 0f;
             while (elapsedTime < animationTime) {
                 textMeshPro.fontSize = Mathf.Lerp(targetFontSize, initialFontSize, elapsedTime / animationTime);

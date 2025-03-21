@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
-
 public class ScriptForCursor : MonoBehaviour {
 
     public Texture2D standard, o, x, triangle;
