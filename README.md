@@ -1,7 +1,7 @@
 3D Tic Tac Toe
 ===
 
->A simple 3D tic-tac-toc, it's easy... maybe?
+>A simple 3D Tic Tac Toe, it's easy... maybe?
 
 Main rule
 ---
