@@ -1,4 +1,4 @@
-3D Tic-tac-toc
+3D Tic Tac Toe
 ===
 
 >A simple 3D tic-tac-toc, it's easy... maybe?
