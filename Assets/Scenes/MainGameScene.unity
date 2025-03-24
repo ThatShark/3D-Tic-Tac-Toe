@@ -758,6 +758,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 2003290119}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: ArrowSetNotActive
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &178594640
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1369,13 +1381,25 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2003290117}
-        m_TargetAssemblyTypeName: 
-        m_MethodName: 
+      - m_Target: {fileID: 2003290119}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: SpinPress
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 2003290119}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: ArrowSetActive
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -2513,6 +2537,7 @@ GameObject:
   m_Component:
   - component: {fileID: 548545966}
   - component: {fileID: 548545965}
+  - component: {fileID: 548545967}
   m_Layer: 0
   m_Name: LeftArrow
   m_TagString: Untagged
@@ -2590,6 +2615,27 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 180}
+--- !u!65 &548545967
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 548545964}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 5.18, y: 5.52, z: 0.2}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &571387180
 GameObject:
   m_ObjectHideFlags: 0
@@ -2686,6 +2732,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 2003290119}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: ArrowSetNotActive
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &571387183
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2746,6 +2804,7 @@ GameObject:
   m_Component:
   - component: {fileID: 597570872}
   - component: {fileID: 597570871}
+  - component: {fileID: 597570873}
   m_Layer: 0
   m_Name: DownArrow
   m_TagString: Untagged
@@ -2823,6 +2882,27 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 180}
+--- !u!65 &597570873
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 597570870}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 5.1800013, y: 5.5200033, z: 0.20000128}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &670774921
 GameObject:
   m_ObjectHideFlags: 0
@@ -2910,6 +2990,18 @@ MonoBehaviour:
       - m_Target: {fileID: 2003290119}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
         m_MethodName: FlipPress
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 2003290119}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: ArrowSetNotActive
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3954,6 +4046,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 2003290119}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: ArrowSetNotActive
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &962801625
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4672,6 +4776,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1063939895}
   - component: {fileID: 1063939894}
+  - component: {fileID: 1063939896}
   m_Layer: 0
   m_Name: UpArrow
   m_TagString: Untagged
@@ -4749,6 +4854,27 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 270, z: 180}
+--- !u!65 &1063939896
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1063939893}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 5.1800013, y: 5.5200033, z: 0.20000128}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1121336891
 GameObject:
   m_ObjectHideFlags: 0
@@ -4836,6 +4962,18 @@ MonoBehaviour:
       - m_Target: {fileID: 2003290119}
         m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
         m_MethodName: TrianglePress
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 2003290119}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: ArrowSetNotActive
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6917,6 +7055,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1805771278}
   - component: {fileID: 1805771277}
+  - component: {fileID: 1805771279}
   m_Layer: 0
   m_Name: RightArrow
   m_TagString: Untagged
@@ -6994,6 +7133,27 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 180}
+--- !u!65 &1805771279
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1805771276}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 5.18, y: 5.52, z: 0.2}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &1937495975
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7262,6 +7422,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 2003290119}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: ArrowSetNotActive
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1983594144
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7386,6 +7558,10 @@ MonoBehaviour:
   SelectOCube: {fileID: 4765858980396252330, guid: e7bbfbbc904e5eb408adc123cc7582d1, type: 3}
   SelectXCube: {fileID: 6513594582940025665, guid: 820a415a671f3d349a8e31c7146db31d, type: 3}
   SelectTriangleCube: {fileID: 28841906979126098, guid: d07e659f9ced0f34a913200c5d6ca90a, type: 3}
+  upArrow: {fileID: 1063939893}
+  downArrow: {fileID: 597570870}
+  leftArrow: {fileID: 548545964}
+  rightArrow: {fileID: 1805771276}
 --- !u!1 &2037507012
 GameObject:
   m_ObjectHideFlags: 0
@@ -7605,7 +7781,31 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2079790758}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2003290119}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: SpinPress
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 2003290119}
+        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
+        m_MethodName: ArrowSetActive
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &2079790758
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7986,7 +8186,7 @@ SceneRoots:
   - {fileID: 2003290118}
   - {fileID: 1674027855}
   - {fileID: 82827700}
-  - {fileID: 548545966}
-  - {fileID: 597570872}
   - {fileID: 1063939895}
+  - {fileID: 597570872}
+  - {fileID: 548545966}
   - {fileID: 1805771278}
