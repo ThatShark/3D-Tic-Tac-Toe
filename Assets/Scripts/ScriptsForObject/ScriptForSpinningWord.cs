@@ -1,10 +1,9 @@
 using UnityEngine;
-
-public class RotateAroundPoint : MonoBehaviour {
-    public float rotationSpeed = 50f; // degree per seccond
-    public Vector3 centerPoint = Vector3.zero;
+public class ScriptForSpinningWord : MonoBehaviour {
+    public float rotationSpeed = 50f; // degree per second
 
     void Update() {
-        transform.RotateAround(centerPoint, Vector3.up, rotationSpeed * Time.deltaTime);
+        Quaternion rotation = Quaternion.Euler(0, rotationSpeed * Time.deltaTime, 0);
+        transform.rotation = transform.rotation * rotation;
     }
 }

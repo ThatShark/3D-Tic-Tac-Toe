@@ -10,11 +10,17 @@ public class ScriptForCursor : MonoBehaviour {
         Default
     }
     public CursorState cursorState;
+    private static ScriptForCursor instance;
 
     void Start() {
         Cursor.visible = true;
         cursorState = CursorState.Default;
-        DontDestroyOnLoad(gameObject);
+        if (instance == null) {
+            instance = this;
+            DontDestroyOnLoad(gameObject);
+        } else {
+            Destroy(gameObject);
+        }
     }
 
     void Update() {
