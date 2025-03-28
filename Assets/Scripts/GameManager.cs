@@ -22,7 +22,6 @@ public class GameManager : MonoBehaviour {
     private GameObject clickedCube = null;
     private bool isHoldingTriangle = false, isSpinning = false, isFlipping = false;
     private bool isOTriangleUsed, isXTriangleUsed, isOSpinUsed = false, isXSpinUsed = false, isOFlipUsed, isXFlipUsed;
-    public GameObject upArrow, downArrow, leftArrow, rightArrow;
     #endregion
 
     #region 主程序
@@ -94,10 +93,6 @@ public class GameManager : MonoBehaviour {
         triangleHoldingCanvas.SetActive(false);
         spinContinueCanvas.SetActive(false);
         flipContinueCanvas.SetActive(false);
-        upArrow.SetActive(false);
-        downArrow.SetActive(false);
-        rightArrow.SetActive(false);
-        leftArrow.SetActive(false);
 
         currentTurn = Player.O;
         winner = Player.Neither;
@@ -108,6 +103,9 @@ public class GameManager : MonoBehaviour {
         isXSpinUsed = false;
         isOFlipUsed = false;
         isXFlipUsed = false;
+        isHoldingTriangle = false;
+        isSpinning = false;
+        isFlipping = false;
 
         for (int x = 0; x < 3; x++) { // 清除舊方塊
             for (int y = 0; y < 4; y++) {
@@ -606,7 +604,6 @@ public class GameManager : MonoBehaviour {
                         Spin("LeftArrow");
                     }
                     spinContinueCanvas.SetActive(false);
-                    ArrowSetNotActive();
                     return true;
                 }
             }
@@ -621,51 +618,39 @@ public class GameManager : MonoBehaviour {
             if (Input.GetKeyDown(key)) {
                 switch (key) {
                     case KeyCode.W:
-                        ArrowSetNotActive();
                         TrianglePress();
                         return false;
                     case KeyCode.A:
-                        ArrowSetActive();
                         SpinPress();
                         return false;
                     case KeyCode.S:
-                        ArrowSetNotActive();
                         FlipPress();
                         return false;
                     case KeyCode.Q:
-                        ArrowSetNotActive();
                         CheckIfSurrender();
                         return false;
 
                     case KeyCode.UpArrow:
                         if (isSpinning && (isOSpinUsed == false || isXSpinUsed == false)) {
                             Spin("UpArrow");
-                            ArrowSetNotActive();
-                            spinContinueCanvas.SetActive(false);
                             return true;
                         }
                         return InputOX(true, clickedCube?.name);
                     case KeyCode.DownArrow:
                         if (isSpinning && (isOSpinUsed == false || isXSpinUsed == false)) {
                             Spin("DownArrow");
-                            ArrowSetNotActive();
-                            spinContinueCanvas.SetActive(false);
                             return true;
                         }
                         return InputOX(false, clickedCube?.name);
                     case KeyCode.RightArrow:
                         if (isSpinning && (isOSpinUsed == false || isXSpinUsed == false)) {
                             Spin("RightArrow");
-                            ArrowSetNotActive();
-                            spinContinueCanvas.SetActive(false);
                             return true;
                         }
                         return false;
                     case KeyCode.LeftArrow:
                         if (isSpinning && (isOSpinUsed == false || isXSpinUsed == false)) {
                             Spin("LeftArrow");
-                            ArrowSetNotActive();
-                            spinContinueCanvas.SetActive(false);
                             return true;
                         }
                         return false;
@@ -675,7 +660,6 @@ public class GameManager : MonoBehaviour {
                             triangleHoldingCanvas.SetActive(false);
                         }
                         if (isSpinning) {
-                            ArrowSetNotActive();
                             isSpinning = false;
                             spinContinueCanvas.SetActive(false);
                         }
@@ -725,18 +709,6 @@ public class GameManager : MonoBehaviour {
     }
     #endregion
     #region Spin
-    public void ArrowSetActive() {
-        upArrow.SetActive(true);
-        downArrow.SetActive(true);
-        rightArrow.SetActive(true);
-        leftArrow.SetActive(true);
-    }
-    public void ArrowSetNotActive() {
-        upArrow.SetActive(false);
-        downArrow.SetActive(false);
-        rightArrow.SetActive(false);
-        leftArrow.SetActive(false);
-    }
     // 當使用Spin時
     public void SpinPress() {
         if (isHoldingTriangle) {
@@ -816,7 +788,7 @@ public class GameManager : MonoBehaviour {
         DestroyAllSelect();
         AllCubeActive();
         isSpinning = false;
-        // Canvas.SetActive(false);
+        spinContinueCanvas.SetActive(false);
         if (currentTurn == Player.O) {
             isOSpinUsed = true;
             OSpinButton.SetActive(false);
