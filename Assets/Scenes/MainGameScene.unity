@@ -8151,7 +8151,7 @@ MonoBehaviour:
   XTriangleButton: {fileID: 1121336891}
   OSpinButton: {fileID: 2079790755}
   XSpinButton: {fileID: 298323190}
-  OFlipButton: {fileID: 1567241390}
+  OFlipButton: {fileID: 1983594141}
   XFlipButton: {fileID: 670774921}
   errorInputCanvas: {fileID: 898741178}
   errorSkillCanvas: {fileID: 1974450800}

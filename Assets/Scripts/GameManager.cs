@@ -831,7 +831,6 @@ public class GameManager : MonoBehaviour {
         }
     }
     void Flip() {
-        DestroyAllSelect();
         for (int i = 0; i < 3; i++) {
             for (int k = 0; k < 3; k++) {
                 int[] tempCubeTypeBoard = new int[3] { 0, 0, 0 };
@@ -865,6 +864,8 @@ public class GameManager : MonoBehaviour {
                 }
             }
         }
+
+        DestroyAllSelect();
         AllCubeActive();
         isFlipping = false;
         flipContinueCanvas.SetActive(false);
