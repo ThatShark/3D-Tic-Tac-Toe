@@ -19,5 +19,5 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Gamemode
   - 3×3×3 Map | Classic Mode
 
-[0.1.1]: https://github.com/ThatShark/3D-Tic-Tac-Toe/releases/compare/v0.1.1...v0.1.1
-[0.1.0]: https://github.com/ThatShark/3D-Tic-Tac-Toe/releases/compare/v0.1.0...v0.0.0
+[0.1.1]: https://github.com/ThatShark/3D-Tic-Tac-Toe/compare/v0.1.1...v0.1.0
+[0.1.0]: https://github.com/ThatShark/3D-Tic-Tac-Toe/compare/v0.1.0...v0.0.0
