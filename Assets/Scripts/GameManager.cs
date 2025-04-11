@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -15,7 +16,7 @@ public class GameManager : MonoBehaviour {
     private int[,,] cubeTypeBoard;
     private GameObject[,,] cubeBoard = new GameObject[3, 4, 3]; // 座標[7*(i-1), 7*(j-1), 7*(k-1)]
     private GameObject[,,] cubeSelectBoard = new GameObject[3, 4, 3];
-    public GameObject OCanvas, XCanvas, OWinText, XWinText;
+    public GameObject OCanvas, XCanvas, OWinText, XWinText, TieText;
     public GameObject OTriangleButton, XTriangleButton, OSpinButton, XSpinButton, OFlipButton, XFlipButton;
     public GameObject errorInputCanvas, errorSkillCanvas, triangleHoldingCanvas, spinContinueCanvas, flipContinueCanvas, checkBox, endScene;
     public GameObject EmptyCube, OCube, XCube, TriangleCube, SelectEmptyCube, SelectOCube, SelectXCube, SelectTriangleCube;
@@ -44,7 +45,23 @@ public class GameManager : MonoBehaviour {
                 flipContinueCanvas.SetActive(false);
                 endScene.SetActive(true);
 
-                ((winner == Player.O) ? XWinText : OWinText).SetActive(false);
+                switch(winner) {
+                    case Player.O:
+                        OWinText.SetActive(true);
+                        XWinText.SetActive(false);
+                        TieText.SetActive(false);
+                        break;
+                    case Player.X:
+                        OWinText.SetActive(false);
+                        XWinText.SetActive(true);
+                        TieText.SetActive(false);
+                        break;
+                    case Player.Neither:
+                        OWinText.SetActive(false);
+                        XWinText.SetActive(false);
+                        TieText.SetActive(true);
+                        break;
+                }
                 if (Input.GetKeyDown(KeyCode.Escape)) {
                     buttonManager.SwitchSceneTo(0);
                 } else if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) {
@@ -52,7 +69,6 @@ public class GameManager : MonoBehaviour {
                 }
                 break;
             case Player.Checking:
-                cursorManager.cursorState = ScriptForCursor.CursorState.Default;
                 if (Input.GetKeyDown(KeyCode.Escape)) {
                     CancelSurrender();
                 } else if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) {
@@ -79,8 +95,9 @@ public class GameManager : MonoBehaviour {
     #region 通用方法
     // 重置場景
     public void ResetScene() {
-        XWinText.SetActive(true);
         OWinText.SetActive(true);
+        XWinText.SetActive(true);
+        TieText.SetActive(true);
         endScene.SetActive(false);
         OCanvas.SetActive(true);
         OTriangleButton.SetActive(true);
@@ -404,7 +421,7 @@ public class GameManager : MonoBehaviour {
     #region 判斷
     // 判斷是否下一輪
     void CheckIfNextTurn() {
-        if (SomeoneHasWin()) {
+        if (SomeoneHasWin() || SomeoneCantDoAnything()) {
             currentTurn = Player.Neither;
         } else if (IsMoveComplete()) {
             clickedCube = null;
@@ -681,6 +698,30 @@ public class GameManager : MonoBehaviour {
             }
         }
         return false;
+    }
+
+    bool SomeoneCantDoAnything() {
+        if (currentTurn == Player.O) {
+            if (!isOTriangleUsed || !isOSpinUsed || !isOFlipUsed) {
+                return false;
+            }
+        } else {
+            if (!isXTriangleUsed || !isXSpinUsed || !isXFlipUsed) {
+                return false;
+            }
+        }
+        bool flag = true;
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                for (int k = 0; k < 3; k++) {
+                    if (cubeTypeBoard[i, j, k] == 0) {
+                        flag = false;
+                        break;
+                    }
+                }
+            }
+        }
+        return flag;
     }
     #endregion
 
