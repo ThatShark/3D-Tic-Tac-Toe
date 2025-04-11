@@ -37,7 +37,7 @@ When using the skill, all items can rotate 90 degrees in one of the four directi
 ***Caution: Blocks that were originally moved beyond the third layer due to the triangle will disappear after the rotation.***
 
 - Flip:
-When using the skill, all items will be flipped upside down. After the flip, the effects will be the same as the "spin" skill.
+When using the skill, all items will be flipped upside down. After the flip, all items will still be affected by gravity and the triangle's effects.
 
 Shortcut Keys
 ---

@@ -1737,8 +1737,8 @@ MonoBehaviour:
     Flip:
 
     When
-    using the skill, all items will be flipped upside down. After the flip, the effects
-    will be the same as the "spin" skill.'
+    using the skill, all items will be flipped upside down. After the flip, all items
+    will still be affected by gravity and the triangle''s effects.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 6f56b4062ecf0f14991e30cc0e81aa5a, type: 2}
   m_sharedMaterial: {fileID: -1235169476982058409, guid: 6f56b4062ecf0f14991e30cc0e81aa5a, type: 2}
