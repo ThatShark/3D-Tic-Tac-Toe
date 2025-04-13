@@ -2,7 +2,7 @@ using JetBrains.Annotations;
 using System;
 using System.Collections;
 using UnityEngine;
-public class GameManager : MonoBehaviour {
+public class ThreeDimensionClassicGameManager : MonoBehaviour {
     #region 變數宣告
     public enum Player {
         O,
@@ -28,7 +28,7 @@ public class GameManager : MonoBehaviour {
     #region 主程序
     void Start() {
         currentTurn = Player.O;
-        cursorManager = FindFirstObjectByType<ScriptForCursor>();
+        // cursorManager = FindFirstObjectByType<ScriptForCursor>();
         buttonManager = FindFirstObjectByType<ScriptForButton>();
         ResetScene();
     }
@@ -36,7 +36,7 @@ public class GameManager : MonoBehaviour {
     void Update() {
         switch (currentTurn) {
             case Player.Neither:
-                cursorManager.cursorState = ScriptForCursor.CursorState.Default;
+                // cursorManager.cursorState = ScriptForCursor.CursorState.Default;
                 checkBox.SetActive(false);
                 OCanvas.SetActive(false);
                 XCanvas.SetActive(false);
@@ -63,12 +63,13 @@ public class GameManager : MonoBehaviour {
                         break;
                 }
                 if (Input.GetKeyDown(KeyCode.Escape)) {
-                    buttonManager.SwitchSceneTo(0);
+                    buttonManager.OnBackButtonClicked();
                 } else if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) {
                     ResetScene();
                 }
                 break;
             case Player.Checking:
+                // cursorManager.cursorState = ScriptForCursor.CursorState.Default;
                 if (Input.GetKeyDown(KeyCode.Escape)) {
                     CancelSurrender();
                 } else if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter)) {
@@ -76,15 +77,15 @@ public class GameManager : MonoBehaviour {
                 }
                 break;
             default:
-                if (isHoldingTriangle) {
-                    cursorManager.cursorState = ScriptForCursor.CursorState.Triangle;
-                } else {
-                    if (currentTurn == Player.O) {
-                        cursorManager.cursorState = ScriptForCursor.CursorState.O;
-                    } else {
-                        cursorManager.cursorState = ScriptForCursor.CursorState.X;
-                    }
-                }
+                // if (isHoldingTriangle) {
+                //     cursorManager.cursorState = ScriptForCursor.CursorState.Triangle;
+                // } else {
+                //     if (currentTurn == Player.O) {
+                //         cursorManager.cursorState = ScriptForCursor.CursorState.O;
+                //     } else {
+                //         cursorManager.cursorState = ScriptForCursor.CursorState.X;
+                //     }
+                // }
                 IsNumberPress();
                 CheckIfNextTurn();
                 break;
