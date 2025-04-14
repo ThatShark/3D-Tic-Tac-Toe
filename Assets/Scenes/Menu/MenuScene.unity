@@ -1963,7 +1963,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   transitionAnimator: {fileID: 90491296}
-  transitionTime: 1
+  transitionTime: 0.5
 --- !u!114 &1884546619
 MonoBehaviour:
   m_ObjectHideFlags: 0

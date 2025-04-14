@@ -45,7 +45,9 @@ public class SceneHistoryManager : MonoBehaviour {
         yield return new WaitForSeconds(transitionTime);
 
         SceneManager.LoadScene(sceneName);
+
+        // 淡入
+        transitionAnimator.SetTrigger("FadeIn");
+        yield return new WaitForSeconds(transitionTime);
     }
 }
-
-#TODO: Fix Scene Transition Bug
