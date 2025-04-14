@@ -12,7 +12,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Menu/AboutScene.unity
     guid: eb67b2a7ef01d9543b9b136632604310
   - enabled: 1
-    path: Assets/Scenes/Menu/RuleScene.unity
+    path: Assets/Scenes/Rule/3DClassicRuleScene.unity
     guid: 06d87b395c76dc44f974b9edb2b5a796
   - enabled: 1
     path: Assets/Scenes/Select/SelectMapScene.unity

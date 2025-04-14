@@ -1,9 +1,9 @@
-3D Tic Tac Toe
+Tic Tac Toe
 ===
 
->A simple 3D Tic Tac Toe, it's easy... maybe?
+> Many kinds of simple Tic Tac Toe games, it's easy... maybe?
 
-Main rule
+3D Classic Mode rule
 ---
 
 Player who gets more **Victory Conditions**  at the same time wins the game.
