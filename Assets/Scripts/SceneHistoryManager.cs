@@ -40,14 +40,18 @@ public class SceneHistoryManager : MonoBehaviour {
     }
 
     private IEnumerator LoadSceneWithTransition(string sceneName) {
-        // 淡出
-        transitionAnimator.SetTrigger("FadeOut");
-        yield return new WaitForSeconds(transitionTime);
+        if (sceneName.Contains("Game")) {
+            // 淡出
+            transitionAnimator.SetTrigger("FadeOut");
+            yield return new WaitForSeconds(transitionTime);
+        }
 
         SceneManager.LoadScene(sceneName);
 
-        // 淡入
-        transitionAnimator.SetTrigger("FadeIn");
-        yield return new WaitForSeconds(transitionTime);
+        if (sceneName.Contains("Game")) {
+            // 淡入
+            transitionAnimator.SetTrigger("FadeIn");
+            yield return new WaitForSeconds(transitionTime);
+        }
     }
 }
