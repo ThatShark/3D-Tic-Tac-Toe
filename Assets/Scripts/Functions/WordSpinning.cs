@@ -1,5 +1,5 @@
 using UnityEngine;
-public class ScriptForSpinningWord : MonoBehaviour {
+public class WordSpinning : MonoBehaviour {
     public float rotationSpeed = 50f; // degree per second
 
     void Update() {

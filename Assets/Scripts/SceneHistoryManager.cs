@@ -2,6 +2,7 @@
 using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 
 public class SceneHistoryManager : MonoBehaviour {
     public static SceneHistoryManager Instance;
@@ -17,6 +18,10 @@ public class SceneHistoryManager : MonoBehaviour {
         } else {
             Destroy(gameObject);
         }
+    }
+    public string owo;
+    void Update() {
+        owo = (sceneStack.Count == 0) ? null : sceneStack.Peek();
     }
 
     public void LoadScene(string sceneName) {

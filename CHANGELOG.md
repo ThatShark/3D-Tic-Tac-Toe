@@ -15,6 +15,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Button Switch Scene Code
 
+### Fixed
+
+- Synchronize button and text colors
+
 ## [0.1.1] - 2025-04-11
 
 ### Added

@@ -1,7 +1,15 @@
-using UnityEditor; // 匯出時要刪掉這行
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 using UnityEngine;
-using UnityEngine.SceneManagement;
-public class ScriptForButton : MonoBehaviour {
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
+
+public class ScriptForButton : MonoBehaviour, IPointerDownHandler, IPointerUpHandler {
+    public UnityEvent onClick;
+    private bool isPointerDown = false;
+
     public void SwitchSceneTo(string sceneName) {
         SceneHistoryManager.Instance.LoadScene(sceneName);
     }
@@ -11,7 +19,20 @@ public class ScriptForButton : MonoBehaviour {
     }
 
     public void QuitGame() {
-        EditorApplication.isPlaying = false; // 匯出時要刪掉這行
+        #if UNITY_EDITOR
+        EditorApplication.isPlaying = false;
+        #endif
         Application.Quit();
+    }
+
+    public void OnPointerDown(PointerEventData eventData) {
+        isPointerDown = true;
+    }
+
+    public void OnPointerUp(PointerEventData eventData) {
+        if (isPointerDown) {
+            onClick.Invoke();
+            isPointerDown = false;
+        }
     }
 }
