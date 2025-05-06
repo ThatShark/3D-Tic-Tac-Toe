@@ -4,13 +4,25 @@ MonoImporter:
   externalObjects: {}
   serializedVersion: 2
   defaultReferences:
-  - emptyCube: {fileID: 2085359752843085642, guid: 990c4d435c4f43447bd0d2cb691c9fbb, type: 3}
   - OCanvas: {instanceID: 0}
   - XCanvas: {instanceID: 0}
-  - endScene: {instanceID: 0}
   - OWinText: {instanceID: 0}
   - XWinText: {instanceID: 0}
+  - TieText: {instanceID: 0}
+  - OTriangleButton: {instanceID: 0}
+  - XTriangleButton: {instanceID: 0}
+  - OSpinButton: {instanceID: 0}
+  - XSpinButton: {instanceID: 0}
+  - OFlipButton: {instanceID: 0}
+  - XFlipButton: {instanceID: 0}
+  - errorInputCanvas: {instanceID: 0}
+  - errorSkillCanvas: {instanceID: 0}
+  - triangleHoldingCanvas: {instanceID: 0}
+  - spinContinueCanvas: {instanceID: 0}
+  - flipContinueCanvas: {instanceID: 0}
   - checkBox: {instanceID: 0}
+  - endScene: {instanceID: 0}
+  - EmptyCube: {fileID: 2085359752843085642, guid: 990c4d435c4f43447bd0d2cb691c9fbb, type: 3}
   - OCube: {fileID: 6537482977566134169, guid: b64fa0cbf0505e64989e48322d747d5b, type: 3}
   - XCube: {fileID: 6296116877947703313, guid: 00b92d1956d487543a252c33010e1497, type: 3}
   - TriangleCube: {fileID: 5879422825265038353, guid: 7a69fe0a0ad54df4d8e0957f04448e53, type: 3}
@@ -18,8 +30,6 @@ MonoImporter:
   - SelectOCube: {fileID: 4765858980396252330, guid: e7bbfbbc904e5eb408adc123cc7582d1, type: 3}
   - SelectXCube: {fileID: 6513594582940025665, guid: 820a415a671f3d349a8e31c7146db31d, type: 3}
   - SelectTriangleCube: {fileID: 28841906979126098, guid: d07e659f9ced0f34a913200c5d6ca90a, type: 3}
-  - surrenderButton: {instanceID: 0}
-  - clickedObject: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
